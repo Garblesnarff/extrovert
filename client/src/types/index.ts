@@ -12,6 +12,8 @@ export interface PostFormData {
   scheduledFor?: Date;
   scheduledTime?: string;
   isDraft?: boolean;
+  recurringPattern?: 'daily' | 'weekly' | 'monthly' | null;
+  recurringEndDate?: Date;
 }
 
 export interface AIAssistResponse {

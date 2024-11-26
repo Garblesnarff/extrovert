@@ -42,14 +42,51 @@ export function registerRoutes(app: Express) {
 
   app.post('/api/posts', async (req, res) => {
     try {
-      const post = await db.insert(posts).values({
-        content: req.body.content,
-        scheduledFor: req.body.scheduledFor,
-        isDraft: req.body.isDraft,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }).returning();
-      res.json(post[0]);
+      if (req.body.recurringPattern && req.body.scheduledFor && req.body.recurringEndDate) {
+        // Create recurring posts
+        const startDate = new Date(req.body.scheduledFor);
+        const endDate = new Date(req.body.recurringEndDate);
+        const posts = [];
+        let currentDate = startDate;
+
+        while (currentDate <= endDate) {
+          posts.push({
+            content: req.body.content,
+            scheduledFor: currentDate.toISOString(),
+            isDraft: req.body.isDraft,
+            recurringPattern: req.body.recurringPattern,
+            recurringEndDate: endDate.toISOString(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          // Calculate next date based on pattern
+          switch (req.body.recurringPattern) {
+            case 'daily':
+              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+              break;
+            case 'weekly':
+              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+              break;
+            case 'monthly':
+              currentDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+              break;
+          }
+        }
+
+        const result = await db.insert(posts).values(posts).returning();
+        res.json(result[0]); // Return the first post
+      } else {
+        // Create single post
+        const post = await db.insert(posts).values({
+          content: req.body.content,
+          scheduledFor: req.body.scheduledFor,
+          isDraft: req.body.isDraft,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }).returning();
+        res.json(post[0]);
+      }
     } catch (error) {
       res.status(500).json({ error: 'Failed to create post' });
     }

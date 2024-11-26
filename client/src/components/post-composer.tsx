@@ -5,6 +5,7 @@ import { Calendar, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { TimeSelect } from '@/components/ui/time-select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -72,6 +73,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
       scheduledFor: undefined,
       scheduledTime: undefined,
       isDraft: false,
+      recurringPattern: null,
+      recurringEndDate: undefined,
     },
   });
 
@@ -85,6 +88,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
           : undefined,
         isDraft: initialPost.isDraft,
+        recurringPattern: null,
+        recurringEndDate: undefined,
       });
     }
   }, [initialPost, editor, form]);
@@ -116,20 +121,23 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
 
   const onSubmit = async (data: PostFormData) => {
     try {
-      if (initialPost) {
-        const scheduledDate = data.scheduledFor && data.scheduledTime
-          ? new Date(
-              new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
-            )
-          : undefined;
+      const scheduledDate = data.scheduledFor && data.scheduledTime
+        ? new Date(
+            new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+          )
+        : undefined;
 
+      if (initialPost) {
         await updatePost.mutateAsync({ 
           id: initialPost.id, 
           ...data,
           scheduledFor: scheduledDate,
         });
       } else {
-        await createPost.mutateAsync(data);
+        await createPost.mutateAsync({
+          ...data,
+          scheduledFor: scheduledDate,
+        });
       }
       form.reset();
       if (editor) {
@@ -232,6 +240,36 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                         form.setValue('scheduledTime', time);
                       }}
                     />
+                    <Select
+                      value={form.getValues('recurringPattern') || ''}
+                      onValueChange={(value) => {
+                        form.setValue('recurringPattern', value === '' ? null : value as 'daily' | 'weekly' | 'monthly');
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Repeat..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">No repeat</SelectItem>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {form.watch('recurringPattern') && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">End Date</p>
+                        <CalendarComponent
+                          mode="single"
+                          selected={form.watch('recurringEndDate')}
+                          onSelect={(date: Date | undefined) => {
+                            form.setValue('recurringEndDate', date);
+                          }}
+                          disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+                          className="rounded-md border"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="flex justify-end gap-2">
                     <Button
@@ -239,6 +277,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                       onClick={() => {
                         form.setValue('scheduledFor', undefined);
                         form.setValue('scheduledTime', undefined);
+                        form.setValue('recurringPattern', null);
+                        form.setValue('recurringEndDate', undefined);
                         setShowSchedule(false);
                       }}
                     >
@@ -248,6 +288,11 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                       onClick={() => {
                         if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
                           setErrorMessage('Please select both date and time for scheduling');
+                          setShowError(true);
+                          return;
+                        }
+                        if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+                          setErrorMessage('Please select an end date for recurring posts');
                           setShowError(true);
                           return;
                         }
@@ -281,6 +326,11 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                 const scheduledTime = form.getValues('scheduledTime');
                 if ((scheduledFor && !scheduledTime) || (!scheduledFor && scheduledTime)) {
                   setErrorMessage('Please select both date and time for scheduling');
+                  setShowError(true);
+                  return;
+                }
+                if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+                  setErrorMessage('Please select an end date for recurring posts');
                   setShowError(true);
                   return;
                 }

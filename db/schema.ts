@@ -16,6 +16,8 @@ export const posts = pgTable("posts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   userId: integer("user_id").references(() => users.id),
+  recurringPattern: text("recurring_pattern"),
+  recurringEndDate: timestamp("recurring_end_date"),
 });
 
 export const insertUserSchema = createInsertSchema(users);
