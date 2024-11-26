@@ -6,7 +6,8 @@ import {
   Settings, 
   Sun, 
   Moon, 
-  Laptop 
+  Laptop,
+  BarChart 
 } from 'lucide-react';
 import { DialogTitle } from '@/components/ui/dialog';
 
@@ -56,6 +57,13 @@ export function CommandMenu() {
         <CommandEmpty>No results found.</CommandEmpty>
         
         <CommandGroup heading="Actions">
+          <CommandItem
+            onSelect={() => runCommand(() => setLocation('/analytics'))}
+          >
+            <BarChart className="mr-2 h-4 w-4" />
+            Analytics
+            <CommandShortcut>⌘A</CommandShortcut>
+          </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => setLocation('/new'))}
           >

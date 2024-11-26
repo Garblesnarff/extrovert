@@ -4,30 +4,15 @@ import { posts } from "@db/schema";
 import { eq, asc, desc } from "drizzle-orm";
 
 export function registerRoutes(app: Express) {
-  // Posts
-  app.post('/api/posts', async (req, res) => {
+  // Posts Routes
+  app.get('/api/posts', async (req, res) => {
     try {
-      // Validate required fields
-      if (!req.body.content) {
-        return res.status(400).json({ error: 'Content is required' });
-      }
-
-      const post = await db.insert(posts).values({
-        content: req.body.content,
-        scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
-        isDraft: req.body.isDraft || false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }).returning();
-
-      res.json(post[0]);
+      const allPosts = await db.query.posts.findMany({
+        orderBy: desc(posts.createdAt),
+      });
+      res.json(allPosts);
     } catch (error) {
-      console.error('Failed to create post:', error);
-      if (error instanceof Error) {
-        res.status(500).json({ error: error.message });
-      } else {
-        res.status(500).json({ error: 'Failed to create post' });
-      }
+      res.status(500).json({ error: 'Failed to fetch posts' });
     }
   });
 
@@ -35,7 +20,7 @@ export function registerRoutes(app: Express) {
     try {
       const drafts = await db.query.posts.findMany({
         where: eq(posts.isDraft, true),
-        orderBy: desc(posts.updatedAt),
+        orderBy: desc(posts.createdAt),
       });
       res.json(drafts);
     } catch (error) {
@@ -47,7 +32,7 @@ export function registerRoutes(app: Express) {
     try {
       const scheduled = await db.query.posts.findMany({
         where: eq(posts.isDraft, false),
-        orderBy: asc(posts.scheduledFor),
+        orderBy: desc(posts.createdAt),
       });
       res.json(scheduled);
     } catch (error) {
@@ -55,12 +40,18 @@ export function registerRoutes(app: Express) {
     }
   });
 
-  app.delete('/api/posts/:id', async (req, res) => {
+  app.post('/api/posts', async (req, res) => {
     try {
-      await db.delete(posts).where(eq(posts.id, parseInt(req.params.id)));
-      res.json({ success: true });
+      const post = await db.insert(posts).values({
+        content: req.body.content,
+        scheduledFor: req.body.scheduledFor,
+        isDraft: req.body.isDraft,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }).returning();
+      res.json(post[0]);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete post' });
+      res.status(500).json({ error: 'Failed to create post' });
     }
   });
 
@@ -69,8 +60,8 @@ export function registerRoutes(app: Express) {
       const post = await db.update(posts)
         .set({
           content: req.body.content,
-          scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
-          isDraft: req.body.isDraft || false,
+          scheduledFor: req.body.scheduledFor,
+          isDraft: req.body.isDraft,
           updatedAt: new Date(),
         })
         .where(eq(posts.id, parseInt(req.params.id)))
@@ -78,6 +69,16 @@ export function registerRoutes(app: Express) {
       res.json(post[0]);
     } catch (error) {
       res.status(500).json({ error: 'Failed to update post' });
+    }
+  });
+
+  app.delete('/api/posts/:id', async (req, res) => {
+    try {
+      await db.delete(posts)
+        .where(eq(posts.id, parseInt(req.params.id)));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to delete post' });
     }
   });
 
@@ -106,6 +107,56 @@ export function registerRoutes(app: Express) {
       res.json(research);
     } catch (error) {
       res.status(500).json({ error: 'Failed to research content' });
+    }
+  });
+
+  // Analytics Routes
+  app.get('/api/analytics', async (req, res) => {
+    try {
+      const [postsCount, draftsCount, scheduledCount] = await Promise.all([
+        db.query.posts.count(),
+        db.query.posts.count({ where: eq(posts.isDraft, true) }),
+        db.query.posts.count({ where: eq(posts.isDraft, false) })
+      ]);
+
+      const recentPosts = await db.query.posts.findMany({
+        orderBy: desc(posts.createdAt),
+        limit: 30,
+      });
+
+      // Calculate post frequency by day
+      const postsByDay = recentPosts.reduce((acc: Record<string, number>, post) => {
+        const date = new Date(post.createdAt).toISOString().split('T')[0];
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Calculate average content length
+      const averageLength = recentPosts.reduce((sum, post) => sum + post.content.length, 0) / (recentPosts.length || 1);
+
+      // Get scheduled post distribution by hour
+      const scheduledPosts = await db.query.posts.findMany({
+        where: eq(posts.isDraft, false),
+      });
+
+      const scheduleByHour = scheduledPosts.reduce((acc: Record<number, number>, post) => {
+        if (post.scheduledFor) {
+          const hour = new Date(post.scheduledFor).getHours();
+          acc[hour] = (acc[hour] || 0) + 1;
+        }
+        return acc;
+      }, {});
+
+      res.json({
+        total: postsCount,
+        drafts: draftsCount,
+        scheduled: scheduledCount,
+        postsByDay,
+        averageContentLength: Math.round(averageLength),
+        scheduleByHour,
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch analytics' });
     }
   });
 }
