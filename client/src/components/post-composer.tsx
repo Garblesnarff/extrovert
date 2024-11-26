@@ -116,10 +116,10 @@ export function PostComposer() {
   return (
     <Form {...form}>
       <AlertDialog open={showError} onOpenChange={setShowError}>
-        <AlertDialogContent aria-describedby="error-description">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle id="error-title">Error</AlertDialogTitle>
-            <AlertDialogDescription id="error-description">{errorMessage}</AlertDialogDescription>
+            <AlertDialogTitle>Error</AlertDialogTitle>
+            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <Button variant="outline" onClick={() => setShowError(false)}>
@@ -145,8 +145,8 @@ export function PostComposer() {
           )}
         />
 
-        <div className="space-y-4">
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-4 mt-4">
+          <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -186,11 +186,12 @@ export function PostComposer() {
                     <CalendarComponent
                       mode="single"
                       selected={form.watch('scheduledFor')}
-                      onSelect={(date) => {
+                      onSelect={(date: Date | undefined) => {
                         form.setValue('scheduledFor', date);
                       }}
                       disabled={(date) => date < new Date()}
                       className="rounded-md border"
+                      initialFocus
                     />
                     <TimeSelect
                       value={form.getValues('scheduledTime')}
@@ -230,7 +231,7 @@ export function PostComposer() {
           <div className="flex justify-end gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={() => {
                 form.setValue('isDraft', true);
                 form.handleSubmit(onSubmit)();
@@ -241,10 +242,11 @@ export function PostComposer() {
             </Button>
             <Button
               type="submit"
+              variant="primary"
               onClick={() => {
                 const scheduledFor = form.getValues('scheduledFor');
                 const scheduledTime = form.getValues('scheduledTime');
-                if (scheduledFor && !scheduledTime || !scheduledFor && scheduledTime) {
+                if ((scheduledFor && !scheduledTime) || (!scheduledFor && scheduledTime)) {
                   setErrorMessage('Please select both date and time for scheduling');
                   setShowError(true);
                   return;
