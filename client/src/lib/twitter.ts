@@ -1,0 +1,48 @@
+import { useMutation, useQuery } from '@tanstack/react-query';
+import type { Post, PostFormData } from '../types';
+
+export const useCreatePost = () => {
+  return useMutation({
+    mutationFn: async (data: PostFormData) => {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create post');
+      }
+      
+      return response.json();
+    },
+  });
+};
+
+export const useDrafts = () => {
+  return useQuery({
+    queryKey: ['drafts'],
+    queryFn: async () => {
+      const response = await fetch('/api/posts/drafts');
+      if (!response.ok) {
+        throw new Error('Failed to fetch drafts');
+      }
+      return response.json() as Promise<Post[]>;
+    },
+  });
+};
+
+export const useScheduledPosts = () => {
+  return useQuery({
+    queryKey: ['scheduled'],
+    queryFn: async () => {
+      const response = await fetch('/api/posts/scheduled');
+      if (!response.ok) {
+        throw new Error('Failed to fetch scheduled posts');
+      }
+      return response.json() as Promise<Post[]>;
+    },
+  });
+};
