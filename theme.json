@@ -2,9 +2,5 @@
   "variant": "professional",
   "primary": "hsl(212, 100%, 45%)",
   "appearance": "system",
-  "radius": 0.5,
-  "calendar": {
-    "selected": "bg-primary text-primary-foreground hover:bg-primary/90",
-    "today": "bg-accent text-accent-foreground"
-  }
+  "radius": 0.5
 }

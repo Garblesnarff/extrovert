@@ -11,21 +11,3 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
-
-@layer components {
-  .ProseMirror {
-    @apply min-h-[100px] outline-none;
-  }
-
-  .ProseMirror p.is-editor-empty:first-child::before {
-    @apply text-muted-foreground;
-    content: "What's on your mind?";
-    float: left;
-    pointer-events: none;
-    height: 0;
-  }
-}
-
-.tiptap {
-  @apply prose prose-sm max-w-none dark:prose-invert;
-}

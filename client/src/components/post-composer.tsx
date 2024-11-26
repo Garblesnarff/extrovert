@@ -17,8 +17,6 @@ import {
 } from '@/components/ui/form';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -115,39 +113,30 @@ export function PostComposer() {
     }
   };
 
-  const formatScheduleDate = (date: Date | undefined, time: string | undefined): string => {
-    if (!date) return 'Schedule';
-    const dateStr = date.toLocaleDateString();
-    return time ? `Scheduled for ${dateStr} ${time}` : dateStr;
-  };
-
   return (
     <Form {...form}>
       <AlertDialog open={showError} onOpenChange={setShowError}>
-        <AlertDialogContent>
+        <AlertDialogContent aria-describedby="error-description">
           <AlertDialogHeader>
-            <AlertDialogTitle>Error Occurred</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+            <AlertDialogTitle id="error-title">Error</AlertDialogTitle>
+            <AlertDialogDescription id="error-description">{errorMessage}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel asChild>
-              <Button variant="secondary">Cancel</Button>
-            </AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <Button onClick={() => setShowError(false)}>Close</Button>
-            </AlertDialogAction>
+            <Button variant="outline" onClick={() => setShowError(false)}>
+              Close
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="content"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <div className="rounded-lg border border-input bg-background p-4">
+                <div className="border rounded-md p-4">
                   <EditorContent editor={editor} className="min-h-[100px] prose prose-sm max-w-none" />
                 </div>
               </FormControl>
@@ -157,7 +146,7 @@ export function PostComposer() {
         />
 
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
+          <div className="flex gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -177,16 +166,18 @@ export function PostComposer() {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
             <Popover open={showSchedule} onOpenChange={setShowSchedule}>
               <PopoverTrigger asChild>
                 <Button 
                   variant="outline" 
                   type="button"
-                  className={`gap-2 ${form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}`}
+                  className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
                 >
-                  <Calendar className="h-4 w-4" />
-                  {formatScheduleDate(form.getValues('scheduledFor'), form.getValues('scheduledTime'))}
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {form.getValues('scheduledFor') && form.getValues('scheduledTime') 
+                    ? `Scheduled for ${new Date(form.getValues('scheduledFor')).toLocaleDateString()} ${form.getValues('scheduledTime')}`
+                    : 'Schedule'
+                  }
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-4" align="start">
@@ -199,12 +190,6 @@ export function PostComposer() {
                         form.setValue('scheduledFor', date);
                       }}
                       disabled={(date) => date < new Date()}
-                      className="rounded-md border shadow"
-                      classNames={{
-                        day_selected: "bg-primary text-primary-foreground hover:bg-primary/90",
-                        day_today: "bg-accent text-accent-foreground",
-                      }}
-                      initialFocus
                     />
                     <TimeSelect
                       value={form.getValues('scheduledTime')}
@@ -215,7 +200,6 @@ export function PostComposer() {
                   </div>
                   <div className="flex justify-end gap-2">
                     <Button
-                      type="button"
                       variant="outline"
                       onClick={() => {
                         form.setValue('scheduledFor', undefined);
@@ -226,7 +210,6 @@ export function PostComposer() {
                       Clear
                     </Button>
                     <Button
-                      type="button"
                       onClick={() => {
                         if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
                           setErrorMessage('Please select both date and time for scheduling');
@@ -243,8 +226,7 @@ export function PostComposer() {
               </PopoverContent>
             </Popover>
           </div>
-
-          <div className="flex justify-end gap-2 border-t pt-4">
+          <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="outline"
@@ -253,13 +235,11 @@ export function PostComposer() {
                 form.handleSubmit(onSubmit)();
               }}
               disabled={createPost.isPending}
-              className="min-w-[120px]"
             >
               Save as Draft
             </Button>
             <Button
               type="submit"
-              variant="default"
               onClick={() => {
                 const scheduledFor = form.getValues('scheduledFor');
                 const scheduledTime = form.getValues('scheduledTime');
@@ -271,7 +251,6 @@ export function PostComposer() {
                 form.setValue('isDraft', false);
               }}
               disabled={createPost.isPending}
-              className="min-w-[120px]"
             >
               {createPost.isPending ? 'Posting...' : 'Post'}
             </Button>
