@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -5,13 +6,15 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { PostCard } from './post-card';
-import { useDrafts, useDeletePost, useUpdatePost } from '../lib/twitter';
+import { EditDialog } from './edit-dialog';
+import { useDrafts, useDeletePost } from '../lib/twitter';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Post } from '../types';
 
 export function DraftList() {
   const { data: drafts, isLoading } = useDrafts();
   const deletePost = useDeletePost();
-  const updatePost = useUpdatePost();
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   if (isLoading) {
     return (
@@ -36,13 +39,22 @@ export function DraftList() {
               <PostCard
                 key={draft.id}
                 post={draft}
-                onEdit={() => {/* TODO: Implement edit dialog */}}
+                onEdit={() => setEditingPost(draft)}
                 onDelete={() => deletePost.mutate(draft.id)}
               />
             ))}
           </div>
         </AccordionContent>
       </AccordionItem>
+      {editingPost && (
+        <EditDialog
+          post={editingPost}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) setEditingPost(null);
+          }}
+        />
+      )}
     </Accordion>
   );
 }

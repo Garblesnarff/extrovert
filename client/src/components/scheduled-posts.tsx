@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -5,13 +6,15 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { PostCard } from './post-card';
-import { useScheduledPosts, useDeletePost, useUpdatePost } from '../lib/twitter';
+import { EditDialog } from './edit-dialog';
+import { useScheduledPosts, useDeletePost } from '../lib/twitter';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Post } from '../types';
 
 export function ScheduledPosts() {
   const { data: scheduled, isLoading } = useScheduledPosts();
   const deletePost = useDeletePost();
-  const updatePost = useUpdatePost();
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   if (isLoading) {
     return (
@@ -38,13 +41,22 @@ export function ScheduledPosts() {
               <PostCard
                 key={post.id}
                 post={post}
-                onEdit={() => {/* TODO: Implement edit dialog */}}
+                onEdit={() => setEditingPost(post)}
                 onDelete={() => deletePost.mutate(post.id)}
               />
             ))}
           </div>
         </AccordionContent>
       </AccordionItem>
+      {editingPost && (
+        <EditDialog
+          post={editingPost}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) setEditingPost(null);
+          }}
+        />
+      )}
     </Accordion>
   );
 }

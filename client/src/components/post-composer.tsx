@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar, Wand2 } from 'lucide-react';
@@ -35,17 +35,22 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { useCreatePost } from '../lib/twitter';
+import { useCreatePost, useUpdatePost } from '../lib/twitter';
 import { useAIAssistant } from '../lib/crewai';
-import { insertPostSchema } from '@db/schema';
-import type { PostFormData } from '../types';
+import type { PostFormData, Post } from '../types';
 
-export function PostComposer() {
+interface PostComposerProps {
+  initialPost?: Post;
+  onSuccess?: () => void;
+}
+
+export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const [showSchedule, setShowSchedule] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { toast } = useToast();
   const createPost = useCreatePost();
+  const updatePost = useUpdatePost();
   const aiAssistant = useAIAssistant();
   
   const editor = useEditor({
@@ -62,7 +67,6 @@ export function PostComposer() {
   });
 
   const form = useForm<PostFormData>({
-    resolver: zodResolver(insertPostSchema),
     defaultValues: {
       content: '',
       scheduledFor: undefined,
@@ -70,6 +74,20 @@ export function PostComposer() {
       isDraft: false,
     },
   });
+
+  useEffect(() => {
+    if (initialPost && editor) {
+      editor.commands.setContent(initialPost.content);
+      form.reset({
+        content: initialPost.content,
+        scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+        scheduledTime: initialPost.scheduledFor ? 
+          new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+          : undefined,
+        isDraft: initialPost.isDraft,
+      });
+    }
+  }, [initialPost, editor, form]);
 
   const handleAIAssist = async () => {
     try {
@@ -98,17 +116,32 @@ export function PostComposer() {
 
   const onSubmit = async (data: PostFormData) => {
     try {
-      await createPost.mutateAsync(data);
+      if (initialPost) {
+        const scheduledDate = data.scheduledFor && data.scheduledTime
+          ? new Date(
+              new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+            )
+          : undefined;
+
+        await updatePost.mutateAsync({ 
+          id: initialPost.id, 
+          ...data,
+          scheduledFor: scheduledDate,
+        });
+      } else {
+        await createPost.mutateAsync(data);
+      }
       form.reset();
       if (editor) {
         editor.commands.setContent('');
       }
+      onSuccess?.();
       toast({
         title: 'Success',
-        description: 'Post created successfully',
+        description: initialPost ? 'Post updated successfully' : 'Post created successfully',
       });
     } catch (error) {
-      setErrorMessage('Failed to create post');
+      setErrorMessage(initialPost ? 'Failed to update post' : 'Failed to create post');
       setShowError(true);
     }
   };
@@ -236,7 +269,7 @@ export function PostComposer() {
                 form.setValue('isDraft', true);
                 form.handleSubmit(onSubmit)();
               }}
-              disabled={createPost.isPending}
+              disabled={createPost.isPending || updatePost.isPending}
             >
               Save as Draft
             </Button>
@@ -253,9 +286,9 @@ export function PostComposer() {
                 }
                 form.setValue('isDraft', false);
               }}
-              disabled={createPost.isPending}
+              disabled={createPost.isPending || updatePost.isPending}
             >
-              {createPost.isPending ? 'Posting...' : 'Post'}
+              {createPost.isPending || updatePost.isPending ? 'Saving...' : (initialPost ? 'Update' : 'Post')}
             </Button>
           </div>
         </div>
