@@ -14,7 +14,7 @@ import {
 import { useAnalytics } from '../lib/analytics';
 
 export function Analytics() {
-  const { data, isLoading } = useAnalytics();
+  const { data, isLoading, error } = useAnalytics();
 
   if (isLoading) {
     return (
@@ -26,6 +26,17 @@ export function Analytics() {
           ))}
         </div>
         <Skeleton className="h-[400px]" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-8">
+        <h1 className="text-3xl font-bold">Analytics</h1>
+        <div className="mt-4 p-4 border rounded-md bg-destructive/10 text-destructive">
+          Failed to load analytics data. Please try again later.
+        </div>
       </div>
     );
   }

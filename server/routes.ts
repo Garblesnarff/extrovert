@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { db } from "../db";
 import { posts } from "@db/schema";
-import { eq, asc, desc } from "drizzle-orm";
+import { eq, asc, desc, sql } from "drizzle-orm";
 
 export function registerRoutes(app: Express) {
   // Posts Routes
@@ -114,9 +114,9 @@ export function registerRoutes(app: Express) {
   app.get('/api/analytics', async (req, res) => {
     try {
       const [postsCount, draftsCount, scheduledCount] = await Promise.all([
-        db.query.posts.count(),
-        db.query.posts.count({ where: eq(posts.isDraft, true) }),
-        db.query.posts.count({ where: eq(posts.isDraft, false) })
+        db.select({ count: sql`count(*)` }).from(posts),
+        db.select({ count: sql`count(*)` }).from(posts).where(eq(posts.isDraft, true)),
+        db.select({ count: sql`count(*)` }).from(posts).where(eq(posts.isDraft, false))
       ]);
 
       const recentPosts = await db.query.posts.findMany({
