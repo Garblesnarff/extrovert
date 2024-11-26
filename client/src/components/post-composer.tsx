@@ -242,7 +242,7 @@ export function PostComposer() {
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               onClick={() => {
                 const scheduledFor = form.getValues('scheduledFor');
                 const scheduledTime = form.getValues('scheduledTime');
