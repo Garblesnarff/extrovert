@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { db } from "../db";
 import { posts } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { eq, asc, desc } from "drizzle-orm";
 
 export function registerRoutes(app: Express) {
   // Posts
