@@ -174,8 +174,8 @@ export function PostComposer() {
                   className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
                 >
                   <Calendar className="mr-2 h-4 w-4" />
-                  {form.getValues('scheduledFor') && form.getValues('scheduledTime')
-                    ? `Scheduled for ${form.getValues('scheduledFor').toLocaleDateString()} ${form.getValues('scheduledTime')}`
+                  {form.watch('scheduledFor') && form.watch('scheduledTime')
+                    ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
                     : 'Schedule'
                   }
                 </Button>
@@ -185,13 +185,9 @@ export function PostComposer() {
                   <div className="space-y-2">
                     <CalendarComponent
                       mode="single"
-                      selected={form.getValues('scheduledFor')}
+                      selected={form.watch('scheduledFor')}
                       onSelect={(date) => {
-                        if (date) {
-                          form.setValue('scheduledFor', date);
-                        } else {
-                          form.setValue('scheduledFor', undefined);
-                        }
+                        form.setValue('scheduledFor', date);
                       }}
                       disabled={(date) => date < new Date()}
                       className="rounded-md border"
