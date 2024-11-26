@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { TimeSelect } from '@/components/ui/time-select';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -65,6 +66,8 @@ export function PostComposer() {
     defaultValues: {
       content: '',
       scheduledFor: undefined,
+      scheduledTime: undefined,
+      isDraft: false,
     },
   });
 
@@ -170,21 +173,53 @@ export function PostComposer() {
                   Schedule
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <CalendarComponent
-                  mode="single"
-                  selected={form.getValues('scheduledFor')}
-                  onSelect={(date) => {
-                    form.setValue('scheduledFor', date ? new Date(date) : undefined);
-                    setShowSchedule(false);
-                  }}
-                />
+              <PopoverContent className="w-auto p-4 space-y-4">
+                <div className="space-y-2">
+                  <CalendarComponent
+                    mode="single"
+                    selected={form.getValues('scheduledFor')}
+                    onSelect={(date) => {
+                      form.setValue('scheduledFor', date);
+                    }}
+                  />
+                  <TimeSelect
+                    value={form.getValues('scheduledTime')}
+                    onChange={(time) => {
+                      form.setValue('scheduledTime', time);
+                    }}
+                  />
+                </div>
+                <Button
+                  onClick={() => setShowSchedule(false)}
+                  className="w-full"
+                >
+                  Done
+                </Button>
               </PopoverContent>
             </Popover>
           </div>
-          <Button type="submit" disabled={createPost.isPending}>
-            {createPost.isPending ? 'Posting...' : 'Post'}
-          </Button>
+          <div className="space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                form.setValue('isDraft', true);
+                form.handleSubmit(onSubmit)();
+              }}
+              disabled={createPost.isPending}
+            >
+              Save as Draft
+            </Button>
+            <Button
+              type="submit"
+              onClick={() => {
+                form.setValue('isDraft', false);
+              }}
+              disabled={createPost.isPending}
+            >
+              {createPost.isPending ? 'Posting...' : 'Post'}
+            </Button>
+          </div>
         </div>
       </form>
     </Form>

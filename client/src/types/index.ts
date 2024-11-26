@@ -10,6 +10,8 @@ export interface Post {
 export interface PostFormData {
   content: string;
   scheduledFor?: Date;
+  scheduledTime?: string;
+  isDraft?: boolean;
 }
 
 export interface AIAssistResponse {

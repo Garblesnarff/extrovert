@@ -11,7 +11,12 @@ export const useCreatePost = () => {
         },
         body: JSON.stringify({
           ...data,
-          scheduledFor: data.scheduledFor ? new Date(data.scheduledFor).toISOString() : null,
+          scheduledFor: data.scheduledFor && data.scheduledTime
+            ? new Date(
+                new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+              ).toISOString()
+            : null,
+          isDraft: data.isDraft || false,
         }),
       });
       
