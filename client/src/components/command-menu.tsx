@@ -8,6 +8,7 @@ import {
   Moon, 
   Laptop 
 } from 'lucide-react';
+import { DialogTitle } from '@/components/ui/dialog';
 
 import {
   CommandDialog,
@@ -42,8 +43,15 @@ export function CommandMenu() {
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Type a command or search..." />
+    <CommandDialog 
+      open={open} 
+      onOpenChange={setOpen}
+    >
+      <DialogTitle className="sr-only">Command Menu</DialogTitle>
+      <CommandInput 
+        placeholder="Type a command or search..." 
+        aria-label="Search commands"
+      />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         

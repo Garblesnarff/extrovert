@@ -113,10 +113,10 @@ export function PostComposer() {
   return (
     <Form {...form}>
       <AlertDialog open={showError} onOpenChange={setShowError}>
-        <AlertDialogContent>
+        <AlertDialogContent aria-describedby="error-description">
           <AlertDialogHeader>
-            <AlertDialogTitle>Error</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+            <AlertDialogTitle id="error-title">Error</AlertDialogTitle>
+            <AlertDialogDescription id="error-description">{errorMessage}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <Button variant="outline" onClick={() => setShowError(false)}>

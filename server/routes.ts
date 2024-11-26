@@ -7,14 +7,27 @@ export function registerRoutes(app: Express) {
   // Posts
   app.post('/api/posts', async (req, res) => {
     try {
+      // Validate required fields
+      if (!req.body.content) {
+        return res.status(400).json({ error: 'Content is required' });
+      }
+
       const post = await db.insert(posts).values({
         content: req.body.content,
-        scheduledFor: req.body.scheduledFor,
-        isDraft: false,
+        scheduledFor: req.body.scheduledFor || null,
+        isDraft: req.body.isDraft || false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }).returning();
+
       res.json(post[0]);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create post' });
+      console.error('Failed to create post:', error);
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to create post' });
+      }
     }
   });
 
