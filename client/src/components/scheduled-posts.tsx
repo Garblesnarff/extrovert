@@ -5,11 +5,13 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { PostCard } from './post-card';
-import { useScheduledPosts } from '../lib/twitter';
+import { useScheduledPosts, useDeletePost, useUpdatePost } from '../lib/twitter';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function ScheduledPosts() {
   const { data: scheduled, isLoading } = useScheduledPosts();
+  const deletePost = useDeletePost();
+  const updatePost = useUpdatePost();
 
   if (isLoading) {
     return (
@@ -36,8 +38,8 @@ export function ScheduledPosts() {
               <PostCard
                 key={post.id}
                 post={post}
-                onEdit={() => {}}
-                onDelete={() => {}}
+                onEdit={() => {/* TODO: Implement edit dialog */}}
+                onDelete={() => deletePost.mutate(post.id)}
               />
             ))}
           </div>

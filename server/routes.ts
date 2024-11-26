@@ -55,6 +55,32 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  app.delete('/api/posts/:id', async (req, res) => {
+    try {
+      await db.delete(posts).where(eq(posts.id, parseInt(req.params.id)));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to delete post' });
+    }
+  });
+
+  app.put('/api/posts/:id', async (req, res) => {
+    try {
+      const post = await db.update(posts)
+        .set({
+          content: req.body.content,
+          scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
+          isDraft: req.body.isDraft || false,
+          updatedAt: new Date(),
+        })
+        .where(eq(posts.id, parseInt(req.params.id)))
+        .returning();
+      res.json(post[0]);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update post' });
+    }
+  });
+
   // AI Routes
   app.post('/api/ai/assist', async (req, res) => {
     try {

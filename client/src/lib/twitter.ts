@@ -61,3 +61,39 @@ export const useScheduledPosts = () => {
     },
   });
 };
+
+export const useDeletePost = () => {
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/posts/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete post');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['drafts'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled'] });
+    },
+  });
+};
+
+export const useUpdatePost = () => {
+  return useMutation({
+    mutationFn: async ({ id, ...data }: PostFormData & { id: number }) => {
+      const response = await fetch(`/api/posts/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to update post');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['drafts'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled'] });
+    },
+  });
+};

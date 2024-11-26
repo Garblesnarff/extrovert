@@ -5,11 +5,13 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { PostCard } from './post-card';
-import { useDrafts } from '../lib/twitter';
+import { useDrafts, useDeletePost, useUpdatePost } from '../lib/twitter';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function DraftList() {
   const { data: drafts, isLoading } = useDrafts();
+  const deletePost = useDeletePost();
+  const updatePost = useUpdatePost();
 
   if (isLoading) {
     return (
@@ -34,8 +36,8 @@ export function DraftList() {
               <PostCard
                 key={draft.id}
                 post={draft}
-                onEdit={() => {}}
-                onDelete={() => {}}
+                onEdit={() => {/* TODO: Implement edit dialog */}}
+                onDelete={() => deletePost.mutate(draft.id)}
               />
             ))}
           </div>
