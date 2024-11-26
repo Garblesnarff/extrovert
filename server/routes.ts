@@ -14,7 +14,7 @@ export function registerRoutes(app: Express) {
 
       const post = await db.insert(posts).values({
         content: req.body.content,
-        scheduledFor: req.body.scheduledFor || null,
+        scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
         isDraft: req.body.isDraft || false,
         createdAt: new Date(),
         updatedAt: new Date(),

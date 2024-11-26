@@ -175,7 +175,7 @@ export function PostComposer() {
                   mode="single"
                   selected={form.getValues('scheduledFor')}
                   onSelect={(date) => {
-                    form.setValue('scheduledFor', date);
+                    form.setValue('scheduledFor', date ? new Date(date) : undefined);
                     setShowSchedule(false);
                   }}
                 />

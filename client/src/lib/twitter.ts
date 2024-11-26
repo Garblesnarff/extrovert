@@ -9,7 +9,10 @@ export const useCreatePost = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          scheduledFor: data.scheduledFor ? new Date(data.scheduledFor).toISOString() : null,
+        }),
       });
       
       if (!response.ok) {
