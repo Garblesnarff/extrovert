@@ -145,7 +145,7 @@ export function PostComposer() {
           )}
         />
 
-        <div className="flex justify-between items-center">
+        <div className="space-y-4">
           <div className="flex gap-2">
             <TooltipProvider>
               <Tooltip>
@@ -168,37 +168,65 @@ export function PostComposer() {
             </TooltipProvider>
             <Popover open={showSchedule} onOpenChange={setShowSchedule}>
               <PopoverTrigger asChild>
-                <Button variant="outline" type="button">
+                <Button 
+                  variant="outline" 
+                  type="button"
+                  className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
+                >
                   <Calendar className="mr-2 h-4 w-4" />
-                  Schedule
+                  {form.getValues('scheduledFor') && form.getValues('scheduledTime') 
+                    ? `Scheduled for ${new Date(form.getValues('scheduledFor')).toLocaleDateString()} ${form.getValues('scheduledTime')}`
+                    : 'Schedule'
+                  }
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-4 space-y-4">
-                <div className="space-y-2">
-                  <CalendarComponent
-                    mode="single"
-                    selected={form.getValues('scheduledFor')}
-                    onSelect={(date) => {
-                      form.setValue('scheduledFor', date);
-                    }}
-                  />
-                  <TimeSelect
-                    value={form.getValues('scheduledTime')}
-                    onChange={(time) => {
-                      form.setValue('scheduledTime', time);
-                    }}
-                  />
+              <PopoverContent className="w-auto p-4" align="start">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <CalendarComponent
+                      mode="single"
+                      selected={form.getValues('scheduledFor')}
+                      onSelect={(date) => {
+                        form.setValue('scheduledFor', date);
+                      }}
+                      disabled={(date) => date < new Date()}
+                    />
+                    <TimeSelect
+                      value={form.getValues('scheduledTime')}
+                      onChange={(time) => {
+                        form.setValue('scheduledTime', time);
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        form.setValue('scheduledFor', undefined);
+                        form.setValue('scheduledTime', undefined);
+                        setShowSchedule(false);
+                      }}
+                    >
+                      Clear
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
+                          setErrorMessage('Please select both date and time for scheduling');
+                          setShowError(true);
+                          return;
+                        }
+                        setShowSchedule(false);
+                      }}
+                    >
+                      Done
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  onClick={() => setShowSchedule(false)}
-                  className="w-full"
-                >
-                  Done
-                </Button>
               </PopoverContent>
             </Popover>
           </div>
-          <div className="space-x-2">
+          <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="outline"
@@ -213,6 +241,13 @@ export function PostComposer() {
             <Button
               type="submit"
               onClick={() => {
+                const scheduledFor = form.getValues('scheduledFor');
+                const scheduledTime = form.getValues('scheduledTime');
+                if (scheduledFor && !scheduledTime || !scheduledFor && scheduledTime) {
+                  setErrorMessage('Please select both date and time for scheduling');
+                  setShowError(true);
+                  return;
+                }
                 form.setValue('isDraft', false);
               }}
               disabled={createPost.isPending}

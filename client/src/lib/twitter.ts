@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { Post, PostFormData } from '../types';
 
+import { queryClient } from './queryClient';
+
 export const useCreatePost = () => {
   return useMutation({
     mutationFn: async (data: PostFormData) => {
@@ -25,6 +27,11 @@ export const useCreatePost = () => {
       }
       
       return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate both queries to trigger a refresh
+      queryClient.invalidateQueries({ queryKey: ['drafts'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled'] });
     },
   });
 };
