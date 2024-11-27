@@ -1,0 +1,40 @@
+> rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --exclude vite.config.ts.* server/index.ts
+
+06:07:27 PM [express] serving on port 5000
+06:07:31 PM [express] GET /api/ai/providers 200 in 229ms :: ["gemini","groq","grok"]
+06:07:31 PM [express] GET /api/posts/scheduled 200 in 317ms :: [{"id":8,"content":"test564","schedule…
+06:07:31 PM [express] GET /api/posts/drafts 200 in 336ms :: [{"id":16,"content":"Creating a post that…
+06:07:32 PM [express] GET /api/ai/providers 304 in 3ms :: ["gemini","groq","grok"]
+06:07:32 PM [express] GET /api/posts/drafts 304 in 68ms :: [{"id":16,"content":"Creating a post that …
+06:07:32 PM [express] GET /api/posts/scheduled 304 in 66ms :: [{"id":8,"content":"test564","scheduled…
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 2, '(value: { content: string | SQL<unknown> | Placeholder<string, any>; scheduledFor?: SQL<unknown> | Date | Placeholder<string, any> | null | undefined; ... 5 more ...; recurringEndDate?: SQL<...> | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Argument of type '{ content: any; scheduledFor: string; isDraft: any; recurringPattern: any; recurringEndDate: string; createdAt: Date; updatedAt: Date; }[]' is not assignable to parameter of type '{ content: string | SQL<unknown> | Placeholder<string, any>; scheduledFor?: SQL<unknown> | Date | Placeholder<string, any> | null | undefined; isDraft?: boolean | ... 2 more ... | undefined; ... 4 more ...; recurringEndDate?: SQL<...> | ... 3 more ... | undefined; }'.
+      Property 'content' is missing in type '{ content: any; scheduledFor: string; isDraft: any; recurringPattern: any; recurringEndDate: string; createdAt: Date; updatedAt: Date; }[]' but required in type '{ content: string | SQL<unknown> | Placeholder<string, any>; scheduledFor?: SQL<unknown> | Date | Placeholder<string, any> | null | undefined; isDraft?: boolean | ... 2 more ... | undefined; ... 4 more ...; recurringEndDate?: SQL<...> | ... 3 more ... | undefined; }'.
+  Overload 2 of 2, '(values: { content: string | SQL<unknown> | Placeholder<string, any>; scheduledFor?: SQL<unknown> | Date | Placeholder<string, any> | null | undefined; ... 5 more ...; recurringEndDate?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Argument of type '{ content: any; scheduledFor: string; isDraft: any; recurringPattern: any; recurringEndDate: string; createdAt: Date; updatedAt: Date; }[]' is not assignable to parameter of type '{ content: string | SQL<unknown> | Placeholder<string, any>; scheduledFor?: SQL<unknown> | Date | Placeholder<string, any> | null | undefined; isDraft?: boolean | ... 2 more ... | undefined; ... 4 more ...; recurringEndDate?: SQL<...> | ... 3 more ... | undefined; }[]'.
+      Type '{ content: any; scheduledFor: string; isDraft: any; recurringPattern: any; recurringEndDate: string; createdAt: Date; updatedAt: Date; }' is not assignable to type '{ content: string | SQL<unknown> | Placeholder<string, any>; scheduledFor?: SQL<unknown> | Date | Placeholder<string, any> | null | undefined; isDraft?: boolean | ... 2 more ... | undefined; ... 4 more ...; recurringEndDate?: SQL<...> | ... 3 more ... | undefined; }'.
+        Types of property 'scheduledFor' are incompatible.
+          Type 'string' is not assignable to type 'SQL<unknown> | Date | Placeholder<string, any> | null | undefined'.
+ FILE  /home/runner/workspace/server/routes.ts:85:54
+
+    83 |
+    84 |         // Insert all posts
+  > 85 |         const result = await db.insert(posts).values(postsToCreate).returning();
+       |                                                      ^^^^^^^^^^^^^
+    86 |
+    87 |         res.json(result[0]); // Return the first post
+    88 |       } else {
+
+[TypeScript] Found 1 error. Watching for file changes.
+06:07:41 PM [express] GET /api/ai/providers 304 in 2ms :: ["gemini","groq","grok"]
+06:07:41 PM [express] GET /api/posts/drafts 304 in 68ms :: [{"id":16,"content":"Creating a post that …
+06:07:41 PM [express] GET /api/posts/scheduled 304 in 67ms :: [{"id":8,"content":"test564","scheduled…
+06:08:28 PM [express] GET /api/ai/providers 304 in 2ms :: ["gemini","groq","grok"]
+06:08:28 PM [express] GET /api/posts/scheduled 304 in 282ms :: [{"id":8,"content":"test564","schedule…
+06:08:28 PM [express] GET /api/posts/drafts 200 in 276ms :: [{"id":16,"content":"Creating a post that…
+06:09:08 PM [express] POST /api/ai/assist 200 in 1287ms :: {"suggestedContent":"Study finds that peop…
+06:09:26 PM [express] POST /api/posts 500 in 2ms :: {"error":"Failed to create post"}
+06:09:36 PM [express] POST /api/posts 500 in 1ms :: {"error":"Failed to create post"}

@@ -47,20 +47,30 @@ export function registerRoutes(app: Express) {
 
   app.post('/api/posts', async (req, res) => {
     try {
+      interface PostToCreate {
+        content: string;
+        scheduledFor: Date;
+        isDraft: boolean;
+        recurringPattern: string | null;
+        recurringEndDate: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+      }
+
       if (req.body.recurringPattern && req.body.scheduledFor && req.body.recurringEndDate) {
         // Create recurring posts
         const startDate = new Date(req.body.scheduledFor);
         const endDate = new Date(req.body.recurringEndDate);
-        const postsToCreate = [];
+        const postsToCreate: PostToCreate[] = [];
         let currentDate = new Date(startDate);
 
         while (currentDate <= endDate) {
           postsToCreate.push({
             content: req.body.content,
-            scheduledFor: currentDate.toISOString(),
-            isDraft: req.body.isDraft || false,
+            scheduledFor: new Date(currentDate),
+            isDraft: !!req.body.isDraft,
             recurringPattern: req.body.recurringPattern,
-            recurringEndDate: endDate.toISOString(),
+            recurringEndDate: new Date(endDate),
             createdAt: new Date(),
             updatedAt: new Date(),
           });
@@ -81,8 +91,15 @@ export function registerRoutes(app: Express) {
           currentDate = nextDate;
         }
 
-        // Insert all posts
-        const result = await db.insert(posts).values(postsToCreate).returning();
+        // Insert first post and get the result
+        const result = await db.insert(posts).values(postsToCreate[0]).returning();
+
+        // Insert remaining posts if any
+        if (postsToCreate.length > 1) {
+          await Promise.all(postsToCreate.slice(1).map(post => 
+            db.insert(posts).values(post)
+          ));
+        }
 
         res.json(result[0]); // Return the first post
       } else {
