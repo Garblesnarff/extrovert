@@ -1,0 +1,35 @@
+ rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --exclude vite.config.ts.* server/index.ts
+
+03:42:37 PM [express] serving on port 5000
+03:42:41 PM [express] GET /api/ai/providers 200 in 199ms :: ["gemini","groq","grok"]
+03:42:41 PM [express] GET /api/posts/drafts 200 in 324ms :: [{"id":7,"content":"test2","scheduledFor"…
+03:42:41 PM [express] GET /api/posts/scheduled 200 in 312ms :: [{"id":8,"content":"test564","schedule…
+
+ ERROR(TypeScript)  Property 'client' has no initializer and is not definitely assigned in the constructor.
+ FILE  /home/runner/workspace/server/providers/grok.ts:5:11
+
+    3 |
+    4 | export class GrokProvider implements LLMProvider {
+  > 5 |   private client: OpenAI;
+      |           ^^^^^^
+    6 |   public name = 'grok';
+    7 |
+    8 |   constructor() {
+
+[TypeScript] Found 1 error. Watching for file changes.
+03:42:44 PM [express] GET /api/ai/providers 304 in 2ms :: ["gemini","groq","grok"]
+03:42:44 PM [express] GET /api/posts/drafts 304 in 67ms :: [{"id":7,"content":"test2","scheduledFor":…
+03:42:44 PM [express] GET /api/posts/scheduled 304 in 67ms :: [{"id":8,"content":"test564","scheduled…
+03:42:51 PM [express] GET /api/ai/providers 304 in 2ms :: ["gemini","groq","grok"]
+03:42:51 PM [express] GET /api/posts/scheduled 304 in 65ms :: [{"id":8,"content":"test564","scheduled…
+03:42:51 PM [express] GET /api/posts/drafts 304 in 67ms :: [{"id":7,"content":"test2","scheduledFor":…
+03:43:35 PM [express] GET /api/ai/providers 304 in 2ms :: ["gemini","groq","grok"]
+03:43:35 PM [express] GET /api/posts/drafts 304 in 277ms :: [{"id":7,"content":"test2","scheduledFor"…
+03:43:35 PM [express] GET /api/posts/scheduled 304 in 280ms :: [{"id":8,"content":"test564","schedule…
+Error with preferred provider grok: Error: Grok AI Error: 404 "The model grok-1 does not exist or your team fc5e59f8-c15b-40a6-9d26-a9ac17061d5d does not have access to it. Please ensure you're using the correct API key. If you believe this is a mistake, please contact support and quote your team ID and the model name."
+    at GrokProvider.generateResponse (/home/runner/workspace/server/providers/grok.ts:48:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at getAIResponse (/home/runner/workspace/server/providers/index.ts:18:16)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:156:24)
+03:47:06 PM [express] POST /api/ai/assist 200 in 1363ms :: {"suggestedContent":"\"Just realized my ca…

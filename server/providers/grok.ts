@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { LLMProvider, ProviderResponse } from './types';
 
 export class GrokProvider implements LLMProvider {
-  private client: OpenAI;
+  private client!: OpenAI;
   public name = 'grok';
 
   constructor() {
@@ -29,7 +29,7 @@ export class GrokProvider implements LLMProvider {
 
     try {
       const completion = await this.client.chat.completions.create({
-        model: 'grok-1',
+        model: 'grok-beta',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
         max_tokens: 1000,
