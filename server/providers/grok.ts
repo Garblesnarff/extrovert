@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { LLMProvider, ProviderResponse } from './types';
 
 export class GrokProvider implements LLMProvider {
-  private client!: OpenAI;
+  private client: OpenAI;
   public name = 'grok';
 
   constructor() {
@@ -10,10 +10,16 @@ export class GrokProvider implements LLMProvider {
     if (apiKey) {
       this.client = new OpenAI({
         apiKey: apiKey,
-        baseURL: 'https://api.x.ai/v1', // xAI's API endpoint
+        baseURL: 'https://api.x.ai/v1',
         defaultHeaders: {
           'User-Agent': 'grok-client/1.0.0',
         },
+      });
+    } else {
+      // Initialize with a dummy client to satisfy TypeScript
+      this.client = new OpenAI({
+        apiKey: 'dummy',
+        baseURL: 'https://api.x.ai/v1',
       });
     }
   }
@@ -29,7 +35,7 @@ export class GrokProvider implements LLMProvider {
 
     try {
       const completion = await this.client.chat.completions.create({
-        model: 'grok-beta',
+        model: 'grok-v2',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
         max_tokens: 1000,
