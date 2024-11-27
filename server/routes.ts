@@ -51,16 +51,16 @@ export function registerRoutes(app: Express) {
         // Create recurring posts
         const startDate = new Date(req.body.scheduledFor);
         const endDate = new Date(req.body.recurringEndDate);
-        const postsData = [];
+        const postsToCreate = [];
         let currentDate = new Date(startDate);
 
         while (currentDate <= endDate) {
-          postsData.push({
+          postsToCreate.push({
             content: req.body.content,
-            scheduledFor: new Date(currentDate),
+            scheduledFor: currentDate.toISOString(),
             isDraft: req.body.isDraft || false,
             recurringPattern: req.body.recurringPattern,
-            recurringEndDate: new Date(endDate),
+            recurringEndDate: endDate.toISOString(),
             createdAt: new Date(),
             updatedAt: new Date(),
           });
@@ -81,14 +81,8 @@ export function registerRoutes(app: Express) {
           currentDate = nextDate;
         }
 
-        // Insert first post and get the result
-        const result = await db.insert(posts).values(postsData[0]).returning();
-
-        // Insert remaining posts if any
-        if (postsData.length > 1) {
-          const remainingPosts = postsData.slice(1);
-          await db.insert(posts).values(remainingPosts);
-        }
+        // Insert all posts
+        const result = await db.insert(posts).values(postsToCreate).returning();
 
         res.json(result[0]); // Return the first post
       } else {
