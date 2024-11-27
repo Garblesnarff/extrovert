@@ -74,7 +74,17 @@ export function registerRoutes(app: Express) {
           }
         }
 
-        const result = await db.insert(posts).values(posts).returning();
+        const postsToInsert = posts.map(post => ({
+          content: post.content,
+          scheduledFor: post.scheduledFor,
+          isDraft: post.isDraft,
+          recurringPattern: post.recurringPattern,
+          recurringEndDate: post.recurringEndDate,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+        }));
+
+        const result = await db.insert(posts).values(postsToInsert).returning();
         res.json(result[0]); // Return the first post
       } else {
         // Create single post

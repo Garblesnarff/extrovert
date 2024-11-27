@@ -243,14 +243,14 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                     <Select
                       value={form.getValues('recurringPattern') || ''}
                       onValueChange={(value) => {
-                        form.setValue('recurringPattern', value === '' ? null : value as 'daily' | 'weekly' | 'monthly');
+                        form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
                       }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Repeat..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No repeat</SelectItem>
+                        <SelectItem value="none">No repeat</SelectItem>
                         <SelectItem value="daily">Daily</SelectItem>
                         <SelectItem value="weekly">Weekly</SelectItem>
                         <SelectItem value="monthly">Monthly</SelectItem>
