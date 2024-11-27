@@ -37,8 +37,10 @@ export function registerRoutes(app: Express) {
           desc(posts.createdAt)
         ],
       });
-      res.json(scheduled.filter(post => post.scheduledFor)); // Only return posts with scheduledFor date
+      // Filter out posts without scheduledFor and ensure proper date handling
+      res.json(scheduled.filter(post => post.scheduledFor !== null));
     } catch (error) {
+      console.error('Error fetching scheduled posts:', error);
       res.status(500).json({ error: 'Failed to fetch scheduled posts' });
     }
   });
@@ -88,12 +90,28 @@ export function registerRoutes(app: Express) {
         }));
 
         // Fix the insert statement for recurring posts
-        const result = await db.insert(posts).values(postsToInsert[0]).returning();
+        const result = await db.insert(posts).values({
+          content: postsToInsert[0].content,
+          scheduledFor: new Date(postsToInsert[0].scheduledFor),
+          isDraft: postsToInsert[0].isDraft,
+          recurringPattern: postsToInsert[0].recurringPattern,
+          recurringEndDate: new Date(postsToInsert[0].recurringEndDate),
+          createdAt: postsToInsert[0].createdAt,
+          updatedAt: postsToInsert[0].updatedAt,
+        }).returning();
 
         // Insert remaining posts separately
         if (postsToInsert.length > 1) {
           for (let i = 1; i < postsToInsert.length; i++) {
-            await db.insert(posts).values(postsToInsert[i]);
+            await db.insert(posts).values({
+              content: postsToInsert[i].content,
+              scheduledFor: new Date(postsToInsert[i].scheduledFor),
+              isDraft: postsToInsert[i].isDraft,
+              recurringPattern: postsToInsert[i].recurringPattern,
+              recurringEndDate: new Date(postsToInsert[i].recurringEndDate),
+              createdAt: postsToInsert[i].createdAt,
+              updatedAt: postsToInsert[i].updatedAt,
+            });
           }
         }
         res.json(result[0]); // Return the first post
