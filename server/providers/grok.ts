@@ -1,18 +1,54 @@
+import OpenAI from 'openai';
 import { LLMProvider, ProviderResponse } from './types';
 
 export class GrokProvider implements LLMProvider {
+  private client: OpenAI;
   public name = 'grok';
 
   constructor() {
-    // Initialize Grok client when API becomes available
+    const apiKey = process.env.X_AI_API_KEY;
+    if (apiKey) {
+      this.client = new OpenAI({
+        apiKey: apiKey,
+        baseURL: 'https://api.x.ai/v1', // xAI's API endpoint
+        defaultHeaders: {
+          'User-Agent': 'grok-client/1.0.0',
+        },
+      });
+    }
   }
 
   isAvailable(): boolean {
-    return false; // Grok API not publicly available yet
+    return !!process.env.X_AI_API_KEY;
   }
 
   async generateResponse(prompt: string): Promise<ProviderResponse> {
-    throw new Error('Grok API not available yet');
+    if (!this.isAvailable()) {
+      throw new Error('X AI API key not configured');
+    }
+
+    try {
+      const completion = await this.client.chat.completions.create({
+        model: 'grok-1',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1000,
+      });
+
+      const text = completion.choices[0]?.message?.content || '';
+
+      return {
+        suggestedContent: text,
+        hashtags: this.extractHashtags(text),
+        analysis: 'Generated using Grok AI',
+        provider: this.name,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Grok AI Error: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
   private extractHashtags(text: string): string[] {
