@@ -51,69 +51,45 @@ export function registerRoutes(app: Express) {
         // Create recurring posts
         const startDate = new Date(req.body.scheduledFor);
         const endDate = new Date(req.body.recurringEndDate);
-        const posts = [];
-        let currentDate = startDate;
+        const postsData = [];
+        let currentDate = new Date(startDate);
 
         while (currentDate <= endDate) {
-          posts.push({
+          postsData.push({
             content: req.body.content,
-            scheduledFor: currentDate.toISOString(),
-            isDraft: req.body.isDraft,
+            scheduledFor: new Date(currentDate),
+            isDraft: req.body.isDraft || false,
             recurringPattern: req.body.recurringPattern,
-            recurringEndDate: endDate.toISOString(),
+            recurringEndDate: new Date(endDate),
             createdAt: new Date(),
             updatedAt: new Date(),
           });
 
           // Calculate next date based on pattern
+          const nextDate = new Date(currentDate);
           switch (req.body.recurringPattern) {
             case 'daily':
-              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+              nextDate.setDate(nextDate.getDate() + 1);
               break;
             case 'weekly':
-              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+              nextDate.setDate(nextDate.getDate() + 7);
               break;
             case 'monthly':
-              currentDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+              nextDate.setMonth(nextDate.getMonth() + 1);
               break;
           }
+          currentDate = nextDate;
         }
 
-        const postsToInsert = posts.map(post => ({
-          content: post.content,
-          scheduledFor: post.scheduledFor,
-          isDraft: post.isDraft,
-          recurringPattern: post.recurringPattern,
-          recurringEndDate: post.recurringEndDate,
-          createdAt: post.createdAt,
-          updatedAt: post.updatedAt,
-        }));
+        // Insert first post and get the result
+        const result = await db.insert(posts).values(postsData[0]).returning();
 
-        // Fix the insert statement for recurring posts
-        const result = await db.insert(posts).values({
-          content: postsToInsert[0].content,
-          scheduledFor: new Date(postsToInsert[0].scheduledFor),
-          isDraft: postsToInsert[0].isDraft,
-          recurringPattern: postsToInsert[0].recurringPattern,
-          recurringEndDate: new Date(postsToInsert[0].recurringEndDate),
-          createdAt: postsToInsert[0].createdAt,
-          updatedAt: postsToInsert[0].updatedAt,
-        }).returning();
-
-        // Insert remaining posts separately
-        if (postsToInsert.length > 1) {
-          for (let i = 1; i < postsToInsert.length; i++) {
-            await db.insert(posts).values({
-              content: postsToInsert[i].content,
-              scheduledFor: new Date(postsToInsert[i].scheduledFor),
-              isDraft: postsToInsert[i].isDraft,
-              recurringPattern: postsToInsert[i].recurringPattern,
-              recurringEndDate: new Date(postsToInsert[i].recurringEndDate),
-              createdAt: postsToInsert[i].createdAt,
-              updatedAt: postsToInsert[i].updatedAt,
-            });
-          }
+        // Insert remaining posts if any
+        if (postsData.length > 1) {
+          const remainingPosts = postsData.slice(1);
+          await db.insert(posts).values(remainingPosts);
         }
+
         res.json(result[0]); // Return the first post
       } else {
         // Create single post
