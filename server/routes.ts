@@ -32,9 +32,12 @@ export function registerRoutes(app: Express) {
     try {
       const scheduled = await db.query.posts.findMany({
         where: eq(posts.isDraft, false),
-        orderBy: desc(posts.createdAt),
+        orderBy: [
+          asc(posts.scheduledFor),
+          desc(posts.createdAt)
+        ],
       });
-      res.json(scheduled);
+      res.json(scheduled.filter(post => post.scheduledFor)); // Only return posts with scheduledFor date
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch scheduled posts' });
     }
@@ -84,7 +87,15 @@ export function registerRoutes(app: Express) {
           updatedAt: post.updatedAt,
         }));
 
-        const result = await db.insert(posts).values(postsToInsert).returning();
+        // Fix the insert statement for recurring posts
+        const result = await db.insert(posts).values(postsToInsert[0]).returning();
+
+        // Insert remaining posts separately
+        if (postsToInsert.length > 1) {
+          for (let i = 1; i < postsToInsert.length; i++) {
+            await db.insert(posts).values(postsToInsert[i]);
+          }
+        }
         res.json(result[0]); // Return the first post
       } else {
         // Create single post
