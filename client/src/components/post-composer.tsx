@@ -37,7 +37,7 @@ import {
 } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { useCreatePost, useUpdatePost } from '../lib/twitter';
-import { useAIAssistant } from '../lib/crewai';
+import { useAIAssistant, useAvailableProviders } from '../lib/crewai';
 import type { PostFormData, Post } from '../types';
 
 interface PostComposerProps {
@@ -53,6 +53,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
   const aiAssistant = useAIAssistant();
+  const { data: providers } = useAvailableProviders();
+  const [selectedProvider, setSelectedProvider] = useState<string>();
   
   const editor = useEditor({
     extensions: [
@@ -103,7 +105,10 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
         return;
       }
 
-      const result = await aiAssistant.mutateAsync(content);
+      const result = await aiAssistant.mutateAsync({ 
+        prompt: content,
+        provider: selectedProvider
+      });
       if (editor) {
         editor.commands.setContent(result.suggestedContent);
       }
@@ -191,16 +196,35 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleAIAssist}
-                    disabled={aiAssistant.isPending}
-                    className="gap-2"
-                  >
-                    <Wand2 className="h-4 w-4" />
-                    AI Assist
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {providers && providers.length > 0 && (
+                      <Select
+                        value={selectedProvider}
+                        onValueChange={setSelectedProvider}
+                      >
+                        <SelectTrigger className="w-[120px]">
+                          <SelectValue placeholder="Provider" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {providers.map(provider => (
+                            <SelectItem key={provider} value={provider}>
+                              {provider.charAt(0).toUpperCase() + provider.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAIAssist}
+                      disabled={aiAssistant.isPending}
+                      className="gap-2"
+                    >
+                      <Wand2 className="h-4 w-4" />
+                      AI Assist
+                    </Button>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Let AI help improve your post</p>

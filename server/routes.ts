@@ -135,30 +135,58 @@ export function registerRoutes(app: Express) {
   });
 
   // AI Routes
+  app.get('/api/ai/providers', async (req, res) => {
+    try {
+      const { availableProviders } = await import('./providers');
+      res.json(availableProviders);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch AI providers' });
+    }
+  });
+
   app.post('/api/ai/assist', async (req, res) => {
     try {
-      // CrewAI integration would go here
-      const suggestion = {
-        suggestedContent: "AI-enhanced version of your post",
-        hashtags: ["#AI", "#Content"],
-        analysis: "This post looks good!"
-      };
-      res.json(suggestion);
+      const { prompt, provider } = req.body;
+      const { getAIResponse } = await import('./providers');
+      
+      if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required' });
+      }
+
+      const response = await getAIResponse(prompt, provider);
+      res.json(response);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to get AI assistance' });
+      console.error('AI assist error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get AI assistance',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
   app.post('/api/ai/research', async (req, res) => {
     try {
-      // CrewAI research agent would go here
-      const research = {
-        topics: ["Topic 1", "Topic 2"],
-        insights: "Research insights here",
-      };
-      res.json(research);
+      const { prompt, provider } = req.body;
+      const { getAIResponse } = await import('./providers');
+      
+      if (!prompt) {
+        return res.status(400).json({ error: 'Research topic is required' });
+      }
+
+      const enhancedPrompt = `Research the following topic and provide insights: ${prompt}`;
+      const response = await getAIResponse(enhancedPrompt, provider);
+      
+      res.json({
+        topics: response.hashtags,
+        insights: response.suggestedContent,
+        provider: response.provider
+      });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to research content' });
+      console.error('AI research error:', error);
+      res.status(500).json({ 
+        error: 'Failed to research content',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
