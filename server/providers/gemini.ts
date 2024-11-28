@@ -6,10 +6,24 @@ export class GeminiProvider implements LLMProvider {
   public name = 'gemini';
   public availableModels = [
     {
-      name: 'gemini-pro',
-      displayName: 'Gemini Pro',
-      description: 'Best for text generation and analysis',
-      maxTokens: 30720,
+      name: 'gemini-1.5-flash',
+      displayName: 'Gemini 1.5 Flash',
+      description: 'Fast and efficient text generation',
+      maxTokens: 16384,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'gemini-1.5-flash-8b',
+      displayName: 'Gemini 1.5 Flash 8B',
+      description: 'Lightweight and fast text generation',
+      maxTokens: 16384,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'gemini-1.5-pro',
+      displayName: 'Gemini 1.5 Pro',
+      description: 'Advanced text generation and analysis',
+      maxTokens: 32768,
       defaultTemperature: 0.7
     }
   ];

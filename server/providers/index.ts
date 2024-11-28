@@ -2,11 +2,13 @@ import { LLMProvider, ProviderResponse } from './types';
 import { GeminiProvider } from './gemini';
 import { GroqProvider } from './groq';
 import { GrokProvider } from './grok';
+import { CerebrasProvider } from './cerebras';
 
 const providers: LLMProvider[] = [
   new GeminiProvider(),
   new GroqProvider(),
   new GrokProvider(),
+  new CerebrasProvider(),
 ];
 
 export async function getAIResponse(prompt: string, preferredProvider?: string, model?: string): Promise<ProviderResponse> {

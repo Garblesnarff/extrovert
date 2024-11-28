@@ -6,17 +6,66 @@ export class GroqProvider implements LLMProvider {
   public name = 'groq';
   public availableModels = [
     {
+      name: 'gemma2-9b-it',
+      displayName: 'Gemma 2 9B',
+      description: 'Gemma 2 9B model optimized for chat',
+      maxTokens: 8192,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'gemma-7b-it',
+      displayName: 'Gemma 7B',
+      description: 'Gemma 7B model optimized for chat',
+      maxTokens: 8192,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'llama-3.1-70b-versatile',
+      displayName: 'LLaMA 3.1 70B Versatile',
+      description: 'Versatile large language model',
+      maxTokens: 8192,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'llama-3.1-8b-instant',
+      displayName: 'LLaMA 3.1 8B Instant',
+      description: 'Fast and efficient language model',
+      maxTokens: 8192,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'llama-3.2-1b-preview',
+      displayName: 'LLaMA 3.2 1B Preview',
+      description: 'Preview version of LLaMA 3.2',
+      maxTokens: 4096,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'llama-3.2-3b-preview',
+      displayName: 'LLaMA 3.2 3B Preview',
+      description: 'Preview version of LLaMA 3.2',
+      maxTokens: 4096,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'llama3-70b-8192',
+      displayName: 'LLaMA 3 70B',
+      description: 'Latest LLaMA 3 large model',
+      maxTokens: 8192,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'llama3-8b-8192',
+      displayName: 'LLaMA 3 8B',
+      description: 'Latest LLaMA 3 efficient model',
+      maxTokens: 8192,
+      defaultTemperature: 0.7
+    },
+    {
       name: 'mixtral-8x7b-32768',
       displayName: 'Mixtral 8x7B',
       description: 'High-performance model with 32k context',
       maxTokens: 32768,
-      defaultTemperature: 0.7
-    },
-    {
-      name: 'llama2-70b-4096',
-      displayName: 'LLaMA 2 70B',
-      description: 'Powerful model with 4k context',
-      maxTokens: 4096,
       defaultTemperature: 0.7
     }
   ];
