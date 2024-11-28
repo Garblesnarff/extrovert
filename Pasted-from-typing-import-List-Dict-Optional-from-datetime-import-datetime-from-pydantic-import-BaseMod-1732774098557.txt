@@ -1,0 +1,274 @@
+from typing import List, Dict, Optional
+from datetime import datetime
+from pydantic import BaseModel
+from crewai import Agent, Task, Crew, Process
+from crewai_tools import SerperDevTool, WebsiteSearchTool
+
+class TwitterMetrics(BaseModel):
+    """Structure for Twitter analytics data"""
+    engagement_rate: float
+    impression_count: int
+    like_count: int
+    reply_count: int
+    repost_count: int
+    quote_count: int
+
+class TwitterPost(BaseModel):
+    """Structure for Twitter post data"""
+    content: str
+    metrics: Optional[TwitterMetrics]
+    posting_time: Optional[datetime]
+    references: Optional[List[str]]
+    
+class OptimizedTwitterCrews:
+    def __init__(self):
+        """Initialize tools and configurations"""
+        self.search_tool = SerperDevTool()
+        self.web_tool = WebsiteSearchTool()
+        
+    def setup_discovery_strategy_crew(self) -> Crew:
+        """
+        Discovery & Strategy Crew
+        Responsibilities:
+        - Find engaging posts
+        - Analyze trends
+        - Plan content
+        - Basic scheduling
+        """
+        trend_analyst = Agent(
+            role="Strategic Trend Analyst",
+            goal="Identify valuable engagement opportunities and plan content strategy",
+            backstory="""Expert in social media trends and content strategy. You have a 
+            deep understanding of viral mechanics and can spot valuable opportunities for 
+            engagement while maintaining a coherent content strategy.""",
+            tools=[self.search_tool],
+            llm="groq/llama3-70b-8192",
+            verbose=True
+        )
+        
+        content_strategist = Agent(
+            role="Content Planning Specialist",
+            goal="Develop content plans and identify optimal posting opportunities",
+            backstory="""Master content strategist with expertise in social media timing 
+            and audience behavior. You excel at planning content that resonates with 
+            audiences and maintaining a consistent posting schedule.""",
+            tools=[self.web_tool],
+            llm="gemini/gemini-flash-8b",
+            verbose=True
+        )
+        
+        return Crew(
+            agents=[trend_analyst, content_strategist],
+            tasks=[
+                Task(
+                    description="""Analyze current trends and conversations in our niche. 
+                    Identify top 5 engagement opportunities with specific posts to engage with.""",
+                    agent=trend_analyst,
+                    expected_output="List of engagement opportunities with analysis"
+                ),
+                Task(
+                    description="""Develop content strategy for identified opportunities. 
+                    Include optimal posting times and content themes.""",
+                    agent=content_strategist,
+                    expected_output="Content strategy plan with schedule"
+                )
+            ],
+            process=Process.sequential,
+            verbose=True
+        )
+
+    def setup_engagement_community_crew(self) -> Crew:
+        """
+        Engagement & Community Crew
+        Responsibilities:
+        - Craft replies
+        - Handle engagement
+        - Maintain voice
+        - Community management
+        """
+        voice_expert = Agent(
+            role="Brand Voice & Community Manager",
+            goal="Maintain consistent brand voice while fostering community engagement",
+            backstory="""Communication expert specialized in brand voice and community 
+            building. You excel at crafting responses that both maintain brand identity 
+            and build stronger connections with the audience.""",
+            llm="grok/grok-beta",
+            verbose=True
+        )
+        
+        engagement_specialist = Agent(
+            role="Engagement Crafting Specialist",
+            goal="Create engaging, authentic responses that drive meaningful interactions",
+            backstory="""Master of social media engagement with expertise in crafting 
+            viral-worthy responses. You know how to spark conversations and maintain 
+            engaging dialogue while handling community management duties.""",
+            llm="groq/mixtral-8x7b-32768",
+            verbose=True
+        )
+        
+        return Crew(
+            agents=[voice_expert, engagement_specialist],
+            tasks=[
+                Task(
+                    description="""Analyze engagement opportunities and craft appropriate 
+                    responses maintaining our brand voice and community guidelines.""",
+                    agent=voice_expert,
+                    expected_output="Crafted responses with voice analysis"
+                ),
+                Task(
+                    description="""Enhance responses with engagement hooks and community 
+                    building elements. Include conversation continuity strategies.""",
+                    agent=engagement_specialist,
+                    expected_output="Enhanced responses with engagement strategies"
+                )
+            ],
+            process=Process.sequential,
+            verbose=True
+        )
+
+    def setup_research_enhancement_crew(self) -> Crew:
+        """
+        Research & Enhancement Crew
+        Responsibilities:
+        - Fact checking
+        - Adding context
+        - Performance analysis
+        - Improvement suggestions
+        """
+        research_validator = Agent(
+            role="Research & Validation Specialist",
+            goal="Ensure accuracy and enhance content with verified information",
+            backstory="""Meticulous researcher with expertise in fact-checking and 
+            content enhancement. You excel at finding and validating information that 
+            adds value to conversations.""",
+            tools=[self.search_tool, self.web_tool],
+            llm="gemini/gemini-flash-8b",
+            verbose=True
+        )
+        
+        content_enhancer = Agent(
+            role="Content Enhancement Strategist",
+            goal="Optimize content with data and contextual improvements",
+            backstory="""Expert in content optimization and performance analysis. You 
+            know how to enhance content with relevant data while maintaining 
+            engagement value.""",
+            tools=[self.web_tool],
+            llm="groq/llama3-70b-8192",
+            verbose=True
+        )
+        
+        return Crew(
+            agents=[research_validator, content_enhancer],
+            tasks=[
+                Task(
+                    description="""Verify facts and gather supporting evidence for 
+                    planned responses. Include credible sources and context.""",
+                    agent=research_validator,
+                    expected_output="Verified facts with sources"
+                ),
+                Task(
+                    description="""Enhance responses with verified information and 
+                    optimize for maximum impact. Include performance predictions.""",
+                    agent=content_enhancer,
+                    expected_output="Enhanced content with optimization analysis"
+                )
+            ],
+            process=Process.sequential,
+            verbose=True
+        )
+
+    def setup_growth_analytics_crew(self) -> Crew:
+        """
+        Growth & Analytics Crew
+        Responsibilities:
+        - Track metrics
+        - Find growth opportunities
+        - Network building
+        - Performance optimization
+        """
+        analytics_expert = Agent(
+            role="Performance Analytics Specialist",
+            goal="Track and analyze performance metrics to drive growth",
+            backstory="""Analytics expert specialized in social media metrics and growth 
+            patterns. You excel at identifying trends and opportunities in performance 
+            data.""",
+            llm="grok/grok-beta",
+            verbose=True
+        )
+        
+        growth_strategist = Agent(
+            role="Network Growth Strategist",
+            goal="Develop and implement growth strategies based on analytics",
+            backstory="""Growth hacking expert with deep understanding of network 
+            effects and audience building. You excel at turning insights into 
+            actionable growth strategies.""",
+            tools=[self.search_tool],
+            llm="groq/mixtral-8x7b-32768",
+            verbose=True
+        )
+        
+        return Crew(
+            agents=[analytics_expert, growth_strategist],
+            tasks=[
+                Task(
+                    description="""Analyze performance metrics of recent posts and 
+                    identify patterns in successful engagement.""",
+                    agent=analytics_expert,
+                    expected_output="Performance analysis with key insights"
+                ),
+                Task(
+                    description="""Develop growth strategies based on analysis. 
+                    Include network building opportunities and optimization tactics.""",
+                    agent=growth_strategist,
+                    expected_output="Growth strategy recommendations"
+                )
+            ],
+            process=Process.sequential,
+            verbose=True
+        )
+
+    def execute_full_workflow(self, initial_data: Dict = None) -> Dict:
+        """
+        Execute the complete workflow across all crews
+        Returns a dictionary containing results from each crew
+        """
+        results = {}
+        
+        # Discovery and Strategy
+        discovery_crew = self.setup_discovery_strategy_crew()
+        results['discovery'] = discovery_crew.kickoff(inputs=initial_data)
+        
+        # Research and Enhancement
+        research_crew = self.setup_research_enhancement_crew()
+        results['research'] = research_crew.kickoff(inputs=results['discovery'])
+        
+        # Engagement and Community
+        engagement_crew = self.setup_engagement_community_crew()
+        results['engagement'] = engagement_crew.kickoff(
+            inputs={**results['discovery'], **results['research']}
+        )
+        
+        # Growth and Analytics
+        analytics_crew = self.setup_growth_analytics_crew()
+        results['analytics'] = analytics_crew.kickoff(
+            inputs={
+                'discovery': results['discovery'],
+                'engagement': results['engagement']
+            }
+        )
+        
+        return results
+
+# Usage Example:
+if __name__ == "__main__":
+    twitter_crews = OptimizedTwitterCrews()
+    
+    # Example initial data
+    initial_data = {
+        "target_topics": ["AI", "Technology", "Programming"],
+        "brand_voice": "Technical but approachable, with occasional humor",
+        "posting_frequency": "2-3 times per day"
+    }
+    
+    # Execute the workflow
+    results = twitter_crews.execute_full_workflow(initial_data)
