@@ -1,5 +1,11 @@
 import { Agent, Crew, Task } from 'crewai';
 
+interface EnhancementResult {
+  suggestedContent: string;
+  hashtags?: string[];
+  insights?: string[];
+}
+
 export class OptimizedTwitterCrews {
   private createEngagementExpert() {
     return new Agent({
@@ -31,7 +37,7 @@ export class OptimizedTwitterCrews {
     });
   }
 
-  setup_engagement_community_crew() {
+  setup_engagement_community_crew(): Crew {
     const engagementExpert = this.createEngagementExpert();
     const strategyAnalyst = this.createStrategyAnalyst();
 
@@ -52,7 +58,7 @@ export class OptimizedTwitterCrews {
     });
   }
 
-  setup_research_enhancement_crew() {
+  setup_research_enhancement_crew(): Crew {
     const contentResearcher = this.createContentResearcher();
     const engagementExpert = this.createEngagementExpert();
 
@@ -73,42 +79,34 @@ export class OptimizedTwitterCrews {
     });
   }
 
-  setup_discovery_strategy_crew() {
-    const strategyAnalyst = this.createStrategyAnalyst();
-    const contentResearcher = this.createContentResearcher();
-
-    const analyzeTopics = new Task({
-      description: 'Analyze trending topics and identify strategic opportunities',
-      agent: strategyAnalyst
-    });
-
-    const researchTrends = new Task({
-      description: 'Research trending topics and gather supporting information',
-      agent: contentResearcher
-    });
-
-    return new Crew({
-      agents: [strategyAnalyst, contentResearcher],
-      tasks: [analyzeTopics, researchTrends],
-      verbose: true
-    });
-  }
-
-  async execute_full_workflow({ content }: { content: string }) {
+  async execute_full_workflow({ content }: { content: string }): Promise<EnhancementResult> {
     const engagementCrew = this.setup_engagement_community_crew();
     const researchCrew = this.setup_research_enhancement_crew();
-    const strategyCrew = this.setup_discovery_strategy_crew();
 
-    const [engagementResults, researchResults, strategyResults] = await Promise.all([
+    const [engagementResults, researchResults] = await Promise.all([
       engagementCrew.kickoff({ content }),
-      researchCrew.kickoff({ content }),
-      strategyCrew.kickoff({ content })
+      researchCrew.kickoff({ content })
     ]);
 
     return {
-      engagement: engagementResults,
-      research: researchResults,
-      strategy: strategyResults
+      suggestedContent: this.combineResults(engagementResults, researchResults),
+      hashtags: this.extractHashtags(engagementResults),
+      insights: this.extractInsights(researchResults)
     };
+  }
+
+  private combineResults(engagementResults: any, researchResults: any): string {
+    // Implement result combination logic
+    return engagementResults.suggestedContent || '';
+  }
+
+  private extractHashtags(results: any): string[] {
+    // Implement hashtag extraction logic
+    return results.hashtags || [];
+  }
+
+  private extractInsights(results: any): string[] {
+    // Implement insights extraction logic
+    return results.insights || [];
   }
 }
