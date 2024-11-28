@@ -194,6 +194,45 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  // CrewAI Enhanced Draft Routes
+  app.post('/api/drafts/enhance', async (req, res) => {
+    try {
+      const { content, enhancementType } = req.body;
+      const { OptimizedTwitterCrews } = await import('./lib/twitter-crews');
+      
+      const twitterCrews = new OptimizedTwitterCrews();
+      let results;
+      
+      switch (enhancementType) {
+        case 'engagement':
+          const engagementCrew = twitterCrews.setup_engagement_community_crew();
+          results = await engagementCrew.kickoff({ content });
+          break;
+        case 'research':
+          const researchCrew = twitterCrews.setup_research_enhancement_crew();
+          results = await researchCrew.kickoff({ content });
+          break;
+        case 'strategy':
+          const strategyCrew = twitterCrews.setup_discovery_strategy_crew();
+          results = await strategyCrew.kickoff({ content });
+          break;
+        default:
+          // Default to full workflow
+          results = await twitterCrews.execute_full_workflow({ content });
+      }
+      
+      res.json({
+        enhanced: results,
+        originalContent: content
+      });
+    } catch (error) {
+      console.error('Draft enhancement error:', error);
+      res.status(500).json({ 
+        error: 'Failed to enhance draft',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
   app.post('/api/ai/research', async (req, res) => {
     try {
       const { prompt, provider } = req.body;

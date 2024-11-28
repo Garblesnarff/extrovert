@@ -41,9 +41,21 @@ class TwitterClient {
         throw new Error('At least one media ID is required');
       }
       
-      const mediaIdsTuple = mediaIds.length === 1 
-        ? [mediaIds[0]] as [string]
-        : mediaIds.slice(0, 4) as [string, string?, string?, string?];
+      let mediaIdsTuple: [string] | [string, string] | [string, string, string] | [string, string, string, string];
+      
+      switch (mediaIds.length) {
+        case 1:
+          mediaIdsTuple = [mediaIds[0]];
+          break;
+        case 2:
+          mediaIdsTuple = [mediaIds[0], mediaIds[1]];
+          break;
+        case 3:
+          mediaIdsTuple = [mediaIds[0], mediaIds[1], mediaIds[2]];
+          break;
+        default:
+          mediaIdsTuple = [mediaIds[0], mediaIds[1], mediaIds[2], mediaIds[3]];
+      }
 
       const tweet = await this.client.v2.tweet(content, {
         media: { media_ids: mediaIdsTuple }
