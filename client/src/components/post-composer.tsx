@@ -49,6 +49,9 @@ interface PostComposerProps {
 export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const [showSchedule, setShowSchedule] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [suggestedTime, setSuggestedTime] = useState<string>();
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { toast } = useToast();
   const createPost = useCreatePost();
@@ -276,17 +279,67 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
             </TooltipProvider>
             <Popover open={showSchedule} onOpenChange={setShowSchedule}>
               <PopoverTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  type="button"
-                  className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
-                >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {form.watch('scheduledFor') && form.watch('scheduledTime')
-                    ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
-                    : 'Schedule'
-                  }
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    type="button"
+                    className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {form.watch('scheduledFor') && form.watch('scheduledTime')
+                      ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+                      : 'Schedule'
+                    }
+                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setAnalyzing(true);
+                            try {
+                              const response = await fetch('/api/posts/suggest-time', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  content: form.getValues('content'),
+                                }),
+                              });
+                              const data = await response.json();
+                              if (data.suggestedTime) {
+                                setSuggestedTime(data.suggestedTime);
+                                setShowSuggestions(true);
+                                toast({
+                                  title: "AI Suggestion",
+                                  description: `Recommended posting time: ${data.suggestedTime}`,
+                                });
+                              }
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: "Failed to get posting time suggestions",
+                                variant: "destructive",
+                              });
+                            } finally {
+                              setAnalyzing(false);
+                            }
+                          }}
+                          disabled={analyzing}
+                        >
+                          <Wand2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Get AI-suggested posting time</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-4" align="start">
                 <div className="space-y-4">

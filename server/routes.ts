@@ -235,6 +235,42 @@ export function registerRoutes(app: Express) {
       });
     }
   });
+  // Optimal Time Suggestion Route
+  app.post('/api/posts/suggest-time', async (req, res) => {
+    try {
+      const { content } = req.body;
+      const { getAIResponse } = await import('./providers');
+
+      // Get historical engagement data from database
+      const posts = await db.query.posts.findMany({
+        where: sql`"scheduledFor" IS NOT NULL`,
+        orderBy: desc(posts.createdAt),
+        limit: 50,
+      });
+
+      // Analyze patterns in successful posts
+      const prompt = `Based on this tweet content: "${content}", and considering that historically successful posts were published at these times: ${
+        posts.map(p => new Date(p.scheduledFor as Date).toLocaleTimeString()).join(', ')
+      }, suggest the optimal posting time. Consider the content type, target audience, and engagement patterns. Return only the suggested time in 24-hour format (HH:mm).`;
+
+      const response = await getAIResponse(prompt, 'gemini', 'gemini-pro');
+      
+      // Extract time from AI response and validate format
+      const timeMatch = response.suggestedContent.match(/(\d{2}:\d{2})/);
+      const suggestedTime = timeMatch ? timeMatch[0] : '09:00';
+
+      res.json({ 
+        suggestedTime,
+        analysis: response.suggestedContent 
+      });
+    } catch (error) {
+      console.error('Time suggestion error:', error);
+      res.status(500).json({ 
+        error: 'Failed to suggest optimal posting time',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
   app.post('/api/ai/research', async (req, res) => {
     try {
       const { prompt, provider } = req.body;
