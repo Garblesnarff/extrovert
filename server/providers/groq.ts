@@ -4,6 +4,22 @@ import { LLMProvider, ProviderResponse } from './types';
 export class GroqProvider implements LLMProvider {
   private client!: Groq;
   public name = 'groq';
+  public availableModels = [
+    {
+      name: 'mixtral-8x7b-32768',
+      displayName: 'Mixtral 8x7B',
+      description: 'High-performance model with 32k context',
+      maxTokens: 32768,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'llama2-70b-4096',
+      displayName: 'LLaMA 2 70B',
+      description: 'Powerful model with 4k context',
+      maxTokens: 4096,
+      defaultTemperature: 0.7
+    }
+  ];
 
   constructor() {
     const apiKey = process.env.GROQ_API_KEY;
@@ -18,14 +34,14 @@ export class GroqProvider implements LLMProvider {
     return !!process.env.GROQ_API_KEY;
   }
 
-  async generateResponse(prompt: string): Promise<ProviderResponse> {
+  async generateResponse(prompt: string, model = 'mixtral-8x7b-32768'): Promise<ProviderResponse> {
     if (!this.isAvailable()) {
       throw new Error('Groq API key not configured');
     }
 
     const completion = await this.client.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "mixtral-8x7b-32768",
+      model: model,
     });
 
     const text = completion.choices[0]?.message?.content || '';
@@ -34,7 +50,8 @@ export class GroqProvider implements LLMProvider {
       suggestedContent: text,
       hashtags: this.extractHashtags(text),
       analysis: "Generated using Groq AI",
-      provider: this.name
+      provider: this.name,
+      model
     };
   }
 

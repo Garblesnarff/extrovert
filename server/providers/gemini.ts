@@ -2,14 +2,22 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { LLMProvider, ProviderResponse } from './types';
 
 export class GeminiProvider implements LLMProvider {
-  private model: any;
+  private genAI: any;
   public name = 'gemini';
+  public availableModels = [
+    {
+      name: 'gemini-pro',
+      displayName: 'Gemini Pro',
+      description: 'Best for text generation and analysis',
+      maxTokens: 30720,
+      defaultTemperature: 0.7
+    }
+  ];
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (apiKey) {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      this.model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      this.genAI = new GoogleGenerativeAI(apiKey);
     }
   }
 
@@ -17,12 +25,13 @@ export class GeminiProvider implements LLMProvider {
     return !!process.env.GEMINI_API_KEY;
   }
 
-  async generateResponse(prompt: string): Promise<ProviderResponse> {
+  async generateResponse(prompt: string, model = 'gemini-pro'): Promise<ProviderResponse> {
     if (!this.isAvailable()) {
       throw new Error('Gemini API key not configured');
     }
 
-    const result = await this.model.generateContent(prompt);
+    const modelInstance = this.genAI.getGenerativeModel({ model });
+    const result = await modelInstance.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
@@ -30,7 +39,8 @@ export class GeminiProvider implements LLMProvider {
       suggestedContent: text,
       hashtags: this.extractHashtags(text),
       analysis: "Generated using Gemini AI",
-      provider: this.name
+      provider: this.name,
+      model
     };
   }
 

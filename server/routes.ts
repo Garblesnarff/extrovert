@@ -148,8 +148,13 @@ export function registerRoutes(app: Express) {
   // AI Routes
   app.get('/api/ai/providers', async (req, res) => {
     try {
-      const { availableProviders } = await import('./providers');
-      res.json(availableProviders);
+      const { providers } = await import('./providers');
+      const providerInfo = providers.map(provider => ({
+        name: provider.name,
+        models: provider.availableModels,
+        isAvailable: provider.isAvailable()
+      }));
+      res.json(providerInfo);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch AI providers' });
     }
@@ -157,14 +162,14 @@ export function registerRoutes(app: Express) {
 
   app.post('/api/ai/assist', async (req, res) => {
     try {
-      const { prompt, provider } = req.body;
+      const { prompt, provider, model } = req.body;
       const { getAIResponse } = await import('./providers');
       
       if (!prompt) {
         return res.status(400).json({ error: 'Prompt is required' });
       }
 
-      const response = await getAIResponse(prompt, provider);
+      const response = await getAIResponse(prompt, provider, model);
       res.json(response);
     } catch (error) {
       console.error('AI assist error:', error);

@@ -55,6 +55,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const aiAssistant = useAIAssistant();
   const { data: providers } = useAvailableProviders();
   const [selectedProvider, setSelectedProvider] = useState<string>();
+  const [selectedModel, setSelectedModel] = useState<string>();
   
   const editor = useEditor({
     extensions: [
@@ -107,7 +108,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
 
       const result = await aiAssistant.mutateAsync({ 
         prompt: content,
-        provider: selectedProvider
+        provider: selectedProvider,
+        model: selectedModel
       });
       if (editor) {
         editor.commands.setContent(result.suggestedContent);
@@ -200,17 +202,41 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                     {providers && providers.length > 0 && (
                       <Select
                         value={selectedProvider}
-                        onValueChange={setSelectedProvider}
+                        onValueChange={(value) => {
+                          setSelectedProvider(value);
+                          setSelectedModel(undefined); // Reset model when provider changes
+                        }}
                       >
                         <SelectTrigger className="w-[120px]">
                           <SelectValue placeholder="Provider" />
                         </SelectTrigger>
                         <SelectContent>
-                          {providers.map(provider => (
-                            <SelectItem key={provider} value={provider}>
-                              {provider.charAt(0).toUpperCase() + provider.slice(1)}
-                            </SelectItem>
-                          ))}
+                          {providers
+                            .filter(provider => provider.isAvailable)
+                            .map(provider => (
+                              <SelectItem key={provider.name} value={provider.name}>
+                                {provider.name.charAt(0).toUpperCase() + provider.name.slice(1)}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    {selectedProvider && providers && (
+                      <Select
+                        value={selectedModel}
+                        onValueChange={setSelectedModel}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {providers
+                            .find(p => p.name === selectedProvider)
+                            ?.models.map(model => (
+                              <SelectItem key={model.name} value={model.name}>
+                                {model.displayName}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     )}

@@ -4,6 +4,22 @@ import { LLMProvider, ProviderResponse } from './types';
 export class GrokProvider implements LLMProvider {
   private client: OpenAI;
   public name = 'grok';
+  public availableModels = [
+    {
+      name: 'grok-1',
+      displayName: 'Grok-1',
+      description: 'Latest Grok model optimized for conversation',
+      maxTokens: 4096,
+      defaultTemperature: 0.7
+    },
+    {
+      name: 'grok-beta',
+      displayName: 'Grok Beta',
+      description: 'Beta version of Grok with experimental features',
+      maxTokens: 2048,
+      defaultTemperature: 0.7
+    }
+  ];
 
   constructor() {
     const apiKey = process.env.X_AI_API_KEY;
@@ -31,7 +47,7 @@ export class GrokProvider implements LLMProvider {
     return !!process.env.X_AI_API_KEY;
   }
 
-  async generateResponse(prompt: string): Promise<ProviderResponse> {
+  async generateResponse(prompt: string, model = 'grok-1'): Promise<ProviderResponse> {
     if (!this.isAvailable()) {
       console.error('Attempted to use Grok AI without API key');
       throw new Error('X AI API key not configured');
@@ -40,10 +56,10 @@ export class GrokProvider implements LLMProvider {
     try {
       console.log('Generating response using Grok AI...');
       const completion = await this.client.chat.completions.create({
-        model: 'grok-beta',
+        model: model,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: model === 'grok-1' ? 4096 : 2048,
         stream: false,
       });
 
@@ -64,6 +80,7 @@ export class GrokProvider implements LLMProvider {
         hashtags: this.extractHashtags(text),
         analysis: 'Generated using Grok AI',
         provider: this.name,
+        model
       };
     } catch (error) {
       console.error('Error generating response from Grok AI:', error);

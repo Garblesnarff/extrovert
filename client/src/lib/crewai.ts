@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 interface AIRequest {
   prompt: string;
   provider?: string;
+  model?: string;
 }
 
 export const useAvailableProviders = () => {
@@ -13,21 +14,31 @@ export const useAvailableProviders = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch AI providers');
       }
-      return response.json() as Promise<string[]>;
+      return response.json() as Promise<Array<{
+        name: string;
+        models: Array<{
+          name: string;
+          displayName: string;
+          description: string;
+          maxTokens: number;
+          defaultTemperature: number;
+        }>;
+        isAvailable: boolean;
+      }>>;
     },
   });
 };
 
 export const useAIAssistant = () => {
   return useMutation({
-    mutationFn: async ({ prompt, provider }: AIRequest) => {
+    mutationFn: async ({ prompt, provider, model }: AIRequest) => {
       try {
         const response = await fetch('/api/ai/assist', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ prompt, provider }),
+          body: JSON.stringify({ prompt, provider, model }),
         });
         
         if (!response.ok) {
@@ -48,14 +59,14 @@ export const useAIAssistant = () => {
 
 export const useContentResearch = () => {
   return useMutation({
-    mutationFn: async ({ prompt, provider }: AIRequest) => {
+    mutationFn: async ({ prompt, provider, model }: AIRequest) => {
       try {
         const response = await fetch('/api/ai/research', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ prompt, provider }),
+          body: JSON.stringify({ prompt, provider, model }),
         });
         
         if (!response.ok) {

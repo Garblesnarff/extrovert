@@ -9,13 +9,13 @@ const providers: LLMProvider[] = [
   new GrokProvider(),
 ];
 
-export async function getAIResponse(prompt: string, preferredProvider?: string): Promise<ProviderResponse> {
+export async function getAIResponse(prompt: string, preferredProvider?: string, model?: string): Promise<ProviderResponse> {
   // If preferred provider is specified, try it first
   if (preferredProvider) {
     const provider = providers.find(p => p.name === preferredProvider);
     if (provider) {
       try {
-        return await provider.generateResponse(prompt);
+        return await provider.generateResponse(prompt, model);
       } catch (error) {
         console.error(`Error with preferred provider ${preferredProvider}:`, error);
         // Fall through to try other providers
@@ -38,4 +38,4 @@ export async function getAIResponse(prompt: string, preferredProvider?: string):
   throw new Error('All providers failed to generate response');
 }
 
-export const availableProviders = providers.map(p => p.name);
+export { providers };
