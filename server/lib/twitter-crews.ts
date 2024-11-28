@@ -37,6 +37,37 @@ export class OptimizedTwitterCrews {
     });
   }
 
+  private createTrendAnalyst() {
+    return new Agent({
+      name: 'Strategic Trend Analyst',
+      goal: 'Identify valuable engagement opportunities and plan content strategy',
+      backstory: 'Expert in social media trends and content strategy with deep understanding of viral mechanics',
+      allowDelegation: true,
+      verbose: true
+    });
+  }
+
+  setup_discovery_strategy_crew(): Crew {
+    const trendAnalyst = this.createTrendAnalyst();
+    const strategyAnalyst = this.createStrategyAnalyst();
+
+    const analyzeTrends = new Task({
+      description: 'Analyze current trends and conversations in our niche. Identify top 5 engagement opportunities.',
+      agent: trendAnalyst
+    });
+
+    const developStrategy = new Task({
+      description: 'Develop content strategy for identified opportunities. Include optimal posting times and content themes.',
+      agent: strategyAnalyst
+    });
+
+    return new Crew({
+      agents: [trendAnalyst, strategyAnalyst],
+      tasks: [analyzeTrends, developStrategy],
+      verbose: true
+    });
+  }
+
   setup_engagement_community_crew(): Crew {
     const engagementExpert = this.createEngagementExpert();
     const strategyAnalyst = this.createStrategyAnalyst();
