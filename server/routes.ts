@@ -198,31 +198,33 @@ export function registerRoutes(app: Express) {
   app.post('/api/drafts/enhance', async (req, res) => {
     try {
       const { content, enhancementType } = req.body;
-      const { OptimizedTwitterCrews } = await import('./lib/twitter-crews');
-      
-      const twitterCrews = new OptimizedTwitterCrews();
-      let results;
-      
+      const { getAIResponse } = await import('./providers');
+
+      let prompt = '';
       switch (enhancementType) {
         case 'engagement':
-          const engagementCrew = twitterCrews.setup_engagement_community_crew();
-          results = await engagementCrew.kickoff({ content });
+          prompt = `Enhance this tweet for better engagement while maintaining its core message: "${content}"
+                   Focus on making it more engaging, adding relevant hashtags, and improving clarity.`;
           break;
         case 'research':
-          const researchCrew = twitterCrews.setup_research_enhancement_crew();
-          results = await researchCrew.kickoff({ content });
+          prompt = `Add factual context and depth to this tweet while keeping it concise: "${content}"
+                   Include relevant data points and ensure accuracy.`;
           break;
         case 'strategy':
-          const strategyCrew = twitterCrews.setup_discovery_strategy_crew();
-          results = await strategyCrew.kickoff({ content });
+          prompt = `Optimize this tweet for better reach and strategic impact: "${content}"
+                   Consider timing, audience targeting, and current trends.`;
           break;
         default:
-          // Default to full workflow
-          results = await twitterCrews.execute_full_workflow({ content });
+          prompt = `Improve this tweet while maintaining its core message: "${content}"`;
       }
+
+      const response = await getAIResponse(prompt, 'gemini', 'gemini-pro');
       
       res.json({
-        enhanced: results,
+        enhanced: {
+          suggestedContent: response.suggestedContent,
+          analysis: `Enhanced ${enhancementType} version of your tweet`
+        },
         originalContent: content
       });
     } catch (error) {

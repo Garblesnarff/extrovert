@@ -1,0 +1,30 @@
+> rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --exclude vite.config.ts.* server/index.ts
+
+06:45:25 AM [express] serving on port 5000
+06:45:29 AM [express] GET /api/ai/providers 200 in 308ms :: [{"name":"gemini","models":[{"name":"gemi…
+06:45:29 AM [express] GET /api/posts/drafts 200 in 326ms :: [{"id":24,"content":"As an AI, I don't ex…
+06:45:30 AM [express] GET /api/posts/scheduled 200 in 326ms :: []
+06:45:31 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+06:45:31 AM [express] GET /api/posts/drafts 304 in 68ms :: [{"id":24,"content":"As an AI, I don't exp…
+06:45:31 AM [express] GET /api/posts/scheduled 304 in 68ms :: []
+06:45:32 AM [express] GET /api/ai/providers 304 in 6ms :: [{"name":"gemini","models":[{"name":"gemini…
+06:45:32 AM [express] GET /api/posts/scheduled 304 in 73ms :: []
+06:45:32 AM [express] GET /api/posts/drafts 304 in 73ms :: [{"id":24,"content":"As an AI, I don't exp…
+
+[TypeScript] Found 0 errors. Watching for file changes.
+06:49:55 AM [express] POST /api/ai/assist 200 in 1968ms :: {"suggestedContent":"As an AI, I don't hav…
+Draft enhancement error: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'crewai' imported from /home/runner/workspace/server/lib/twitter-crews.ts
+    at packageResolve (node:internal/modules/esm/resolve:854:9)
+    at moduleResolve (node:internal/modules/esm/resolve:927:18)
+    at defaultResolve (node:internal/modules/esm/resolve:1169:11)
+    at nextResolve (node:internal/modules/esm/hooks:866:28)
+    at resolveBase (file:///home/runner/workspace/node_modules/tsx/dist/esm/index.mjs?1732776323152:2:3212)
+    at resolveDirectory (file:///home/runner/workspace/node_modules/tsx/dist/esm/index.mjs?1732776323152:2:3584)
+    at resolveTsPaths (file:///home/runner/workspace/node_modules/tsx/dist/esm/index.mjs?1732776323152:2:4073)
+    at async resolve (file:///home/runner/workspace/node_modules/tsx/dist/esm/index.mjs?1732776323152:2:4441)
+    at async nextResolve (node:internal/modules/esm/hooks:866:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:304:24) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+06:50:12 AM [express] POST /api/drafts/enhance 500 in 29ms :: {"error":"Failed to enhance draft","mes…
