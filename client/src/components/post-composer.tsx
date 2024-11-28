@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Calendar, Wand2 } from 'lucide-react';
+import { Calendar, Wand2, Twitter } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { TimeSelect } from '@/components/ui/time-select';
@@ -56,6 +57,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const { data: providers } = useAvailableProviders();
   const [selectedProvider, setSelectedProvider] = useState<string>();
   const [selectedModel, setSelectedModel] = useState<string>();
+  const [postToTwitter, setPostToTwitter] = useState(false);
   
   const editor = useEditor({
     extensions: [
@@ -144,6 +146,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
         await createPost.mutateAsync({
           ...data,
           scheduledFor: scheduledDate,
+          postToTwitter: postToTwitter && !data.isDraft && !scheduledDate,
         });
       }
       form.reset();
@@ -195,6 +198,20 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
 
         <div className="flex flex-col gap-4 mt-4">
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={postToTwitter}
+                onCheckedChange={setPostToTwitter}
+                id="post-to-twitter"
+              />
+              <label
+                htmlFor="post-to-twitter"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1"
+              >
+                <Twitter className="h-4 w-4" />
+                Post to Twitter
+              </label>
+            </div>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

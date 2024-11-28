@@ -5,7 +5,7 @@ import { queryClient } from './queryClient';
 
 export const useCreatePost = () => {
   return useMutation({
-    mutationFn: async (data: PostFormData) => {
+    mutationFn: async (data: PostFormData & { postToTwitter?: boolean }) => {
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {

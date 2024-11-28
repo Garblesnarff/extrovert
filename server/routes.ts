@@ -55,6 +55,20 @@ export function registerRoutes(app: Express) {
         recurringEndDate: Date | null;
         createdAt: Date;
         updatedAt: Date;
+        tweetId?: string;
+      }
+
+      const twitterClient = (await import('./lib/twitter')).default;
+
+      // If it's not a draft and not scheduled, post to Twitter immediately
+      if (!req.body.isDraft && !req.body.scheduledFor) {
+        try {
+          const tweet = await twitterClient.postTweet(req.body.content);
+          req.body.tweetId = tweet.id;
+        } catch (error) {
+          console.error('Failed to post to Twitter:', error);
+          return res.status(500).json({ error: 'Failed to post to Twitter' });
+        }
       }
 
       if (req.body.recurringPattern && req.body.scheduledFor && req.body.recurringEndDate) {
