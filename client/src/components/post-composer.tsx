@@ -38,7 +38,7 @@ import {
 } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { useCreatePost, useUpdatePost } from '../lib/twitter';
-import { useAIAssistant, useAvailableProviders, useSuggestTime } from '../lib/crewai';
+import { useAIAssistant, useAvailableProviders } from '../lib/crewai';
 import type { PostFormData, Post } from '../types';
 
 interface PostComposerProps {
@@ -53,7 +53,6 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const suggestTime = useSuggestTime();
   const { toast } = useToast();
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
@@ -302,35 +301,35 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                           onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            const content = editor?.getText();
-                            if (!content?.trim()) {
-                              toast({
-                                title: "Error",
-                                description: "Please enter some content first",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
-                            
+                            setAnalyzing(true);
                             try {
-                              const result = await suggestTime.mutateAsync({ content });
-                              if (result.suggestedTime) {
-                                form.setValue('scheduledTime', result.suggestedTime);
+                              const response = await fetch('/api/posts/suggest-time', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  content: form.getValues('content'),
+                                }),
+                              });
+                              const data = await response.json();
+                              if (data.suggestedTime) {
+                                setSuggestedTime(data.suggestedTime);
+                                setShowSuggestions(true);
                                 toast({
                                   title: "AI Suggestion",
-                                  description: `Recommended posting time: ${result.suggestedTime}`,
+                                  description: `Recommended posting time: ${data.suggestedTime}`,
                                 });
                               }
                             } catch (error) {
-                              console.error('Time suggestion error:', error);
                               toast({
                                 title: "Error",
                                 description: "Failed to get posting time suggestions",
                                 variant: "destructive",
                               });
+                            } finally {
+                              setAnalyzing(false);
                             }
                           }}
-                          disabled={!editor?.getText().trim() || suggestTime.isPending}
+                          disabled={analyzing}
                         >
                           <Wand2 className="h-4 w-4" />
                         </Button>
