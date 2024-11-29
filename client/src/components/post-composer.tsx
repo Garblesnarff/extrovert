@@ -301,7 +301,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                           onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            if (!form.getValues('content')) {
+                            const content = form.getValues('content');
+                            if (!content) {
                               toast({
                                 title: "Error",
                                 description: "Please enter some content first",
@@ -314,23 +315,23 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                               const response = await fetch('/api/posts/suggest-time', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  content: form.getValues('content'),
-                                }),
+                                body: JSON.stringify({ content }),
                               });
+                              
                               if (!response.ok) {
                                 throw new Error('Failed to get suggestions');
                               }
+                              
                               const data = await response.json();
                               if (data.suggestedTime) {
-                                setSuggestedTime(data.suggestedTime);
-                                setShowSuggestions(true);
+                                form.setValue('scheduledTime', data.suggestedTime);
                                 toast({
                                   title: "AI Suggestion",
                                   description: `Recommended posting time: ${data.suggestedTime}`,
                                 });
                               }
                             } catch (error) {
+                              console.error('Time suggestion error:', error);
                               toast({
                                 title: "Error",
                                 description: "Failed to get posting time suggestions",
@@ -340,7 +341,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                               setAnalyzing(false);
                             }
                           }}
-                          disabled={analyzing}
+                          disabled={!form.getValues('content') || analyzing}
                         >
                           <Wand2 className="h-4 w-4" />
                         </Button>
