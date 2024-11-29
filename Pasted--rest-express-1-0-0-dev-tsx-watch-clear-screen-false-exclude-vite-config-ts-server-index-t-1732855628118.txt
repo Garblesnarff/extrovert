@@ -1,0 +1,42 @@
+> rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --exclude vite.config.ts.* server/index.ts
+
+04:45:55 AM [express] serving on port 5000
+
+ ERROR(TypeScript)  'posts' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+ FILE  /home/runner/workspace/server/routes.ts:245:13
+
+    243 |
+    244 |       // Get historical engagement data from database
+  > 245 |       const posts = await db.query.posts.findMany({
+        |             ^^^^^
+    246 |         where: sql`"scheduledFor" IS NOT NULL`,
+    247 |         orderBy: desc(posts.createdAt),
+    248 |         limit: 50,
+
+ ERROR(TypeScript)  Block-scoped variable 'posts' used before its declaration.
+ FILE  /home/runner/workspace/server/routes.ts:247:23
+
+    245 |       const posts = await db.query.posts.findMany({
+    246 |         where: sql`"scheduledFor" IS NOT NULL`,
+  > 247 |         orderBy: desc(posts.createdAt),
+        |                       ^^^^^
+    248 |         limit: 50,
+    249 |       });
+    250 |
+
+ ERROR(TypeScript)  Parameter 'p' implicitly has an 'any' type.
+ FILE  /home/runner/workspace/server/routes.ts:253:19
+
+    251 |       // Analyze patterns in successful posts
+    252 |       const prompt = `Based on this tweet content: "${content}", and considering that historically successful posts were published at these times: ${
+  > 253 |         posts.map(p => new Date(p.scheduledFor as Date).toLocaleTimeString()).join(', ')
+        |                   ^
+    254 |       }, suggest the optimal posting time. Consider the content type, target audience, and engagement patterns. Return only the suggested time in 24-hour format (HH:mm).`;
+    255 |
+    256 |       const response = await getAIResponse(prompt, 'gemini', 'gemini-pro');
+
+[TypeScript] Found 3 errors. Watching for file changes.
+04:46:04 AM [express] GET /api/ai/providers 304 in 176ms :: [{"name":"gemini","models":[{"name":"gemi…
+04:46:05 AM [express] GET /api/posts/drafts 304 in 856ms :: [{"id":24,"content":"\"🚨 Attention innov…
+04:46:05 AM [express] GET /api/posts/scheduled 304 in 1301ms :: []

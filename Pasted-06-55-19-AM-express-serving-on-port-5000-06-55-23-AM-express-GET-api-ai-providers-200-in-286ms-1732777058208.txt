@@ -1,0 +1,51 @@
+06:55:19 AM [express] serving on port 5000
+06:55:23 AM [express] GET /api/ai/providers 200 in 286ms :: [{"name":"gemini","models":[{"name":"gemi…
+                                                                                06:55:23 AM [express] GET /api/posts/scheduled 200 in 366ms :: []
+06:55:23 AM [express] GET /api/posts/drafts 200 in 349ms :: [{"id":24,"content":"\"🚨 Attention innov…
+
+ ERROR(TypeScript)  'posts' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+ FILE  /home/runner/workspace/server/routes.ts:245:13
+
+    243 |
+    244 |       // Get historical engagement data from database
+  > 245 |       const posts = await db.query.posts.findMany({
+        |             ^^^^^
+    246 |         where: sql`"scheduledFor" IS NOT NULL`,
+    247 |         orderBy: desc(posts.createdAt),
+    248 |         limit: 50,
+
+ ERROR(TypeScript)  Block-scoped variable 'posts' used before its declaration.
+ FILE  /home/runner/workspace/server/routes.ts:247:23
+
+    245 |       const posts = await db.query.posts.findMany({
+    246 |         where: sql`"scheduledFor" IS NOT NULL`,
+  > 247 |         orderBy: desc(posts.createdAt),
+        |                       ^^^^^
+    248 |         limit: 50,
+    249 |       });
+    250 |
+
+ ERROR(TypeScript)  Parameter 'p' implicitly has an 'any' type.
+ FILE  /home/runner/workspace/server/routes.ts:253:19
+
+    251 |       // Analyze patterns in successful posts
+    252 |       const prompt = `Based on this tweet content: "${content}", and considering that historically successful posts were published at these times: ${
+  > 253 |         posts.map(p => new Date(p.scheduledFor as Date).toLocaleTimeString()).join(', ')
+        |                   ^
+    254 |       }, suggest the optimal posting time. Consider the content type, target audience, and engagement patterns. Return only the suggested time in 24-hour format (HH:mm).`;
+    255 |
+    256 |       const response = await getAIResponse(prompt, 'gemini', 'gemini-pro');
+
+[TypeScript] Found 3 errors. Watching for file changes.
+06:55:31 AM [express] GET /api/ai/providers 304 in 3ms :: [{"name":"gemini","models":[{"name":"gemini…
+06:55:31 AM [express] GET /api/posts/drafts 304 in 70ms :: [{"id":24,"content":"\"🚨 Attention innova…
+06:55:31 AM [express] GET /api/posts/scheduled 304 in 66ms :: []
+06:55:31 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+06:55:32 AM [express] GET /api/posts/drafts 304 in 67ms :: [{"id":24,"content":"\"🚨 Attention innova…
+06:55:32 AM [express] GET /api/posts/scheduled 304 in 68ms :: []
+Time suggestion error: ReferenceError: Cannot access 'posts2' before initialization
+    at <anonymous> (/home/runner/workspace/server/routes.ts:247:23)
+06:56:47 AM [express] POST /api/posts/suggest-time 500 in 8ms :: {"error":"Failed to suggest optimal …
+Time suggestion error: ReferenceError: Cannot access 'posts2' before initialization
+    at <anonymous> (/home/runner/workspace/server/routes.ts:247:23)
+06:57:05 AM [express] POST /api/posts/suggest-time 500 in 2ms :: {"error":"Failed to suggest optimal …

@@ -241,19 +241,22 @@ export function registerRoutes(app: Express) {
       const { content } = req.body;
       const { getAIResponse } = await import('./providers');
 
+      // Import required schema
+      const { posts } = db.query;
+
       // Get historical engagement data from database
-      const posts = await db.query.posts.findMany({
+      const historicalPosts = await posts.findMany({
         where: sql`"scheduledFor" IS NOT NULL`,
-        orderBy: desc(posts.createdAt),
+        orderBy: [{ createdAt: 'desc' }],
         limit: 50,
       });
 
       // Analyze patterns in successful posts
       const prompt = `Based on this tweet content: "${content}", and considering that historically successful posts were published at these times: ${
-        posts.map(p => new Date(p.scheduledFor as Date).toLocaleTimeString()).join(', ')
+        historicalPosts.map(post => new Date(post.scheduledFor as Date).toLocaleTimeString()).join(', ')
       }, suggest the optimal posting time. Consider the content type, target audience, and engagement patterns. Return only the suggested time in 24-hour format (HH:mm).`;
 
-      const response = await getAIResponse(prompt, 'gemini', 'gemini-pro');
+      const response = await getAIResponse(prompt, 'gemini', 'gemini-1.5-pro');
       
       // Extract time from AI response and validate format
       const timeMatch = response.suggestedContent.match(/(\d{2}:\d{2})/);
