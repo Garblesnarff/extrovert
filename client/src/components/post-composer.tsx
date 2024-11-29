@@ -301,6 +301,14 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                           onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            if (!form.getValues('content')) {
+                              toast({
+                                title: "Error",
+                                description: "Please enter some content first",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
                             setAnalyzing(true);
                             try {
                               const response = await fetch('/api/posts/suggest-time', {
@@ -310,6 +318,9 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                                   content: form.getValues('content'),
                                 }),
                               });
+                              if (!response.ok) {
+                                throw new Error('Failed to get suggestions');
+                              }
                               const data = await response.json();
                               if (data.suggestedTime) {
                                 setSuggestedTime(data.suggestedTime);
