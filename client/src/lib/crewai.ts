@@ -84,3 +84,31 @@ export const useContentResearch = () => {
     },
   });
 };
+
+export const useSuggestTime = () => {
+  return useMutation({
+    mutationFn: async ({ content }: { content: string }) => {
+      try {
+        const response = await fetch('/api/posts/suggest-time', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to get time suggestion');
+        }
+        
+        return response.json();
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(`Time Suggestion Error: ${error.message}`);
+        }
+        throw error;
+      }
+    },
+  });
+};
