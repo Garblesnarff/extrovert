@@ -291,66 +291,57 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                       : 'Schedule'
                     }
                   </Button>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          type="button"
-                          onClick={async (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const content = form.getValues('content');
-                            if (!content) {
-                              toast({
-                                title: "Error",
-                                description: "Please enter some content first",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
-                            setAnalyzing(true);
-                            try {
-                              const response = await fetch('/api/posts/suggest-time', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ content }),
-                              });
-                              
-                              if (!response.ok) {
-                                throw new Error('Failed to get suggestions');
-                              }
-                              
-                              const data = await response.json();
-                              if (data.suggestedTime) {
-                                form.setValue('scheduledTime', data.suggestedTime);
-                                toast({
-                                  title: "AI Suggestion",
-                                  description: `Recommended posting time: ${data.suggestedTime}`,
-                                });
-                              }
-                            } catch (error) {
-                              console.error('Time suggestion error:', error);
-                              toast({
-                                title: "Error",
-                                description: "Failed to get posting time suggestions",
-                                variant: "destructive",
-                              });
-                            } finally {
-                              setAnalyzing(false);
-                            }
-                          }}
-                          disabled={!form.getValues('content') || analyzing}
-                        >
-                          <Wand2 className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Get AI-suggested posting time</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    onClick={async () => {
+                      const content = editor?.getText() || '';
+                      if (!content.trim()) {
+                        toast({
+                          title: "Error",
+                          description: "Please enter some content first",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      
+                      setAnalyzing(true);
+                      try {
+                        const response = await fetch('/api/posts/suggest-time', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ content }),
+                        });
+                        
+                        if (!response.ok) {
+                          throw new Error('Failed to get suggestions');
+                        }
+                        
+                        const data = await response.json();
+                        if (data.suggestedTime) {
+                          form.setValue('scheduledTime', data.suggestedTime);
+                          toast({
+                            title: "AI Suggestion",
+                            description: `Recommended posting time: ${data.suggestedTime}`,
+                          });
+                        }
+                      } catch (error) {
+                        console.error('Time suggestion error:', error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to get posting time suggestions",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setAnalyzing(false);
+                      }
+                    }}
+                    disabled={!editor?.getText().trim() || analyzing}
+                    title="Get AI-suggested posting time"
+                  >
+                    <Wand2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-4" align="start">
