@@ -241,15 +241,12 @@ export function registerRoutes(app: Express) {
       const { content } = req.body;
       const { getAIResponse } = await import('./providers');
 
-      // Import required schema
-      const { posts } = db.query;
-
       // Get historical engagement data from database
-      const historicalPosts = await posts.findMany({
-        where: sql`"scheduledFor" IS NOT NULL`,
-        orderBy: [{ createdAt: 'desc' }],
-        limit: 50,
-      });
+      const historicalPosts = await db.select()
+        .from(posts)
+        .where(sql`"scheduledFor" IS NOT NULL`)
+        .orderBy(desc(posts.createdAt))
+        .limit(50);
 
       // Analyze patterns in successful posts
       const prompt = `Based on this tweet content: "${content}", and considering that historically successful posts were published at these times: ${

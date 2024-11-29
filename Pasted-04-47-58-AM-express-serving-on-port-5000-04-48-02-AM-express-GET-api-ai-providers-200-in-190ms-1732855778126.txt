@@ -1,0 +1,38 @@
+04:47:58 AM [express] serving on port 5000
+04:48:02 AM [express] GET /api/ai/providers 200 in 190ms :: [{"name":"gemini","models":[{"name":"gemi…
+04:48:03 AM [express] GET /api/posts/drafts 200 in 332ms :: [{"id":24,"content":"\"🚨 Attention innov…
+04:48:03 AM [express] GET /api/posts/scheduled 200 in 299ms :: []
+
+ ERROR(TypeScript)  Object literal may only specify known properties, and 'createdAt' does not exist in type 'SQL<unknown> | AnyColumn'.
+ FILE  /home/runner/workspace/server/routes.ts:250:21
+
+    248 |       const historicalPosts = await posts.findMany({
+    249 |         where: sql`"scheduledFor" IS NOT NULL`,
+  > 250 |         orderBy: [{ createdAt: 'desc' }],
+        |                     ^^^^^^^^^
+    251 |         limit: 50,
+    252 |       });
+    253 |
+
+[TypeScript] Found 1 error. Watching for file changes.
+04:48:08 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+04:48:08 AM [express] GET /api/posts/drafts 304 in 66ms :: [{"id":24,"content":"\"🚨 Attention innova…
+04:48:08 AM [express] GET /api/posts/scheduled 304 in 67ms :: []
+04:48:08 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+04:48:08 AM [express] GET /api/posts/drafts 304 in 66ms :: [{"id":24,"content":"\"🚨 Attention innova…
+04:48:08 AM [express] GET /api/posts/scheduled 304 in 65ms :: []
+Time suggestion error: TypeError: Cannot read properties of undefined (reading 'map')
+    at mapColumnsInSQLToAlias (/home/runner/workspace/node_modules/src/alias.ts:111:36)
+    at <anonymous> (/home/runner/workspace/node_modules/src/pg-core/dialect.ts:1226:12)
+    at Array.map (<anonymous>)
+    at PgDialect.buildRelationalQueryWithoutPK (/home/runner/workspace/node_modules/src/pg-core/dialect.ts:1222:26)
+    at QueryPromise._getQuery (/home/runner/workspace/node_modules/src/pg-core/query-builders/query.ts:117:23)
+    at QueryPromise._toSQL (/home/runner/workspace/node_modules/src/pg-core/query-builders/query.ts:134:22)
+    at <anonymous> (/home/runner/workspace/node_modules/src/pg-core/query-builders/query.ts:92:39)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at QueryPromise._prepare (/home/runner/workspace/node_modules/src/pg-core/query-builders/query.ts:91:17)
+    at <anonymous> (/home/runner/workspace/node_modules/src/pg-core/query-builders/query.ts:147:16)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at QueryPromise.execute (/home/runner/workspace/node_modules/src/pg-core/query-builders/query.ts:146:17)
+    at QueryPromise.then (/home/runner/workspace/node_modules/src/query-promise.ts:31:15)
+04:49:16 AM [express] POST /api/posts/suggest-time 500 in 26ms :: {"error":"Failed to suggest optimal…
