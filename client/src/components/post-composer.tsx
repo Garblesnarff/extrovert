@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Calendar, Wand2, Twitter } from 'lucide-react';
+import { Calendar, Wand2, Twitter, Clock } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -294,45 +294,67 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          type="button"
-                          onClick={async (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setAnalyzing(true);
-                            try {
-                              const response = await fetch('/api/posts/suggest-time', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  content: form.getValues('content'),
-                                }),
-                              });
-                              const data = await response.json();
-                              if (data.suggestedTime) {
-                                setSuggestedTime(data.suggestedTime);
-                                setShowSuggestions(true);
-                                toast({
-                                  title: "AI Suggestion",
-                                  description: `Recommended posting time: ${data.suggestedTime}`,
-                                });
-                              }
-                            } catch (error) {
-                              toast({
-                                title: "Error",
-                                description: "Failed to get posting time suggestions",
-                                variant: "destructive",
-                              });
-                            } finally {
-                              setAnalyzing(false);
-                            }
-                          }}
-                          disabled={analyzing}
-                        >
-                          <Wand2 className="h-4 w-4" />
-                        </Button>
+                        <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setAnalyzing(true);
+                                try {
+                                  const response = await fetch('/api/posts/suggest-time', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      content: form.getValues('content'),
+                                    }),
+                                  });
+                                  const data = await response.json();
+                                  if (data.suggestedTime) {
+                                    setSuggestedTime(data.suggestedTime);
+                                    setShowSuggestions(true);
+                                  }
+                                } catch (error) {
+                                  toast({
+                                    title: "Error",
+                                    description: "Failed to get posting time suggestions",
+                                    variant: "destructive",
+                                  });
+                                } finally {
+                                  setAnalyzing(false);
+                                }
+                              }}
+                              disabled={analyzing}
+                              className={showSuggestions ? 'bg-primary/10' : ''}
+                            >
+                              <Wand2 className="h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-4" align="start">
+                            <div className="space-y-2">
+                              <p className="font-medium">AI Suggested Posting Time</p>
+                              <p className="text-sm text-muted-foreground">
+                                Based on your content and historical engagement patterns
+                              </p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Clock className="h-4 w-4 text-primary" />
+                                <span className="font-medium">{suggestedTime}</span>
+                              </div>
+                              <Button 
+                                className="w-full mt-2"
+                                onClick={() => {
+                                  form.setValue('scheduledTime', suggestedTime);
+                                  setShowSuggestions(false);
+                                }}
+                              >
+                                Apply Suggestion
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Get AI-suggested posting time</p>
