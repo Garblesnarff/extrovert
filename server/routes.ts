@@ -311,10 +311,34 @@ export function registerRoutes(app: Express) {
   });
   app.get('/api/trends', async (req, res) => {
     try {
-      const { execSync } = require('child_process');
-      const trendsData = execSync('python3 server/lib/trends.py').toString();
-      console.log('Trends data:', trendsData);
-      res.json(JSON.parse(trendsData));
+      const { exec } = await import('child_process');
+      const command = 'python3 server/lib/trends.py';
+      
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Error executing Python script:', error);
+          return res.status(500).json({ 
+            error: 'Failed to fetch trending topics',
+            message: error.message 
+          });
+        }
+        
+        if (stderr) {
+          console.error('Python script stderr:', stderr);
+        }
+
+        try {
+          const trendsData = JSON.parse(stdout);
+          console.log('Trends data:', trendsData);
+          res.json(trendsData);
+        } catch (parseError) {
+          console.error('Error parsing trends data:', parseError);
+          res.status(500).json({ 
+            error: 'Failed to parse trending topics',
+            message: 'Invalid data format returned from trends service'
+          });
+        }
+      });
     } catch (error) {
       console.error('Failed to fetch trends:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
