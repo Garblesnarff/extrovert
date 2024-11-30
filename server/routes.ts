@@ -144,12 +144,14 @@ export function registerRoutes(app: Express) {
           res.json(post[0]);
         } catch (error) {
           console.error('Failed to create single post:', error);
-          res.status(500).json({ error: 'Failed to create post', details: error.message });
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          res.status(500).json({ error: 'Failed to create post', details: errorMessage });
         }
       }
     } catch (error) {
       console.error('Post creation error:', error);
-      res.status(500).json({ error: 'Failed to create post', details: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(500).json({ error: 'Failed to create post', details: errorMessage });
     }
   });
 
