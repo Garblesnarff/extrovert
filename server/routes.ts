@@ -155,18 +155,31 @@ export function registerRoutes(app: Express) {
 
   app.put('/api/posts/:id', async (req, res) => {
     try {
+      const postData = {
+        content: req.body.content,
+        scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
+        isDraft: !!req.body.isDraft,
+        recurringPattern: req.body.recurringPattern || null,
+        recurringEndDate: req.body.recurringEndDate ? new Date(req.body.recurringEndDate) : null,
+        updatedAt: new Date(),
+      };
+
       const post = await db.update(posts)
-        .set({
-          content: req.body.content,
-          scheduledFor: req.body.scheduledFor,
-          isDraft: req.body.isDraft,
-          updatedAt: new Date(),
-        })
+        .set(postData)
         .where(eq(posts.id, parseInt(req.params.id)))
         .returning();
+
+      if (!post.length) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+
       res.json(post[0]);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update post' });
+      console.error('Failed to update post:', error);
+      res.status(500).json({ 
+        error: 'Failed to update post',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
