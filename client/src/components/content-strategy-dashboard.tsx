@@ -43,13 +43,25 @@ export function ContentStrategyDashboard() {
       
       const themesData = await themesResponse.json();
       
-      const suggestions: ThemeSuggestion[] = themesData.insights.split('\n')
-        .filter((line: string) => line.trim())
-        .map((theme: string) => ({
-          theme: theme.split(':')[0] || theme,
+      // Handle the response data safely
+      let suggestions: ThemeSuggestion[] = [];
+      try {
+        const insights = themesData.insights || '';
+        suggestions = insights.split('\n')
+          .filter((line: string) => line.trim())
+          .map((theme: string) => ({
+            theme: theme.split(':')[0]?.trim() || theme,
+            topics: trendsData.slice(0, 3).map((t: Topic) => t.name),
+            description: theme.split(':')[1]?.trim() || 'Emerging trend based on current search patterns',
+          }));
+      } catch (error) {
+        console.warn('Error parsing theme suggestions:', error);
+        suggestions = [{
+          theme: 'Content Strategy',
           topics: trendsData.slice(0, 3).map((t: Topic) => t.name),
-          description: theme.split(':')[1] || 'Emerging trend based on current search patterns',
-        }));
+          description: 'Analyzing current trending topics'
+        }];
+      }
 
       setThemeSuggestions(suggestions);
     } catch (error) {
