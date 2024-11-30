@@ -244,7 +244,7 @@ export function registerRoutes(app: Express) {
       // Get historical engagement data from database
       const historicalPosts = await db.select()
         .from(posts)
-        .where(sql`"scheduled_for" IS NOT NULL`)
+        .where(sql`"scheduledFor" IS NOT NULL`)
         .orderBy(desc(posts.createdAt))
         .limit(50);
 
