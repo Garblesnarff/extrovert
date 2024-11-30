@@ -26,7 +26,11 @@ export function ContentStrategyDashboard() {
     try {
       // Fetch trending topics from Google Trends
       const trendsResponse = await fetch('/api/trends');
+      if (!trendsResponse.ok) {
+        throw new Error('Failed to fetch trending topics');
+      }
       const trendsData = await trendsResponse.json();
+      console.log('Trends data received:', trendsData);
       setTrendingTopics(trendsData);
 
       // Fetch content themes and suggestions
@@ -40,6 +44,9 @@ export function ContentStrategyDashboard() {
           provider: 'gemini',
         }),
       });
+      if (!themesResponse.ok) {
+        throw new Error('Failed to fetch theme suggestions');
+      }
       
       const themesData = await themesResponse.json();
       

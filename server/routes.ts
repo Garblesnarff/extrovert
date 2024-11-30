@@ -309,11 +309,11 @@ export function registerRoutes(app: Express) {
       });
     }
   });
-  app.post('/api/ai/research', async (req, res) => {
   app.get('/api/trends', async (req, res) => {
     try {
       const { execSync } = require('child_process');
       const trendsData = execSync('python3 server/lib/trends.py').toString();
+      console.log('Trends data:', trendsData);
       res.json(JSON.parse(trendsData));
     } catch (error) {
       console.error('Failed to fetch trends:', error);
@@ -324,6 +324,8 @@ export function registerRoutes(app: Express) {
       });
     }
   });
+
+  app.post('/api/ai/research', async (req, res) => {
 
     try {
       const { prompt, provider } = req.body;
