@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Calendar, Wand2, Twitter, Clock } from 'lucide-react';
+import { Calendar, Wand2, Twitter, Clock, Timer } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -333,24 +333,28 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                               <Wand2 className="h-4 w-4" />
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-4" align="start">
-                            <div className="space-y-2">
-                              <p className="font-medium">AI Suggested Posting Time</p>
-                              <p className="text-sm text-muted-foreground">
-                                Based on your content and historical engagement patterns
-                              </p>
-                              <div className="flex items-center gap-2 mt-2">
-                                <Clock className="h-4 w-4 text-primary" />
-                                <span className="font-medium">{suggestedTime}</span>
+                          <PopoverContent className="w-[300px] p-4" align="end" sideOffset={5}>
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Timer className="h-5 w-5 text-primary" />
+                                <div>
+                                  <h4 className="font-medium">Optimal Posting Time</h4>
+                                  <p className="text-sm text-muted-foreground">Based on engagement patterns</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-center bg-primary/5 p-3 rounded-lg">
+                                <Clock className="h-5 w-5 text-primary mr-2" />
+                                <span className="text-lg font-medium">{suggestedTime}</span>
                               </div>
                               <Button 
-                                className="w-full mt-2"
+                                className="w-full"
                                 onClick={() => {
                                   form.setValue('scheduledTime', suggestedTime);
                                   setShowSuggestions(false);
+                                  setShowSchedule(true); // Open schedule dialog after applying
                                 }}
                               >
-                                Apply Suggestion
+                                Apply & Schedule
                               </Button>
                             </div>
                           </PopoverContent>
