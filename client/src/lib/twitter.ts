@@ -13,12 +13,12 @@ export const useCreatePost = () => {
         },
         body: JSON.stringify({
           ...data,
-          scheduledFor: data.scheduledFor && data.scheduledTime
+          scheduled_for: data.scheduled_for && data.scheduled_time
             ? new Date(
-                new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+                new Date(data.scheduled_for).toISOString().split('T')[0] + 'T' + data.scheduled_time
               ).toISOString()
             : null,
-          isDraft: data.isDraft || false,
+          is_draft: data.is_draft || false,
         }),
       });
       
