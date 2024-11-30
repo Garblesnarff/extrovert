@@ -1,0 +1,69 @@
+[vite] connecting...
+[vite] connected.
+Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
+
+Check the render method of `SlotClone`.
+    at Popover (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=9314c419:60:5)
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1980:13
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=9314c419:194:13
+    at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-L7FCK3EQ.js?v=9314c419:48:15)
+    at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1915:15)
+    at Popper (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1972:11)
+    at Tooltip (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=9314c419:103:5)
+    at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-L7FCK3EQ.js?v=9314c419:48:15)
+    at TooltipProvider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=9314c419:59:5)
+    at div
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1980:13
+    at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=9314c419:111:13
+    at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-L7FCK3EQ.js?v=9314c419:48:15)
+    at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1915:15)
+    at Popper (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1972:11)
+    at Popover (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=9314c419:60:5)
+   …
+
+Check the render method of &#x60;SlotClone&#x60;.
+at Popover (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=9314c419:60:5)
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1980:13
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=9314c419:194:13
+at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-L7FCK3EQ.js?v=9314c419:48:15)
+at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1915:15)
+at Popper (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1972:11)
+at Tooltip (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=9314c419:103:5)
+at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-L7FCK3EQ.js?v=9314c419:48:15)
+at TooltipProvider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=9314c419:59:5)
+at div
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:52:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=9314c419:33:11
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=9314c419:41:13
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1980:13
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=9314c419:111:13
+at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-L7FCK3EQ.js?v=9314c419:48:15)
+at Provider (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1915:15)
+at Popper (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-THKTXKDM.js?v=9314c419:1972:11)
+at Popover (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=9314c419:60:5)
+…
+at t.value (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://abb2166c-4feb-4c86-b0a8-f4b45bf29e87-00-3r5d31axmhds5.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

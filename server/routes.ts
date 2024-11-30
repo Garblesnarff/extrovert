@@ -49,7 +49,7 @@ export function registerRoutes(app: Express) {
     try {
       interface PostToCreate {
         content: string;
-        scheduledFor: Date;
+        scheduledFor: Date | null;
         isDraft: boolean;
         recurringPattern: string | null;
         recurringEndDate: Date | null;
@@ -58,10 +58,14 @@ export function registerRoutes(app: Express) {
         tweetId?: string;
       }
 
+      if (!req.body.content) {
+        return res.status(400).json({ error: 'Content is required' });
+      }
+
       const twitterClient = (await import('./lib/twitter')).default;
 
       // If it's not a draft and not scheduled, post to Twitter immediately
-      if (!req.body.isDraft && !req.body.scheduledFor) {
+      if (!req.body.isDraft && !req.body.scheduledFor && req.body.postToTwitter) {
         try {
           const tweet = await twitterClient.postTweet(req.body.content);
           req.body.tweetId = tweet.id;
@@ -87,6 +91,7 @@ export function registerRoutes(app: Express) {
             recurringEndDate: new Date(endDate),
             createdAt: new Date(),
             updatedAt: new Date(),
+            tweetId: req.body.tweetId
           });
 
           // Calculate next date based on pattern
@@ -105,30 +110,46 @@ export function registerRoutes(app: Express) {
           currentDate = nextDate;
         }
 
-        // Insert first post and get the result
-        const result = await db.insert(posts).values(postsToCreate[0]).returning();
+        try {
+          // Insert first post and get the result
+          const result = await db.insert(posts).values(postsToCreate[0]).returning();
 
-        // Insert remaining posts if any
-        if (postsToCreate.length > 1) {
-          await Promise.all(postsToCreate.slice(1).map(post => 
-            db.insert(posts).values(post)
-          ));
+          // Insert remaining posts if any
+          if (postsToCreate.length > 1) {
+            await Promise.all(postsToCreate.slice(1).map(post => 
+              db.insert(posts).values(post)
+            ));
+          }
+
+          res.json(result[0]); // Return the first post
+        } catch (error) {
+          console.error('Failed to create recurring posts:', error);
+          res.status(500).json({ error: 'Failed to create recurring posts' });
         }
-
-        res.json(result[0]); // Return the first post
       } else {
         // Create single post
-        const post = await db.insert(posts).values({
-          content: req.body.content,
-          scheduledFor: req.body.scheduledFor,
-          isDraft: req.body.isDraft,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }).returning();
-        res.json(post[0]);
+        try {
+          const postData = {
+            content: req.body.content,
+            scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
+            isDraft: !!req.body.isDraft,
+            recurringPattern: null,
+            recurringEndDate: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            tweetId: req.body.tweetId
+          };
+
+          const post = await db.insert(posts).values(postData).returning();
+          res.json(post[0]);
+        } catch (error) {
+          console.error('Failed to create single post:', error);
+          res.status(500).json({ error: 'Failed to create post', details: error.message });
+        }
       }
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create post' });
+      console.error('Post creation error:', error);
+      res.status(500).json({ error: 'Failed to create post', details: error.message });
     }
   });
 

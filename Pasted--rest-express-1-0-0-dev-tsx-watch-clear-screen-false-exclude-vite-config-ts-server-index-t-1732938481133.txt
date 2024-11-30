@@ -1,0 +1,59 @@
+> rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --exclude vite.config.ts.* server/index.ts
+
+03:32:36 AM [express] serving on port 5000
+03:32:40 AM [express] GET /api/ai/providers 200 in 186ms :: [{"name":"gemini","models":[{"name":"gemi…
+03:32:40 AM [express] GET /api/posts/drafts 200 in 334ms :: [{"id":24,"content":"\"🚨 Attention innov…
+03:32:40 AM [express] GET /api/posts/scheduled 200 in 321ms :: []
+
+[TypeScript] Found 0 errors. Watching for file changes.
+03:32:43 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+03:32:43 AM [express] GET /api/posts/drafts 304 in 68ms :: [{"id":24,"content":"\"🚨 Attention innova…
+03:32:43 AM [express] GET /api/posts/scheduled 304 in 68ms :: []
+03:32:43 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+03:32:44 AM [express] GET /api/posts/drafts 304 in 66ms :: [{"id":24,"content":"\"🚨 Attention innova…
+03:32:44 AM [express] GET /api/posts/scheduled 304 in 66ms :: []
+03:36:07 AM [express] POST /api/posts/suggest-time 200 in 2263ms :: {"suggestedTime":"10:00","analysi…
+03:36:39 AM [express] POST /api/posts/suggest-time 200 in 2421ms :: {"suggestedTime":"10:00","analysi…
+3:38:46 AM [vite] hmr update /src/components/post-composer.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+3:39:32 AM [vite] hmr update /src/components/post-composer.tsx, /src/index.css
+
+ ERROR(TypeScript)  Cannot find name 'Clock'. Did you mean 'Lock'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:343:34
+
+    341 |                               </p>
+    342 |                               <div className="flex items-center gap-2 mt-2">
+  > 343 |                                 <Clock className="h-4 w-4 text-primary" />
+        |                                  ^^^^^
+    344 |                                 <span className="font-medium">{suggestedTime}</span>
+    345 |                               </div>
+    346 |                               <Button 
+
+[TypeScript] Found 1 error. Watching for file changes.
+3:40:05 AM [vite] hmr update /src/components/post-composer.tsx, /src/index.css
+03:40:08 AM [express] GET /api/ai/providers 200 in 32ms :: [{"name":"gemini","models":[{"name":"gemin…
+
+[TypeScript] Found 0 errors. Watching for file changes.
+03:40:08 AM [express] GET /api/posts/drafts 200 in 313ms :: [{"id":24,"content":"\"🚨 Attention innov…
+03:40:08 AM [express] GET /api/posts/scheduled 200 in 288ms :: []
+03:40:12 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+03:40:12 AM [express] GET /api/posts/drafts 304 in 67ms :: [{"id":24,"content":"\"🚨 Attention innova…
+03:40:12 AM [express] GET /api/posts/scheduled 304 in 66ms :: []
+03:44:19 AM [express] POST /api/posts/suggest-time 200 in 2529ms :: {"suggestedTime":"15:00","analysi…
+3:45:14 AM [vite] hmr update /src/components/post-composer.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+3:45:25 AM [vite] hmr update /src/components/post-composer.tsx, /src/index.css
+
+[TypeScript] Found 0 errors. Watching for file changes.
+03:45:27 AM [express] GET /api/ai/providers 200 in 4ms :: [{"name":"gemini","models":[{"name":"gemini…
+03:45:27 AM [express] GET /api/posts/drafts 200 in 282ms :: [{"id":24,"content":"\"🚨 Attention innov…
+03:45:27 AM [express] GET /api/posts/scheduled 200 in 282ms :: []
+03:45:30 AM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+03:45:30 AM [express] GET /api/posts/drafts 304 in 66ms :: [{"id":24,"content":"\"🚨 Attention innova…
+03:45:30 AM [express] GET /api/posts/scheduled 304 in 67ms :: []
+03:47:26 AM [express] POST /api/posts/suggest-time 200 in 1823ms :: {"suggestedTime":"10:00","analysi…
+03:47:44 AM [express] POST /api/posts 500 in 113ms :: {"error":"Failed to create post"}
+03:47:47 AM [express] POST /api/posts 500 in 1ms :: {"error":"Failed to create post"}
