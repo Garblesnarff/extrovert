@@ -16,6 +16,7 @@ export interface PostFormData {
   is_draft?: boolean;
   recurring_pattern?: 'daily' | 'weekly' | 'monthly' | null;
   recurring_end_date?: Date;
+  post_to_twitter?: boolean;
 }
 
 export interface AIAssistResponse {

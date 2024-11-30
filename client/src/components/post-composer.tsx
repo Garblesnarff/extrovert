@@ -42,11 +42,11 @@ import { useAIAssistant, useAvailableProviders } from '../lib/crewai';
 import type { PostFormData, Post } from '../types';
 
 interface PostComposerProps {
-  initialPost?: Post;
-  onSuccess?: () => void;
+  initial_post?: Post;
+  on_success?: () => void;
 }
 
-export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
+export function PostComposer({ initial_post: initialPost, on_success: onSuccess }: PostComposerProps) {
   const [showSchedule, setShowSchedule] = useState(false);
   const [showError, setShowError] = useState(false);
   const [suggestedTime, setSuggestedTime] = useState<string>();
@@ -60,7 +60,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const { data: providers } = useAvailableProviders();
   const [selectedProvider, setSelectedProvider] = useState<string>();
   const [selectedModel, setSelectedModel] = useState<string>();
-  const [postToTwitter, setPostToTwitter] = useState(false);
+  const [post_to_twitter, set_post_to_twitter] = useState(false);
   
   const editor = useEditor({
     extensions: [
@@ -78,11 +78,12 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const form = useForm<PostFormData>({
     defaultValues: {
       content: '',
-      scheduledFor: undefined,
-      scheduledTime: undefined,
-      isDraft: false,
-      recurringPattern: null,
-      recurringEndDate: undefined,
+      scheduled_for: undefined,
+      scheduled_time: undefined,
+      is_draft: false,
+      recurring_pattern: null,
+      recurring_end_date: undefined,
+      post_to_twitter: false,
     },
   });
 
@@ -91,13 +92,14 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
       editor.commands.setContent(initialPost.content);
       form.reset({
         content: initialPost.content,
-        scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
-        scheduledTime: initialPost.scheduledFor ? 
-          new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+        scheduled_for: initialPost.scheduled_for ? new Date(initialPost.scheduled_for) : undefined,
+        scheduled_time: initialPost.scheduled_for ? 
+          new Date(initialPost.scheduled_for).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
           : undefined,
-        isDraft: initialPost.isDraft,
-        recurringPattern: null,
-        recurringEndDate: undefined,
+        is_draft: initialPost.is_draft,
+        recurring_pattern: null,
+        recurring_end_date: undefined,
+        post_to_twitter: false,
       });
     }
   }, [initialPost, editor, form]);
@@ -133,9 +135,9 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
 
   const onSubmit = async (data: PostFormData) => {
     try {
-      const scheduledDate = data.scheduledFor && data.scheduledTime
+      const scheduled_date = data.scheduled_for && data.scheduled_time
         ? new Date(
-            new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+            new Date(data.scheduled_for).toISOString().split('T')[0] + 'T' + data.scheduled_time
           )
         : undefined;
 
@@ -143,13 +145,13 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
         await updatePost.mutateAsync({ 
           id: initialPost.id, 
           ...data,
-          scheduledFor: scheduledDate,
+          scheduled_for: scheduled_date,
         });
       } else {
         await createPost.mutateAsync({
           ...data,
-          scheduledFor: scheduledDate,
-          postToTwitter: postToTwitter && !data.isDraft && !scheduledDate,
+          scheduled_for: scheduled_date,
+          post_to_twitter: post_to_twitter && !data.is_draft && !scheduled_date,
         });
       }
       form.reset();
@@ -203,8 +205,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               <Switch
-                checked={postToTwitter}
-                onCheckedChange={setPostToTwitter}
+                checked={post_to_twitter}
+                onCheckedChange={set_post_to_twitter}
                 id="post-to-twitter"
               />
               <label
@@ -224,7 +226,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                         value={selectedProvider}
                         onValueChange={(value) => {
                           setSelectedProvider(value);
-                          setSelectedModel(undefined); // Reset model when provider changes
+                          setSelectedModel(undefined);
                         }}
                       >
                         <SelectTrigger className="w-[120px]">
@@ -283,11 +285,11 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                   <Button 
                     variant="outline" 
                     type="button"
-                    className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
+                    className={form.getValues('scheduled_for') && form.getValues('scheduled_time') ? 'bg-primary/10' : ''}
                   >
                     <Calendar className="mr-2 h-4 w-4" />
-                    {form.watch('scheduledFor') && form.watch('scheduledTime')
-                      ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+                    {form.watch('scheduled_for') && form.watch('scheduled_time')
+                      ? `Scheduled for ${form.watch('scheduled_for')?.toLocaleDateString()} ${form.watch('scheduled_time')}`
                       : 'Schedule'
                     }
                   </Button>
@@ -346,24 +348,24 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                   <div className="space-y-2">
                     <CalendarComponent
                       mode="single"
-                      selected={form.watch('scheduledFor')}
+                      selected={form.watch('scheduled_for')}
                       onSelect={(date: Date | undefined) => {
-                        form.setValue('scheduledFor', date);
+                        form.setValue('scheduled_for', date);
                       }}
                       disabled={(date) => date < new Date()}
                       className="rounded-md border"
                       initialFocus
                     />
                     <TimeSelect
-                      value={form.getValues('scheduledTime')}
+                      value={form.getValues('scheduled_time')}
                       onChange={(time) => {
-                        form.setValue('scheduledTime', time);
+                        form.setValue('scheduled_time', time);
                       }}
                     />
                     <Select
-                      value={form.getValues('recurringPattern') || ''}
+                      value={form.getValues('recurring_pattern') || ''}
                       onValueChange={(value) => {
-                        form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
+                        form.setValue('recurring_pattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
                       }}
                     >
                       <SelectTrigger>
@@ -376,16 +378,16 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                         <SelectItem value="monthly">Monthly</SelectItem>
                       </SelectContent>
                     </Select>
-                    {form.watch('recurringPattern') && (
+                    {form.watch('recurring_pattern') && (
                       <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">End Date</p>
                         <CalendarComponent
                           mode="single"
-                          selected={form.watch('recurringEndDate')}
+                          selected={form.watch('recurring_end_date')}
                           onSelect={(date: Date | undefined) => {
-                            form.setValue('recurringEndDate', date);
+                            form.setValue('recurring_end_date', date);
                           }}
-                          disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+                          disabled={(date) => date < (form.watch('scheduled_for') || new Date())}
                           className="rounded-md border"
                         />
                       </div>
@@ -395,10 +397,10 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        form.setValue('scheduledFor', undefined);
-                        form.setValue('scheduledTime', undefined);
-                        form.setValue('recurringPattern', null);
-                        form.setValue('recurringEndDate', undefined);
+                        form.setValue('scheduled_for', undefined);
+                        form.setValue('scheduled_time', undefined);
+                        form.setValue('recurring_pattern', null);
+                        form.setValue('recurring_end_date', undefined);
                         setShowSchedule(false);
                       }}
                     >
@@ -406,12 +408,12 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                     </Button>
                     <Button
                       onClick={() => {
-                        if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
+                        if (!form.getValues('scheduled_for') || !form.getValues('scheduled_time')) {
                           setErrorMessage('Please select both date and time for scheduling');
                           setShowError(true);
                           return;
                         }
-                        if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+                        if (form.getValues('recurring_pattern') && !form.getValues('recurring_end_date')) {
                           setErrorMessage('Please select an end date for recurring posts');
                           setShowError(true);
                           return;
@@ -431,7 +433,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
               type="button"
               variant="secondary"
               onClick={() => {
-                form.setValue('isDraft', true);
+                form.setValue('is_draft', true);
                 form.handleSubmit(onSubmit)();
               }}
               disabled={createPost.isPending || updatePost.isPending}
@@ -442,19 +444,19 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
               type="submit"
               variant="default"
               onClick={() => {
-                const scheduledFor = form.getValues('scheduledFor');
-                const scheduledTime = form.getValues('scheduledTime');
-                if ((scheduledFor && !scheduledTime) || (!scheduledFor && scheduledTime)) {
+                const scheduled_for = form.getValues('scheduled_for');
+                const scheduled_time = form.getValues('scheduled_time');
+                if ((scheduled_for && !scheduled_time) || (!scheduled_for && scheduled_time)) {
                   setErrorMessage('Please select both date and time for scheduling');
                   setShowError(true);
                   return;
                 }
-                if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+                if (form.getValues('recurring_pattern') && !form.getValues('recurring_end_date')) {
                   setErrorMessage('Please select an end date for recurring posts');
                   setShowError(true);
                   return;
                 }
-                form.setValue('isDraft', false);
+                form.setValue('is_draft', false);
               }}
               disabled={createPost.isPending || updatePost.isPending}
             >

@@ -1,0 +1,1453 @@
+> rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --exclude vite.config.ts.* server/index.ts
+
+03:17:46 AM [express] serving on port 5000
+03:17:50 AM [express] GET /api/ai/providers 304 in 181ms :: [{"name":"gemini","models":[{"name":"gemi…
+03:17:51 AM [express] GET /api/posts/drafts 304 in 321ms :: [{"id":24,"content":"\"🚨 Attention innov…
+03:17:51 AM [express] GET /api/posts/scheduled 304 in 290ms :: []
+
+ ERROR(TypeScript)  Object literal may only specify known properties, but 'isDraft' does not exist in type 'PostFormData & { id: number; }'. Did you mean to write 'is_draft'?
+ FILE  /home/runner/workspace/client/src/components/draft-list.tsx:69:9
+
+    67 |         id: draft.id,
+    68 |         content: data.enhanced.suggestedContent,
+  > 69 |         isDraft: true,
+       |         ^^^^^^^
+    70 |       });
+    71 |       
+    72 |       toast({
+
+ ERROR(TypeScript)  Property 'createdAt' does not exist on type 'Post'. Did you mean 'created_at'?
+ FILE  /home/runner/workspace/client/src/components/draft-list.tsx:96:35
+
+    94 |               <div className="space-y-2 flex-1">
+    95 |                 <div className="text-sm text-muted-foreground">
+  > 96 |                   {new Date(draft.createdAt).toLocaleDateString()}
+       |                                   ^^^^^^^^^
+    97 |                 </div>
+    98 |                 <div className="whitespace-pre-wrap">{draft.content}</div>
+    99 |               </div>
+
+ ERROR(TypeScript)  Object literal may only specify known properties, but 'isDraft' does not exist in type 'PostFormData & { id: number; }'. Did you mean to write 'is_draft'?
+ FILE  /home/runner/workspace/client/src/components/draft-list.tsx:156:21
+
+    154 |                     id: draft.id,
+    155 |                     content: draft.content,
+  > 156 |                     isDraft: false,
+        |                     ^^^^^^^
+    157 |                   });
+    158 |                 }}
+    159 |               >
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:31:21
+
+    29 |           <CardHeader>
+    30 |             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
+  > 31 |               {post.scheduledFor ? (
+       |                     ^^^^^^^^^^^^
+    32 |                 <>
+    33 |                   <Calendar className="h-4 w-4" />
+    34 |                   {new Date(post.scheduledFor).toLocaleString()}
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:34:34
+
+    32 |                 <>
+    33 |                   <Calendar className="h-4 w-4" />
+  > 34 |                   {new Date(post.scheduledFor).toLocaleString()}
+       |                                  ^^^^^^^^^^^^
+    35 |                 </>
+    36 |               ) : (
+    37 |                 <>
+
+ ERROR(TypeScript)  Property 'createdAt' does not exist on type 'Post'. Did you mean 'created_at'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:39:34
+
+    37 |                 <>
+    38 |                   <Clock className="h-4 w-4" />
+  > 39 |                   {new Date(post.createdAt).toLocaleDateString()}
+       |                                  ^^^^^^^^^
+    40 |                 </>
+    41 |               )}
+    42 |             </CardTitle>
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:54:25
+
+    52 |               {onDelete && (
+    53 |                 <Button variant="destructive" size="sm" onClick={onDelete}>
+  > 54 |                   {post.scheduledFor ? 'Cancel' : 'Delete'}
+       |                         ^^^^^^^^^^^^
+    55 |                 </Button>
+    56 |               )}
+    57 |             </div>
+
+ ERROR(TypeScript)  Property 'createdAt' does not exist on type 'Post'. Did you mean 'created_at'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:64:37
+
+    62 |         <div className="space-y-2">
+    63 |           <p className="text-sm text-muted-foreground">
+  > 64 |             Created: {new Date(post.createdAt).toLocaleString()}
+       |                                     ^^^^^^^^^
+    65 |           </p>
+    66 |           <p className="text-sm text-muted-foreground">
+    67 |             Last modified: {new Date(post.updatedAt).toLocaleString()}
+
+ ERROR(TypeScript)  Property 'updatedAt' does not exist on type 'Post'. Did you mean 'updated_at'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:67:43
+
+    65 |           </p>
+    66 |           <p className="text-sm text-muted-foreground">
+  > 67 |             Last modified: {new Date(post.updatedAt).toLocaleString()}
+       |                                           ^^^^^^^^^
+    68 |           </p>
+    69 |           {post.scheduledFor && (
+    70 |             <p className="text-sm font-semibold">
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:69:17
+
+    67 |             Last modified: {new Date(post.updatedAt).toLocaleString()}
+    68 |           </p>
+  > 69 |           {post.scheduledFor && (
+       |                 ^^^^^^^^^^^^
+    70 |             <p className="text-sm font-semibold">
+    71 |               Scheduled for: {new Date(post.scheduledFor).toLocaleString()}
+    72 |             </p>
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-card.tsx:71:45
+
+    69 |           {post.scheduledFor && (
+    70 |             <p className="text-sm font-semibold">
+  > 71 |               Scheduled for: {new Date(post.scheduledFor).toLocaleString()}
+       |                                             ^^^^^^^^^^^^
+    72 |             </p>
+    73 |           )}
+    74 |         </div>
+
+ ERROR(TypeScript)  Object literal may only specify known properties, and 'scheduledFor' does not exist in type 'AsyncDefaultValues<PostFormData> | { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; }'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:81:7
+
+    79 |     defaultValues: {
+    80 |       content: '',
+  > 81 |       scheduledFor: undefined,
+       |       ^^^^^^^^^^^^
+    82 |       scheduledTime: undefined,
+    83 |       isDraft: false,
+    84 |       recurringPattern: null,
+
+ ERROR(TypeScript)  Object literal may only specify known properties, and 'scheduledFor' does not exist in type 'PostFormData | { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | ResetAction<...>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:94:9
+
+    92 |       form.reset({
+    93 |         content: initialPost.content,
+  > 94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+       |         ^^^^^^^^^^^^
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:94:35
+
+    92 |       form.reset({
+    93 |         content: initialPost.content,
+  > 94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+       |                                   ^^^^^^^^^^^^
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:94:71
+
+    92 |       form.reset({
+    93 |         content: initialPost.content,
+  > 94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+       |                                                                       ^^^^^^^^^^^^
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:95:36
+
+    93 |         content: initialPost.content,
+    94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+  > 95 |         scheduledTime: initialPost.scheduledFor ? 
+       |                                    ^^^^^^^^^^^^
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+    98 |         isDraft: initialPost.isDraft,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:96:32
+
+    94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+  > 96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+       |                                ^^^^^^^^^^^^
+    97 |           : undefined,
+    98 |         isDraft: initialPost.isDraft,
+    99 |         recurringPattern: null,
+
+ ERROR(TypeScript)  Property 'isDraft' does not exist on type 'Post'. Did you mean 'is_draft'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:98:30
+
+     96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+     97 |           : undefined,
+  >  98 |         isDraft: initialPost.isDraft,
+        |                              ^^^^^^^
+     99 |         recurringPattern: null,
+    100 |         recurringEndDate: undefined,
+    101 |       });
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'PostFormData'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:136:34
+
+    134 |   const onSubmit = async (data: PostFormData) => {
+    135 |     try {
+  > 136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+        |                                  ^^^^^^^^^^^^
+    137 |         ? new Date(
+    138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+    139 |           )
+
+ ERROR(TypeScript)  Property 'scheduledTime' does not exist on type 'PostFormData'. Did you mean 'scheduled_time'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:136:55
+
+    134 |   const onSubmit = async (data: PostFormData) => {
+    135 |     try {
+  > 136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+        |                                                       ^^^^^^^^^^^^^
+    137 |         ? new Date(
+    138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+    139 |           )
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'PostFormData'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:138:27
+
+    136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+    137 |         ? new Date(
+  > 138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+        |                           ^^^^^^^^^^^^
+    139 |           )
+    140 |         : undefined;
+    141 |
+
+ ERROR(TypeScript)  Property 'scheduledTime' does not exist on type 'PostFormData'. Did you mean 'scheduled_time'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:138:82
+
+    136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+    137 |         ? new Date(
+  > 138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+        |                                                                                  ^^^^^^^^^^^^^
+    139 |           )
+    140 |         : undefined;
+    141 |
+
+ ERROR(TypeScript)  Object literal may only specify known properties, but 'scheduledFor' does not exist in type 'PostFormData & { id: number; }'. Did you mean to write 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:146:11
+
+    144 |           id: initialPost.id, 
+    145 |           ...data,
+  > 146 |           scheduledFor: scheduledDate,
+        |           ^^^^^^^^^^^^
+    147 |         });
+    148 |       } else {
+    149 |         await createPost.mutateAsync({
+
+ ERROR(TypeScript)  Object literal may only specify known properties, but 'scheduledFor' does not exist in type 'PostFormData & { postToTwitter?: boolean | undefined; }'. Did you mean to write 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:151:11
+
+    149 |         await createPost.mutateAsync({
+    150 |           ...data,
+  > 151 |           scheduledFor: scheduledDate,
+        |           ^^^^^^^^^^^^
+    152 |           postToTwitter: postToTwitter && !data.isDraft && !scheduledDate,
+    153 |         });
+    154 |       }
+
+ ERROR(TypeScript)  Property 'isDraft' does not exist on type 'PostFormData'. Did you mean 'is_draft'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:152:49
+
+    150 |           ...data,
+    151 |           scheduledFor: scheduledDate,
+  > 152 |           postToTwitter: postToTwitter && !data.isDraft && !scheduledDate,
+        |                                                 ^^^^^^^
+    153 |         });
+    154 |       }
+    155 |       form.reset();
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:286:47
+
+    284 |                     variant="outline" 
+    285 |                     type="button"
+  > 286 |                     className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
+        |                                               ^^^^^^^^^^^^^^
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:286:81
+
+    284 |                     variant="outline" 
+    285 |                     type="button"
+  > 286 |                     className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
+        |                                                                                 ^^^^^^^^^^^^^^^
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:289:33
+
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+  > 289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+        |                                 ^^^^^^^^^^^^^^
+    290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+    291 |                       : 'Schedule'
+    292 |                     }
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:289:63
+
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+  > 289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+        |                                                               ^^^^^^^^^^^^^^^
+    290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+    291 |                       : 'Schedule'
+    292 |                     }
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:290:53
+
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+  > 290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+        |                                                     ^^^^^^^^^^^^^^
+    291 |                       : 'Schedule'
+    292 |                     }
+    293 |                   </Button>
+
+ ERROR(TypeScript)  Property 'toLocaleDateString' does not exist on type 'readonly (string | boolean | Date | null | undefined)[]'. Did you mean 'toLocaleString'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:290:70
+
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+  > 290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+        |                                                                      ^^^^^^^^^^^^^^^^^^
+    291 |                       : 'Schedule'
+    292 |                     }
+    293 |                   </Button>
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:290:105
+
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+  > 290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+        |                                                                                                         ^^^^^^^^^^^^^^^
+    291 |                       : 'Schedule'
+    292 |                     }
+    293 |                   </Button>
+
+ ERROR(TypeScript)  Type 'readonly (string | boolean | Date | null | undefined)[]' is not assignable to type 'Matcher | Matcher[] | undefined'.
+  The type 'readonly (string | boolean | Date | null | undefined)[]' is 'readonly' and cannot be assigned to the mutable type 'Matcher[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:349:23
+
+    347 |                     <CalendarComponent
+    348 |                       mode="single"
+  > 349 |                       selected={form.watch('scheduledFor')}
+        |                       ^^^^^^^^
+    350 |                       onSelect={(date: Date | undefined) => {
+    351 |                         form.setValue('scheduledFor', date);
+    352 |                       }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:349:44
+
+    347 |                     <CalendarComponent
+    348 |                       mode="single"
+  > 349 |                       selected={form.watch('scheduledFor')}
+        |                                            ^^^^^^^^^^^^^^
+    350 |                       onSelect={(date: Date | undefined) => {
+    351 |                         form.setValue('scheduledFor', date);
+    352 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:351:39
+
+    349 |                       selected={form.watch('scheduledFor')}
+    350 |                       onSelect={(date: Date | undefined) => {
+  > 351 |                         form.setValue('scheduledFor', date);
+        |                                       ^^^^^^^^^^^^^^
+    352 |                       }}
+    353 |                       disabled={(date) => date < new Date()}
+    354 |                       className="rounded-md border"
+
+ ERROR(TypeScript)  Type 'string | boolean | Date | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:358:23
+
+    356 |                     />
+    357 |                     <TimeSelect
+  > 358 |                       value={form.getValues('scheduledTime')}
+        |                       ^^^^^
+    359 |                       onChange={(time) => {
+    360 |                         form.setValue('scheduledTime', time);
+    361 |                       }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:358:45
+
+    356 |                     />
+    357 |                     <TimeSelect
+  > 358 |                       value={form.getValues('scheduledTime')}
+        |                                             ^^^^^^^^^^^^^^^
+    359 |                       onChange={(time) => {
+    360 |                         form.setValue('scheduledTime', time);
+    361 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:360:39
+
+    358 |                       value={form.getValues('scheduledTime')}
+    359 |                       onChange={(time) => {
+  > 360 |                         form.setValue('scheduledTime', time);
+        |                                       ^^^^^^^^^^^^^^^
+    361 |                       }}
+    362 |                     />
+    363 |                     <Select
+
+ ERROR(TypeScript)  Type 'string | true | Date' is not assignable to type 'string | undefined'.
+  Type 'boolean' is not assignable to type 'string'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:364:23
+
+    362 |                     />
+    363 |                     <Select
+  > 364 |                       value={form.getValues('recurringPattern') || ''}
+        |                       ^^^^^
+    365 |                       onValueChange={(value) => {
+    366 |                         form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
+    367 |                       }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:364:45
+
+    362 |                     />
+    363 |                     <Select
+  > 364 |                       value={form.getValues('recurringPattern') || ''}
+        |                                             ^^^^^^^^^^^^^^^^^^
+    365 |                       onValueChange={(value) => {
+    366 |                         form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
+    367 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:366:39
+
+    364 |                       value={form.getValues('recurringPattern') || ''}
+    365 |                       onValueChange={(value) => {
+  > 366 |                         form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
+        |                                       ^^^^^^^^^^^^^^^^^^
+    367 |                       }}
+    368 |                     >
+    369 |                       <SelectTrigger>
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:379:33
+
+    377 |                       </SelectContent>
+    378 |                     </Select>
+  > 379 |                     {form.watch('recurringPattern') && (
+        |                                 ^^^^^^^^^^^^^^^^^^
+    380 |                       <div className="space-y-2">
+    381 |                         <p className="text-sm text-muted-foreground">End Date</p>
+    382 |                         <CalendarComponent
+
+ ERROR(TypeScript)  Type 'readonly (string | boolean | Date | null | undefined)[]' is not assignable to type 'Matcher | Matcher[] | undefined'.
+  The type 'readonly (string | boolean | Date | null | undefined)[]' is 'readonly' and cannot be assigned to the mutable type 'Matcher[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:384:27
+
+    382 |                         <CalendarComponent
+    383 |                           mode="single"
+  > 384 |                           selected={form.watch('recurringEndDate')}
+        |                           ^^^^^^^^
+    385 |                           onSelect={(date: Date | undefined) => {
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:384:48
+
+    382 |                         <CalendarComponent
+    383 |                           mode="single"
+  > 384 |                           selected={form.watch('recurringEndDate')}
+        |                                                ^^^^^^^^^^^^^^^^^^
+    385 |                           onSelect={(date: Date | undefined) => {
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+
+ ERROR(TypeScript)  Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:386:43
+
+    384 |                           selected={form.watch('recurringEndDate')}
+    385 |                           onSelect={(date: Date | undefined) => {
+  > 386 |                             form.setValue('recurringEndDate', date);
+        |                                           ^^^^^^^^^^^^^^^^^^
+    387 |                           }}
+    388 |                           disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+    389 |                           className="rounded-md border"
+
+ ERROR(TypeScript)  Operator '<' cannot be applied to types 'Date' and 'readonly (string | boolean | Date | null | undefined)[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:388:47
+
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+  > 388 |                           disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+        |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    389 |                           className="rounded-md border"
+    390 |                         />
+    391 |                       </div>
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:388:66
+
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+  > 388 |                           disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+        |                                                                  ^^^^^^^^^^^^^^
+    389 |                           className="rounded-md border"
+    390 |                         />
+    391 |                       </div>
+
+ ERROR(TypeScript)  Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:398:39
+
+    396 |                       variant="outline"
+    397 |                       onClick={() => {
+  > 398 |                         form.setValue('scheduledFor', undefined);
+        |                                       ^^^^^^^^^^^^^^
+    399 |                         form.setValue('scheduledTime', undefined);
+    400 |                         form.setValue('recurringPattern', null);
+    401 |                         form.setValue('recurringEndDate', undefined);
+
+ ERROR(TypeScript)  Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:399:39
+
+    397 |                       onClick={() => {
+    398 |                         form.setValue('scheduledFor', undefined);
+  > 399 |                         form.setValue('scheduledTime', undefined);
+        |                                       ^^^^^^^^^^^^^^^
+    400 |                         form.setValue('recurringPattern', null);
+    401 |                         form.setValue('recurringEndDate', undefined);
+    402 |                         setShowSchedule(false);
+
+ ERROR(TypeScript)  Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:400:39
+
+    398 |                         form.setValue('scheduledFor', undefined);
+    399 |                         form.setValue('scheduledTime', undefined);
+  > 400 |                         form.setValue('recurringPattern', null);
+        |                                       ^^^^^^^^^^^^^^^^^^
+    401 |                         form.setValue('recurringEndDate', undefined);
+    402 |                         setShowSchedule(false);
+    403 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:401:39
+
+    399 |                         form.setValue('scheduledTime', undefined);
+    400 |                         form.setValue('recurringPattern', null);
+  > 401 |                         form.setValue('recurringEndDate', undefined);
+        |                                       ^^^^^^^^^^^^^^^^^^
+    402 |                         setShowSchedule(false);
+    403 |                       }}
+    404 |                     >
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:409:45
+
+    407 |                     <Button
+    408 |                       onClick={() => {
+  > 409 |                         if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
+        |                                             ^^^^^^^^^^^^^^
+    410 |                           setErrorMessage('Please select both date and time for scheduling');
+    411 |                           setShowError(true);
+    412 |                           return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:409:80
+
+    407 |                     <Button
+    408 |                       onClick={() => {
+  > 409 |                         if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
+        |                                                                                ^^^^^^^^^^^^^^^
+    410 |                           setErrorMessage('Please select both date and time for scheduling');
+    411 |                           setShowError(true);
+    412 |                           return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:414:44
+
+    412 |                           return;
+    413 |                         }
+  > 414 |                         if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                            ^^^^^^^^^^^^^^^^^^
+    415 |                           setErrorMessage('Please select an end date for recurring posts');
+    416 |                           setShowError(true);
+    417 |                           return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:414:83
+
+    412 |                           return;
+    413 |                         }
+  > 414 |                         if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                                                                   ^^^^^^^^^^^^^^^^^^
+    415 |                           setErrorMessage('Please select an end date for recurring posts');
+    416 |                           setShowError(true);
+    417 |                           return;
+
+ ERROR(TypeScript)  Argument of type '"isDraft"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:434:31
+
+    432 |               variant="secondary"
+    433 |               onClick={() => {
+  > 434 |                 form.setValue('isDraft', true);
+        |                               ^^^^^^^^^
+    435 |                 form.handleSubmit(onSubmit)();
+    436 |               }}
+    437 |               disabled={createPost.isPending || updatePost.isPending}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:445:53
+
+    443 |               variant="default"
+    444 |               onClick={() => {
+  > 445 |                 const scheduledFor = form.getValues('scheduledFor');
+        |                                                     ^^^^^^^^^^^^^^
+    446 |                 const scheduledTime = form.getValues('scheduledTime');
+    447 |                 if ((scheduledFor && !scheduledTime) || (!scheduledFor && scheduledTime)) {
+    448 |                   setErrorMessage('Please select both date and time for scheduling');
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:446:54
+
+    444 |               onClick={() => {
+    445 |                 const scheduledFor = form.getValues('scheduledFor');
+  > 446 |                 const scheduledTime = form.getValues('scheduledTime');
+        |                                                      ^^^^^^^^^^^^^^^
+    447 |                 if ((scheduledFor && !scheduledTime) || (!scheduledFor && scheduledTime)) {
+    448 |                   setErrorMessage('Please select both date and time for scheduling');
+    449 |                   setShowError(true);
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:452:36
+
+    450 |                   return;
+    451 |                 }
+  > 452 |                 if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                    ^^^^^^^^^^^^^^^^^^
+    453 |                   setErrorMessage('Please select an end date for recurring posts');
+    454 |                   setShowError(true);
+    455 |                   return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:452:75
+
+    450 |                   return;
+    451 |                 }
+  > 452 |                 if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                                                           ^^^^^^^^^^^^^^^^^^
+    453 |                   setErrorMessage('Please select an end date for recurring posts');
+    454 |                   setShowError(true);
+    455 |                   return;
+
+ ERROR(TypeScript)  Argument of type '"isDraft"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:457:31
+
+    455 |                   return;
+    456 |                 }
+  > 457 |                 form.setValue('isDraft', false);
+        |                               ^^^^^^^^^
+    458 |               }}
+    459 |               disabled={createPost.isPending || updatePost.isPending}
+    460 |             >
+
+ ERROR(TypeScript)  Property 'scheduled_for' does not exist on type '{ scheduledFor: Date | null; isDraft: boolean; id: number; content: string; createdAt: Date; updatedAt: Date; recurringPattern: string | null; recurringEndDate: Date | null; userId: number | null; }'. Did you mean 'scheduledFor'?
+ FILE  /home/runner/workspace/server/routes.ts:253:51
+
+    251 |       // Analyze patterns in successful posts
+    252 |       const prompt = `Based on this tweet content: "${content}", and considering that historically successful posts were published at these times: ${
+  > 253 |         historicalPosts.map(post => new Date(post.scheduled_for as Date).toLocaleTimeString()).join(', ')
+        |                                                   ^^^^^^^^^^^^^
+    254 |       }, suggest the optimal posting time. Consider the content type, target audience, and engagement patterns. Return only the suggested time in 24-hour format (HH:mm).`;
+    255 |
+    256 |       const response = await getAIResponse(prompt, 'gemini', 'gemini-1.5-pro');
+
+[TypeScript] Found 62 errors. Watching for file changes.
+  > 81 |       scheduledFor: undefined,
+       |       ^^^^^^^^^^^^
+    82 |       scheduledTime: undefined,
+    83 |       isDraft: false,
+    84 |       recurringPattern: null,
+
+ ERROR(TypeScript)  Object literal may only specify known properties, and 'scheduledFor' does not exist in type 'PostFormData | { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | ResetAction<...>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:94:9
+
+    92 |       form.reset({
+    93 |         content: initialPost.content,
+  > 94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+       |         ^^^^^^^^^^^^
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:94:35
+
+    92 |       form.reset({
+    93 |         content: initialPost.content,
+  > 94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+       |                                   ^^^^^^^^^^^^
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:94:71
+
+    92 |       form.reset({
+    93 |         content: initialPost.content,
+  > 94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+       |                                                                       ^^^^^^^^^^^^
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:95:36
+
+    93 |         content: initialPost.content,
+    94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+  > 95 |         scheduledTime: initialPost.scheduledFor ? 
+       |                                    ^^^^^^^^^^^^
+    96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+    97 |           : undefined,
+    98 |         isDraft: initialPost.isDraft,
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'Post'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:96:32
+
+    94 |         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
+    95 |         scheduledTime: initialPost.scheduledFor ? 
+  > 96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+       |                                ^^^^^^^^^^^^
+    97 |           : undefined,
+    98 |         isDraft: initialPost.isDraft,
+    99 |         recurringPattern: null,
+
+ ERROR(TypeScript)  Property 'isDraft' does not exist on type 'Post'. Did you mean 'is_draft'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:98:30
+
+     96 |           new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+     97 |           : undefined,
+  >  98 |         isDraft: initialPost.isDraft,
+        |                              ^^^^^^^
+     99 |         recurringPattern: null,
+    100 |         recurringEndDate: undefined,
+    101 |       });
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'PostFormData'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:136:34
+
+    134 |   const onSubmit = async (data: PostFormData) => {
+    135 |     try {
+  > 136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+        |                                  ^^^^^^^^^^^^
+    137 |         ? new Date(
+    138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+    139 |           )
+
+ ERROR(TypeScript)  Property 'scheduledTime' does not exist on type 'PostFormData'. Did you mean 'scheduled_time'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:136:55
+
+    134 |   const onSubmit = async (data: PostFormData) => {
+    135 |     try {
+  > 136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+        |                                                       ^^^^^^^^^^^^^
+    137 |         ? new Date(
+    138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+    139 |           )
+
+ ERROR(TypeScript)  Property 'scheduledFor' does not exist on type 'PostFormData'. Did you mean 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:138:27
+
+    136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+    137 |         ? new Date(
+  > 138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+        |                           ^^^^^^^^^^^^
+    139 |           )
+    140 |         : undefined;
+    141 |
+
+ ERROR(TypeScript)  Property 'scheduledTime' does not exist on type 'PostFormData'. Did you mean 'scheduled_time'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:138:82
+
+    136 |       const scheduledDate = data.scheduledFor && data.scheduledTime
+    137 |         ? new Date(
+  > 138 |             new Date(data.scheduledFor).toISOString().split('T')[0] + 'T' + data.scheduledTime
+        |                                                                                  ^^^^^^^^^^^^^
+    139 |           )
+    140 |         : undefined;
+    141 |
+
+ ERROR(TypeScript)  Object literal may only specify known properties, but 'scheduledFor' does not exist in type 'PostFormData & { id: number; }'. Did you mean to write 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:146:11
+
+    144 |           id: initialPost.id, 
+    145 |           ...data,
+  > 146 |           scheduledFor: scheduledDate,
+        |           ^^^^^^^^^^^^
+    147 |         });
+    148 |       } else {
+    149 |         await createPost.mutateAsync({
+
+ ERROR(TypeScript)  Object literal may only specify known properties, but 'scheduledFor' does not exist in type 'PostFormData & { postToTwitter?: boolean | undefined; }'. Did you mean to write 'scheduled_for'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:151:11
+
+    149 |         await createPost.mutateAsync({
+    150 |           ...data,
+  > 151 |           scheduledFor: scheduledDate,
+        |           ^^^^^^^^^^^^
+    152 |           postToTwitter: postToTwitter && !data.isDraft && !scheduledDate,
+    153 |         });
+    154 |       }
+
+ ERROR(TypeScript)  Property 'isDraft' does not exist on type 'PostFormData'. Did you mean 'is_draft'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:152:49
+
+    150 |           ...data,
+    151 |           scheduledFor: scheduledDate,
+  > 152 |           postToTwitter: postToTwitter && !data.isDraft && !scheduledDate,
+        |                                                 ^^^^^^^
+    153 |         });
+    154 |       }
+    155 |       form.reset();
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:286:47
+
+    284 |                     variant="outline" 
+    285 |                     type="button"
+  > 286 |                     className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
+        |                                               ^^^^^^^^^^^^^^
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:286:81
+
+    284 |                     variant="outline" 
+    285 |                     type="button"
+  > 286 |                     className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
+        |                                                                                 ^^^^^^^^^^^^^^^
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:289:33
+
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+  > 289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+        |                                 ^^^^^^^^^^^^^^
+    290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+    291 |                       : 'Schedule'
+    292 |                     }
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:289:63
+
+    287 |                   >
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+  > 289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+        |                                                               ^^^^^^^^^^^^^^^
+    290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+    291 |                       : 'Schedule'
+    292 |                     }
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:290:53
+
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+  > 290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+        |                                                     ^^^^^^^^^^^^^^
+    291 |                       : 'Schedule'
+    292 |                     }
+    293 |                   </Button>
+
+ ERROR(TypeScript)  Property 'toLocaleDateString' does not exist on type 'readonly (string | boolean | Date | null | undefined)[]'. Did you mean 'toLocaleString'?
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:290:70
+
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+  > 290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+        |                                                                      ^^^^^^^^^^^^^^^^^^
+    291 |                       : 'Schedule'
+    292 |                     }
+    293 |                   </Button>
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:290:105
+
+    288 |                     <Calendar className="mr-2 h-4 w-4" />
+    289 |                     {form.watch('scheduledFor') && form.watch('scheduledTime')
+  > 290 |                       ? `Scheduled for ${form.watch('scheduledFor')?.toLocaleDateString()} ${form.watch('scheduledTime')}`
+        |                                                                                                         ^^^^^^^^^^^^^^^
+    291 |                       : 'Schedule'
+    292 |                     }
+    293 |                   </Button>
+
+ ERROR(TypeScript)  Type 'readonly (string | boolean | Date | null | undefined)[]' is not assignable to type 'Matcher | Matcher[] | undefined'.
+  The type 'readonly (string | boolean | Date | null | undefined)[]' is 'readonly' and cannot be assigned to the mutable type 'Matcher[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:349:23
+
+    347 |                     <CalendarComponent
+    348 |                       mode="single"
+  > 349 |                       selected={form.watch('scheduledFor')}
+        |                       ^^^^^^^^
+    350 |                       onSelect={(date: Date | undefined) => {
+    351 |                         form.setValue('scheduledFor', date);
+    352 |                       }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:349:44
+
+    347 |                     <CalendarComponent
+    348 |                       mode="single"
+  > 349 |                       selected={form.watch('scheduledFor')}
+        |                                            ^^^^^^^^^^^^^^
+    350 |                       onSelect={(date: Date | undefined) => {
+    351 |                         form.setValue('scheduledFor', date);
+    352 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:351:39
+
+    349 |                       selected={form.watch('scheduledFor')}
+    350 |                       onSelect={(date: Date | undefined) => {
+  > 351 |                         form.setValue('scheduledFor', date);
+        |                                       ^^^^^^^^^^^^^^
+    352 |                       }}
+    353 |                       disabled={(date) => date < new Date()}
+    354 |                       className="rounded-md border"
+
+ ERROR(TypeScript)  Type 'string | boolean | Date | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:358:23
+
+    356 |                     />
+    357 |                     <TimeSelect
+  > 358 |                       value={form.getValues('scheduledTime')}
+        |                       ^^^^^
+    359 |                       onChange={(time) => {
+    360 |                         form.setValue('scheduledTime', time);
+    361 |                       }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:358:45
+
+    356 |                     />
+    357 |                     <TimeSelect
+  > 358 |                       value={form.getValues('scheduledTime')}
+        |                                             ^^^^^^^^^^^^^^^
+    359 |                       onChange={(time) => {
+    360 |                         form.setValue('scheduledTime', time);
+    361 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:360:39
+
+    358 |                       value={form.getValues('scheduledTime')}
+    359 |                       onChange={(time) => {
+  > 360 |                         form.setValue('scheduledTime', time);
+        |                                       ^^^^^^^^^^^^^^^
+    361 |                       }}
+    362 |                     />
+    363 |                     <Select
+
+ ERROR(TypeScript)  Type 'string | true | Date' is not assignable to type 'string | undefined'.
+  Type 'boolean' is not assignable to type 'string'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:364:23
+
+    362 |                     />
+    363 |                     <Select
+  > 364 |                       value={form.getValues('recurringPattern') || ''}
+        |                       ^^^^^
+    365 |                       onValueChange={(value) => {
+    366 |                         form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
+    367 |                       }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:364:45
+
+    362 |                     />
+    363 |                     <Select
+  > 364 |                       value={form.getValues('recurringPattern') || ''}
+        |                                             ^^^^^^^^^^^^^^^^^^
+    365 |                       onValueChange={(value) => {
+    366 |                         form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
+    367 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:366:39
+
+    364 |                       value={form.getValues('recurringPattern') || ''}
+    365 |                       onValueChange={(value) => {
+  > 366 |                         form.setValue('recurringPattern', value === 'none' ? null : value as 'daily' | 'weekly' | 'monthly');
+        |                                       ^^^^^^^^^^^^^^^^^^
+    367 |                       }}
+    368 |                     >
+    369 |                       <SelectTrigger>
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:379:33
+
+    377 |                       </SelectContent>
+    378 |                     </Select>
+  > 379 |                     {form.watch('recurringPattern') && (
+        |                                 ^^^^^^^^^^^^^^^^^^
+    380 |                       <div className="space-y-2">
+    381 |                         <p className="text-sm text-muted-foreground">End Date</p>
+    382 |                         <CalendarComponent
+
+ ERROR(TypeScript)  Type 'readonly (string | boolean | Date | null | undefined)[]' is not assignable to type 'Matcher | Matcher[] | undefined'.
+  The type 'readonly (string | boolean | Date | null | undefined)[]' is 'readonly' and cannot be assigned to the mutable type 'Matcher[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:384:27
+
+    382 |                         <CalendarComponent
+    383 |                           mode="single"
+  > 384 |                           selected={form.watch('recurringEndDate')}
+        |                           ^^^^^^^^
+    385 |                           onSelect={(date: Date | undefined) => {
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:384:48
+
+    382 |                         <CalendarComponent
+    383 |                           mode="single"
+  > 384 |                           selected={form.watch('recurringEndDate')}
+        |                                                ^^^^^^^^^^^^^^^^^^
+    385 |                           onSelect={(date: Date | undefined) => {
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+
+ ERROR(TypeScript)  Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:386:43
+
+    384 |                           selected={form.watch('recurringEndDate')}
+    385 |                           onSelect={(date: Date | undefined) => {
+  > 386 |                             form.setValue('recurringEndDate', date);
+        |                                           ^^^^^^^^^^^^^^^^^^
+    387 |                           }}
+    388 |                           disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+    389 |                           className="rounded-md border"
+
+ ERROR(TypeScript)  Operator '<' cannot be applied to types 'Date' and 'readonly (string | boolean | Date | null | undefined)[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:388:47
+
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+  > 388 |                           disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+        |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    389 |                           className="rounded-md border"
+    390 |                         />
+    391 |                       </div>
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 4, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[], defaultValue?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): readonly (string | ... 3 more ... | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+  Overload 2 of 4, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date", defaultValue?: string | boolean | Date | null | undefined): string | ... 3 more ... | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 3 of 4, '(callback: WatchObserver<PostFormData>, defaultValues?: { content?: string | undefined; scheduled_for?: Date | undefined; scheduled_time?: string | undefined; is_draft?: boolean | undefined; recurring_pattern?: "daily" | ... 3 more ... | undefined; recurring_end_date?: Date | undefined; } | undefined): Subscription', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'WatchObserver<PostFormData>'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:388:66
+
+    386 |                             form.setValue('recurringEndDate', date);
+    387 |                           }}
+  > 388 |                           disabled={(date) => date < (form.watch('scheduledFor') || new Date())}
+        |                                                                  ^^^^^^^^^^^^^^
+    389 |                           className="rounded-md border"
+    390 |                         />
+    391 |                       </div>
+
+ ERROR(TypeScript)  Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:398:39
+
+    396 |                       variant="outline"
+    397 |                       onClick={() => {
+  > 398 |                         form.setValue('scheduledFor', undefined);
+        |                                       ^^^^^^^^^^^^^^
+    399 |                         form.setValue('scheduledTime', undefined);
+    400 |                         form.setValue('recurringPattern', null);
+    401 |                         form.setValue('recurringEndDate', undefined);
+
+ ERROR(TypeScript)  Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:399:39
+
+    397 |                       onClick={() => {
+    398 |                         form.setValue('scheduledFor', undefined);
+  > 399 |                         form.setValue('scheduledTime', undefined);
+        |                                       ^^^^^^^^^^^^^^^
+    400 |                         form.setValue('recurringPattern', null);
+    401 |                         form.setValue('recurringEndDate', undefined);
+    402 |                         setShowSchedule(false);
+
+ ERROR(TypeScript)  Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:400:39
+
+    398 |                         form.setValue('scheduledFor', undefined);
+    399 |                         form.setValue('scheduledTime', undefined);
+  > 400 |                         form.setValue('recurringPattern', null);
+        |                                       ^^^^^^^^^^^^^^^^^^
+    401 |                         form.setValue('recurringEndDate', undefined);
+    402 |                         setShowSchedule(false);
+    403 |                       }}
+
+ ERROR(TypeScript)  Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:401:39
+
+    399 |                         form.setValue('scheduledTime', undefined);
+    400 |                         form.setValue('recurringPattern', null);
+  > 401 |                         form.setValue('recurringEndDate', undefined);
+        |                                       ^^^^^^^^^^^^^^^^^^
+    402 |                         setShowSchedule(false);
+    403 |                       }}
+    404 |                     >
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:409:45
+
+    407 |                     <Button
+    408 |                       onClick={() => {
+  > 409 |                         if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
+        |                                             ^^^^^^^^^^^^^^
+    410 |                           setErrorMessage('Please select both date and time for scheduling');
+    411 |                           setShowError(true);
+    412 |                           return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:409:80
+
+    407 |                     <Button
+    408 |                       onClick={() => {
+  > 409 |                         if (!form.getValues('scheduledFor') || !form.getValues('scheduledTime')) {
+        |                                                                                ^^^^^^^^^^^^^^^
+    410 |                           setErrorMessage('Please select both date and time for scheduling');
+    411 |                           setShowError(true);
+    412 |                           return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:414:44
+
+    412 |                           return;
+    413 |                         }
+  > 414 |                         if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                            ^^^^^^^^^^^^^^^^^^
+    415 |                           setErrorMessage('Please select an end date for recurring posts');
+    416 |                           setShowError(true);
+    417 |                           return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:414:83
+
+    412 |                           return;
+    413 |                         }
+  > 414 |                         if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                                                                   ^^^^^^^^^^^^^^^^^^
+    415 |                           setErrorMessage('Please select an end date for recurring posts');
+    416 |                           setShowError(true);
+    417 |                           return;
+
+ ERROR(TypeScript)  Argument of type '"isDraft"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:434:31
+
+    432 |               variant="secondary"
+    433 |               onClick={() => {
+  > 434 |                 form.setValue('isDraft', true);
+        |                               ^^^^^^^^^
+    435 |                 form.handleSubmit(onSubmit)();
+    436 |               }}
+    437 |               disabled={createPost.isPending || updatePost.isPending}
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledFor"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:445:53
+
+    443 |               variant="default"
+    444 |               onClick={() => {
+  > 445 |                 const scheduledFor = form.getValues('scheduledFor');
+        |                                                     ^^^^^^^^^^^^^^
+    446 |                 const scheduledTime = form.getValues('scheduledTime');
+    447 |                 if ((scheduledFor && !scheduledTime) || (!scheduledFor && scheduledTime)) {
+    448 |                   setErrorMessage('Please select both date and time for scheduling');
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"scheduledTime"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:446:54
+
+    444 |               onClick={() => {
+    445 |                 const scheduledFor = form.getValues('scheduledFor');
+  > 446 |                 const scheduledTime = form.getValues('scheduledTime');
+        |                                                      ^^^^^^^^^^^^^^^
+    447 |                 if ((scheduledFor && !scheduledTime) || (!scheduledFor && scheduledTime)) {
+    448 |                   setErrorMessage('Please select both date and time for scheduling');
+    449 |                   setShowError(true);
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringPattern"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:452:36
+
+    450 |                   return;
+    451 |                 }
+  > 452 |                 if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                    ^^^^^^^^^^^^^^^^^^
+    453 |                   setErrorMessage('Please select an end date for recurring posts');
+    454 |                   setShowError(true);
+    455 |                   return;
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 3, '(name: "content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"): string | boolean | Date | null | undefined', gave the following error.
+    Argument of type '"recurringEndDate"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+  Overload 2 of 3, '(names: readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]): (string | boolean | Date | null | undefined)[]', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'readonly ("content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date")[]'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:452:75
+
+    450 |                   return;
+    451 |                 }
+  > 452 |                 if (form.getValues('recurringPattern') && !form.getValues('recurringEndDate')) {
+        |                                                                           ^^^^^^^^^^^^^^^^^^
+    453 |                   setErrorMessage('Please select an end date for recurring posts');
+    454 |                   setShowError(true);
+    455 |                   return;
+
+ ERROR(TypeScript)  Argument of type '"isDraft"' is not assignable to parameter of type '"content" | "scheduled_for" | "scheduled_time" | "is_draft" | "recurring_pattern" | "recurring_end_date"'.
+ FILE  /home/runner/workspace/client/src/components/post-composer.tsx:457:31
+
+    455 |                   return;
+    456 |                 }
+  > 457 |                 form.setValue('isDraft', false);
+        |                               ^^^^^^^^^
+    458 |               }}
+    459 |               disabled={createPost.isPending || updatePost.isPending}
+    460 |             >
+
+ ERROR(TypeScript)  Property 'scheduled_for' does not exist on type '{ scheduledFor: Date | null; isDraft: boolean; id: number; content: string; createdAt: Date; updatedAt: Date; recurringPattern: string | null; recurringEndDate: Date | null; userId: number | null; }'. Did you mean 'scheduledFor'?
+ FILE  /home/runner/workspace/server/routes.ts:253:51
+
+    251 |       // Analyze patterns in successful posts
+    252 |       const prompt = `Based on this tweet content: "${content}", and considering that historically successful posts were published at these times: ${
+  > 253 |         historicalPosts.map(post => new Date(post.scheduled_for as Date).toLocaleTimeString()).join(', ')
+        |                                                   ^^^^^^^^^^^^^
+    254 |       }, suggest the optimal posting time. Consider the content type, target audience, and engagement patterns. Return only the suggested time in 24-hour format (HH:mm).`;
+    255 |
+    256 |       const response = await getAIResponse(prompt, 'gemini', 'gemini-1.5-pro');
+
+[TypeScript] Found 62 errors. Watching for file changes.
+03:18:46 AM [express] GET /api/ai/providers 304 in 4ms :: [{"name":"gemini","models":[{"name":"gemini…
+03:18:46 AM [express] GET /api/posts/scheduled 304 in 288ms :: []
+03:18:46 AM [express] GET /api/posts/drafts 304 in 298ms :: [{"id":24,"content":"\"🚨 Attention innov…
+03:18:55 AM [express] POST /api/ai/assist 200 in 329ms :: {"suggestedContent":"🔥 The future of AI is…
+03:19:01 AM [express] POST /api/posts/suggest-time 200 in 2611ms :: {"suggestedTime":"10:00","analysi…
