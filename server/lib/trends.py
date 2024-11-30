@@ -57,6 +57,3 @@ def get_trending_topics(category='all'):
 
 if __name__ == "__main__":
     get_trending_topics()
-
-if __name__ == "__main__":
-    print(get_trending_topics())
