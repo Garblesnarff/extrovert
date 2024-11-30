@@ -18,8 +18,14 @@ interface ThemeSuggestion {
 
 export function ContentStrategyDashboard() {
   const [loading, setLoading] = useState(false);
-  const [trendingTopics, setTrendingTopics] = useState<Topic[]>([]);
-  const [themeSuggestions, setThemeSuggestions] = useState<ThemeSuggestion[]>([]);
+  const [trendingTopics, setTrendingTopics] = useState<Topic[]>(() => {
+    const saved = localStorage.getItem('trendingTopics');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [themeSuggestions, setThemeSuggestions] = useState<ThemeSuggestion[]>(() => {
+    const saved = localStorage.getItem('themeSuggestions');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const fetchTrendingInsights = async () => {
     setLoading(true);
@@ -32,6 +38,7 @@ export function ContentStrategyDashboard() {
       const trendsData = await trendsResponse.json();
       console.log('Trends data received:', trendsData);
       setTrendingTopics(trendsData);
+      localStorage.setItem('trendingTopics', JSON.stringify(trendsData));
 
       // Fetch content themes and suggestions
       const themesResponse = await fetch('/api/ai/research', {
@@ -71,6 +78,7 @@ export function ContentStrategyDashboard() {
       }
 
       setThemeSuggestions(suggestions);
+      localStorage.setItem('themeSuggestions', JSON.stringify(suggestions));
     } catch (error) {
       console.error('Failed to fetch insights:', error);
     } finally {
