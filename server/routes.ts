@@ -310,6 +310,21 @@ export function registerRoutes(app: Express) {
     }
   });
   app.post('/api/ai/research', async (req, res) => {
+  app.get('/api/trends', async (req, res) => {
+    try {
+      const { execSync } = require('child_process');
+      const trendsData = execSync('python3 server/lib/trends.py').toString();
+      res.json(JSON.parse(trendsData));
+    } catch (error) {
+      console.error('Failed to fetch trends:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(500).json({ 
+        error: 'Failed to fetch trending topics',
+        message: errorMessage 
+      });
+    }
+  });
+
     try {
       const { prompt, provider } = req.body;
       const { getAIResponse } = await import('./providers');

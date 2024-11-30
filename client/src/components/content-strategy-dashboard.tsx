@@ -24,35 +24,33 @@ export function ContentStrategyDashboard() {
   const fetchTrendingInsights = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/ai/research', {
+      // Fetch trending topics from Google Trends
+      const trendsResponse = await fetch('/api/trends');
+      const trendsData = await trendsResponse.json();
+      setTrendingTopics(trendsData);
+
+      // Fetch content themes and suggestions
+      const themesResponse = await fetch('/api/ai/research', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prompt: 'Analyze current trends and suggest content themes',
+          prompt: `Analyze these trending topics and suggest content themes: ${trendsData.map((t: Topic) => t.name).join(', ')}`,
           provider: 'gemini',
         }),
       });
       
-      const data = await response.json();
+      const themesData = await themesResponse.json();
       
-      // Parse insights into topics and themes
-      const topics: Topic[] = data.topics.map((topic: string) => ({
-        name: topic,
-        score: Math.random() * 100, // This would be replaced with actual engagement metrics
-        description: 'Trending topic in tech and AI space',
-      }));
-      
-      const suggestions: ThemeSuggestion[] = data.insights.split('\n')
+      const suggestions: ThemeSuggestion[] = themesData.insights.split('\n')
         .filter((line: string) => line.trim())
         .map((theme: string) => ({
           theme: theme.split(':')[0] || theme,
-          topics: data.topics.slice(0, 3),
-          description: theme.split(':')[1] || 'Emerging trend in the industry',
+          topics: trendsData.slice(0, 3).map((t: Topic) => t.name),
+          description: theme.split(':')[1] || 'Emerging trend based on current search patterns',
         }));
 
-      setTrendingTopics(topics);
       setThemeSuggestions(suggestions);
     } catch (error) {
       console.error('Failed to fetch insights:', error);
