@@ -16,7 +16,38 @@ interface EngagementOpportunity {
 export function EngagementOpportunities() {
   const [loading, setLoading] = useState(false);
   const [opportunities, setOpportunities] = useState<EngagementOpportunity[]>([]);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const handleStatusUpdate = async (id: string, status: 'engaged' | 'ignored') => {
+    setUpdatingId(id);
+    try {
+      const response = await fetch(`/api/engagement/opportunities/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+
+      setOpportunities(opportunities.map(opp => 
+        opp.id === id ? { ...opp, status } : opp
+      ));
+
+      toast({
+        title: "Status Updated",
+        description: `Opportunity ${status === 'engaged' ? 'engaged' : 'ignored'} successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update opportunity status",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const fetchOpportunities = async () => {
     setLoading(true);
@@ -104,20 +135,18 @@ export function EngagementOpportunities() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    // Handle ignore action
-                  }}
+                  onClick={() => handleStatusUpdate(opportunity.id, 'ignored')}
+                  disabled={updatingId === opportunity.id || opportunity.status !== 'pending'}
                 >
-                  Ignore
+                  {updatingId === opportunity.id ? 'Updating...' : 'Ignore'}
                 </Button>
                 <Button
                   variant="default"
                   size="sm"
-                  onClick={() => {
-                    // Handle engage action
-                  }}
+                  onClick={() => handleStatusUpdate(opportunity.id, 'engaged')}
+                  disabled={updatingId === opportunity.id || opportunity.status !== 'pending'}
                 >
-                  Engage
+                  {updatingId === opportunity.id ? 'Updating...' : 'Engage'}
                 </Button>
               </div>
             </CardContent>

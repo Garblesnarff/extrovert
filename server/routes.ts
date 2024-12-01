@@ -466,4 +466,21 @@ export function registerRoutes(app: Express) {
       res.status(500).json({ error: 'Failed to fetch engagement opportunities' });
     }
   });
+
+  app.put('/api/engagement/opportunities/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!['engaged', 'ignored'].includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+      }
+
+      // Mock success response - will be replaced with actual database/Twitter integration
+      res.json({ id, status });
+    } catch (error) {
+      console.error('Failed to update engagement opportunity:', error);
+      res.status(500).json({ error: 'Failed to update engagement opportunity' });
+    }
+  });
 }
