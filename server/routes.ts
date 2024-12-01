@@ -428,4 +428,42 @@ export function registerRoutes(app: Express) {
       res.status(500).json({ error: 'Failed to fetch analytics' });
     }
   });
+
+  // Engagement Opportunities Routes
+  app.get('/api/engagement/opportunities', async (req, res) => {
+    try {
+      // Mock data for now - will be replaced with actual Twitter API integration
+      const opportunities = [
+        {
+          id: '1',
+          type: 'mention',
+          content: '@youraccount Great thread about AI! Would love to hear more about your experience.',
+          timestamp: new Date().toISOString(),
+          priority: 'high',
+          status: 'pending'
+        },
+        {
+          id: '2',
+          type: 'reply',
+          content: 'Interesting perspective! Have you considered the impact of...',
+          timestamp: new Date().toISOString(),
+          priority: 'medium',
+          status: 'pending'
+        },
+        {
+          id: '3',
+          type: 'trend',
+          content: '#AITrends is gaining traction - opportunity to share your insights!',
+          timestamp: new Date().toISOString(),
+          priority: 'low',
+          status: 'pending'
+        }
+      ];
+      
+      res.json(opportunities);
+    } catch (error) {
+      console.error('Failed to fetch engagement opportunities:', error);
+      res.status(500).json({ error: 'Failed to fetch engagement opportunities' });
+    }
+  });
 }
