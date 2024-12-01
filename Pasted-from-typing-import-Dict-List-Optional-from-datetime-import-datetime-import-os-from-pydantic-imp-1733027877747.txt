@@ -1,0 +1,187 @@
+from typing import Dict, List, Optional
+from datetime import datetime
+import os
+from pydantic import BaseModel
+from crewai import Agent, Task, Crew, Process, LLM
+from crewai.project import CrewBase, agent, crew, task
+from crewai_tools import SerperDevTool, WebsiteSearchTool
+
+class ResearchResult(BaseModel):
+    """Structure for research findings"""
+    facts: List[Dict[str, str]]
+    sources: List[str]
+    confidence_score: float
+    context: str
+    enhancement_suggestions: List[str]
+
+class TwitterResearchCrew(CrewBase):
+    """Research crew for validating and enhancing Twitter content"""
+    
+    def __init__(self):
+        super().__init__()
+        # Initialize tools
+        self.search_tool = SerperDevTool()
+        self.web_tool = WebsiteSearchTool()
+        
+        # Initialize LLMs following best practices
+        self.gemini_config = {
+            "model": "gemini-flash-8b",
+            "api_key": os.getenv("GEMINI_API_KEY")
+        }
+        
+        self.groq_config = {
+            "model": "llama3-70b-8192",
+            "base_url": "https://api.groq.com/v1",
+            "api_key": os.getenv("GROQ_API_KEY")
+        }
+
+    @agent
+    def fact_checker(self) -> Agent:
+        """Creates the fact checking agent"""
+        return Agent(
+            role="Research Validator & Fact Checker",
+            goal="Thoroughly verify claims and gather supporting evidence",
+            backstory="""You are a meticulous fact-checker with years of experience 
+            in research and verification. Your expertise lies in finding and 
+            validating information from reliable sources, ensuring accuracy in 
+            every detail.""",
+            tools=[self.search_tool, self.web_tool],
+            llm=LLM(config=self.gemini_config),
+            verbose=True
+        )
+
+    @agent
+    def context_researcher(self) -> Agent:
+        """Creates the context research agent"""
+        return Agent(
+            role="Context & Background Researcher",
+            goal="Provide comprehensive context and background information",
+            backstory="""You are an expert at finding and synthesizing relevant 
+            background information and context. You excel at connecting different 
+            pieces of information to create a complete picture.""",
+            tools=[self.search_tool, self.web_tool],
+            llm=LLM(config=self.groq_config),
+            verbose=True
+        )
+
+    @agent
+    def content_enhancer(self) -> Agent:
+        """Creates the content enhancement agent"""
+        return Agent(
+            role="Content Enhancement Specialist",
+            goal="Enhance content with verified data and engaging context",
+            backstory="""You are skilled at taking verified information and 
+            transforming it into engaging, shareable content while maintaining 
+            accuracy. You know how to present facts in a way that resonates 
+            with social media audiences.""",
+            tools=[self.web_tool],
+            llm=LLM(config=self.gemini_config),
+            verbose=True
+        )
+
+    @task
+    def verify_facts(self) -> Task:
+        """Task for fact verification"""
+        return Task(
+            description="""Verify all claims in the provided content. For each claim:
+            1. Find primary sources
+            2. Cross-reference with multiple reliable sources
+            3. Note any discrepancies or nuances
+            4. Provide confidence score for each verified fact
+            5. List all sources used""",
+            agent=self.fact_checker(),
+            expected_output="Detailed fact-check report with sources and confidence scores"
+        )
+
+    @task
+    def research_context(self) -> Task:
+        """Task for context research"""
+        return Task(
+            description="""Research broader context around the topic:
+            1. Find relevant background information
+            2. Identify related trending discussions
+            3. Look for recent developments
+            4. Find relevant statistics and data
+            5. Identify expert opinions and analysis""",
+            agent=self.context_researcher(),
+            context=[self.verify_facts()],
+            expected_output="Comprehensive context report with background information"
+        )
+
+    @task
+    def enhance_content(self) -> Task:
+        """Task for content enhancement"""
+        return Task(
+            description="""Using verified facts and contextual research:
+            1. Suggest ways to enhance the content
+            2. Provide relevant data points
+            3. Identify potential angles for engagement
+            4. Suggest credible sources to reference
+            5. Format information for social media impact""",
+            agent=self.content_enhancer(),
+            context=[self.verify_facts(), self.research_context()],
+            expected_output="Enhanced content suggestions with supporting data"
+        )
+
+    @crew
+    def crew(self) -> Crew:
+        """Assembles the research crew"""
+        return Crew(
+            agents=[
+                self.fact_checker(),
+                self.context_researcher(),
+                self.content_enhancer()
+            ],
+            tasks=[
+                self.verify_facts(),
+                self.research_context(),
+                self.enhance_content()
+            ],
+            process=Process.sequential,
+            verbose=True
+        )
+
+def process_content(content: str) -> ResearchResult:
+    """Process content through the research crew"""
+    try:
+        # Check for required environment variables
+        required_vars = ["GEMINI_API_KEY", "GROQ_API_KEY", "SERPER_API_KEY"]
+        missing_vars = [var for var in required_vars if not os.getenv(var)]
+        if missing_vars:
+            raise EnvironmentError(
+                f"Missing required environment variables: {', '.join(missing_vars)}"
+            )
+
+        # Initialize and run the crew
+        research_crew = TwitterResearchCrew()
+        results = research_crew.crew().kickoff(inputs={"content": content})
+
+        # Process and structure the results
+        processed_results = ResearchResult(
+            facts=results.tasks[0].output.get("verified_facts", []),
+            sources=results.tasks[0].output.get("sources", []),
+            confidence_score=results.tasks[0].output.get("average_confidence", 0.0),
+            context=results.tasks[1].output.get("context", ""),
+            enhancement_suggestions=results.tasks[2].output.get("suggestions", [])
+        )
+
+        return processed_results
+
+    except Exception as e:
+        raise Exception(f"Error processing content: {str(e)}")
+
+# Usage Example
+if __name__ == "__main__":
+    # Example tweet content to research
+    tweet_content = """AI has reduced software development time by 80% across all industries in 2024, 
+    leading to a significant shift in how companies approach technical hiring."""
+    
+    try:
+        research_results = process_content(tweet_content)
+        print("Research Results:")
+        print(f"Facts verified: {len(research_results.facts)}")
+        print(f"Sources used: {len(research_results.sources)}")
+        print(f"Confidence score: {research_results.confidence_score}")
+        print(f"Enhancement suggestions: {len(research_results.enhancement_suggestions)}")
+    except Exception as e:
+        print(f"Error: {str(e)}")
