@@ -1,22 +1,21 @@
 import * as React from "react"
 
-export interface SlotProps extends React.HTMLAttributes<HTMLElement> {
+import { forwardRef, HTMLAttributes, Children, isValidElement, cloneElement } from "react"
+
+interface SlotProps extends HTMLAttributes<HTMLElement> {
   children?: React.ReactNode
 }
 
-const Slot = React.forwardRef<HTMLElement, SlotProps>(
-  ({ children, ...props }, ref) => {
-    if (!children) {
-      return null
-    }
-
-    const child = React.Children.only(children) as React.ReactElement
-    return React.cloneElement(child, {
-      ...props,
-      ref,
-    })
+const Slot = forwardRef<HTMLElement, SlotProps>(({ children, ...props }, ref) => {
+  if (!isValidElement(children)) {
+    return null
   }
-)
+
+  return cloneElement(children, {
+    ...props,
+    ref: ref ?? children.props.ref,
+  })
+})
 Slot.displayName = "Slot"
 
 export { Slot }

@@ -6,15 +6,22 @@ import { Slot } from "./slot"
 
 const Popover = PopoverPrimitive.Root
 
-const PopoverTrigger = React.forwardRef<
+const PopoverTrigger = PopoverPrimitive.Trigger
+
+const PopoverTriggerWithSlot = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger>
->(({ ...props }, ref) => (
-  <Slot>
-    <PopoverPrimitive.Trigger ref={ref} {...props} />
-  </Slot>
-))
-PopoverTrigger.displayName = PopoverPrimitive.Trigger.displayName
+>(({ asChild, ...props }, ref) => {
+  if (!asChild) {
+    return <PopoverTrigger ref={ref} {...props} />
+  }
+  return (
+    <Slot {...props}>
+      <PopoverTrigger ref={ref} />
+    </Slot>
+  )
+})
+PopoverTriggerWithSlot.displayName = PopoverPrimitive.Trigger.displayName
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
