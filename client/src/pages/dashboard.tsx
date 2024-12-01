@@ -19,12 +19,10 @@ export function Dashboard() {
         </TabsList>
 
         <TabsContent value="compose">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-8">
-              <PostComposer />
+          <div className="space-y-8">
+            <PostComposer />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <DraftList />
-            </div>
-            <div>
               <ScheduledPosts />
             </div>
           </div>
