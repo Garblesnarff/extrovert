@@ -328,11 +328,13 @@ export function registerRoutes(app: Express) {
         }
 
         try {
-          const trendsData = JSON.parse(stdout);
+          // Clean the output before parsing
+          const cleanedOutput = stdout.trim().replace(/\n/g, '');
+          const trendsData = JSON.parse(cleanedOutput);
           console.log('Trends data:', trendsData);
           res.json(trendsData);
         } catch (parseError) {
-          console.error('Error parsing trends data:', parseError);
+          console.error('Error parsing trends data:', parseError, '\nRaw output:', stdout);
           res.status(500).json({ 
             error: 'Failed to parse trending topics',
             message: 'Invalid data format returned from trends service'
