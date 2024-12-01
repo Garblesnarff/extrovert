@@ -21,30 +21,37 @@ export function ResearchAssistantPanel() {
   const { toast } = useToast();
 
   const handleResearch = async () => {
-    if (!query.trim()) {
-      toast({
-        title: "Empty Query",
-        description: "Please enter a topic to research.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
+      setResults([]);
+      
+      if (!query.trim()) {
+        toast({
+          title: "Empty Query",
+          description: "Please enter a topic to research.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const response = await fetch('/api/ai/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: query }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Research service error');
+        throw new Error(data.error || 'Research service error');
       }
 
-      const data = await response.json();
-      
       if (!data.facts || data.facts.length === 0) {
-        throw new Error('No research results available');
+        toast({
+          title: "No Results",
+          description: "No research results available for this query. Try being more specific.",
+          variant: "destructive",
+        });
+        return;
       }
 
       const processedResults: ResearchFact[] = data.facts.map((fact: any) => ({
@@ -55,15 +62,18 @@ export function ResearchAssistantPanel() {
       }));
 
       setResults(processedResults);
-      toast({
-        title: "Research Complete",
-        description: `Found ${processedResults.length} verified facts`,
-      });
+      
+      if (processedResults.length > 0) {
+        toast({
+          title: "Research Complete",
+          description: `Found ${processedResults.length} verified facts`,
+        });
+      }
     } catch (error) {
       console.error('Research failed:', error);
       toast({
         title: "Research Failed",
-        description: error instanceof Error ? error.message : "Unable to complete research",
+        description: error instanceof Error ? error.message : "Unable to complete research. Please try again.",
         variant: "destructive",
       });
     }

@@ -11,10 +11,14 @@ router.post('/research', async (req, res) => {
       return res.status(400).json({ error: 'Content is required' });
     }
 
+    if (!content.trim()) {
+      return res.status(400).json({ error: 'Research topic is required' });
+    }
+
     const options = {
-      mode: 'json',
+      mode: 'text' as const,
       scriptPath: path.join(__dirname, '../services'),
-      args: [JSON.stringify({ content })],
+      args: [JSON.stringify({ content: content.trim() })],
     };
 
     let results;
