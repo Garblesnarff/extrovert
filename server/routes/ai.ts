@@ -6,12 +6,18 @@ const router = Router();
 
 router.post('/research', async (req, res) => {
   try {
+    console.log('Received research request body:', req.body); // Debug log
+    
+    if (!req.body || typeof req.body !== 'object') {
+      return res.status(400).json({ error: 'Invalid request body' });
+    }
+
     const { content } = req.body;
-    if (!content) {
+    if (content === undefined || content === null) {
       return res.status(400).json({ error: 'Content is required' });
     }
 
-    const trimmedContent = content.trim();
+    const trimmedContent = String(content).trim();
     if (!trimmedContent) {
       return res.status(400).json({ error: 'Research topic is required' });
     }

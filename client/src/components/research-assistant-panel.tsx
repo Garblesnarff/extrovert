@@ -33,10 +33,11 @@ export function ResearchAssistantPanel() {
         return;
       }
 
+      console.log('Sending research query:', query); // Debug log
       const response = await fetch('/api/ai/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: query }),
+        body: JSON.stringify({ content: query.trim() }),
       });
 
       const data = await response.json();
