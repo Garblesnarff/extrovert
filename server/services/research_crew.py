@@ -136,10 +136,39 @@ if __name__ == "__main__":
     try:
         # Read input from command line
         input_data = json.loads(sys.argv[1])
-        content = input_data.get("content", "")
+        query = input_data.get("query", "")
         
-        # Process the research
-        result = process_research(content)
+        if not query:
+            raise ValueError("Query is required")
+            
+        # Initialize the research crew
+        research_crew = TwitterResearchCrew()
+        
+        # Process the research using only fact checking and context research
+        crew = Crew(
+            agents=[
+                research_crew.fact_checker(),
+                research_crew.context_researcher()
+            ],
+            tasks=[
+                research_crew.verify_facts(),
+                research_crew.research_context()
+            ],
+            process=Process.sequential,
+            verbose=True
+        )
+        
+        # Run the research
+        results = crew.kickoff(inputs={"content": query})
+        
+        # Format the results
+        response = {
+            "insights": results.tasks[0].output,
+            "context": results.tasks[1].output if len(results.tasks) > 1 else "",
+        }
+        
+        # Output the result as JSON
+        print(json.dumps(response))
         
         # Output the result as JSON
         print(json.dumps(result.dict()))

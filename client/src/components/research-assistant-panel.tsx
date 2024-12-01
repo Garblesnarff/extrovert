@@ -37,13 +37,13 @@ export function ResearchAssistantPanel() {
       const response = await fetch('/api/ai/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: query.trim() }),
+        body: JSON.stringify({ query: query.trim() }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        const errorMessage = data.error || data.details || 'Research service error';
+        const errorMessage = data.error || 'Research service error';
         toast({
           title: "Research Failed",
           description: errorMessage,
@@ -52,7 +52,23 @@ export function ResearchAssistantPanel() {
         return;
       }
 
-      if (!data.facts || !Array.isArray(data.facts) || data.facts.length === 0) {
+      const processedResults: ResearchFact[] = [];
+      
+      if (data.insights) {
+        // Split insights into individual facts
+        const facts = data.insights.split('\n').filter(Boolean);
+        facts.forEach((fact: string) => {
+          if (fact.trim()) {
+            processedResults.push({
+              fact: fact.trim(),
+              confidence: 'high',
+              context: data.context || ''
+            });
+          }
+        });
+      }
+
+      if (processedResults.length === 0) {
         toast({
           title: "No Results",
           description: "No research results available for this query. Try being more specific.",
@@ -60,13 +76,6 @@ export function ResearchAssistantPanel() {
         });
         return;
       }
-
-      const processedResults: ResearchFact[] = data.facts.map((fact: any) => ({
-        fact: fact.statement || fact.fact || '',
-        source: fact.source || '',
-        confidence: getConfidenceLevel(fact.confidence || data.confidence || 0),
-        context: fact.context || data.context || ''
-      })).filter((result: ResearchFact) => result.fact.trim() !== '');
 
       setResults(processedResults);
       
