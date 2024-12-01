@@ -33,7 +33,7 @@ export function ResearchAssistantPanel() {
         return;
       }
 
-      console.log('Sending research query:', query); // Debug log
+      console.log('Sending research query:', { content: query.trim() }); // Debug log
       const response = await fetch('/api/ai/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,11 +113,12 @@ export function ResearchAssistantPanel() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !contentResearch.isPending) {
+                if (e.key === 'Enter' && !contentResearch.isPending && query.trim()) {
                   handleResearch();
                 }
               }}
               className="flex-1"
+              aria-label="Research topic input"
             />
             <Button 
               onClick={handleResearch}
