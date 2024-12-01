@@ -42,10 +42,16 @@ export function ResearchAssistantPanel() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Research service error');
+        const errorMessage = data.error || data.details || 'Research service error';
+        toast({
+          title: "Research Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return;
       }
 
-      if (!data.facts || data.facts.length === 0) {
+      if (!data.facts || !Array.isArray(data.facts) || data.facts.length === 0) {
         toast({
           title: "No Results",
           description: "No research results available for this query. Try being more specific.",
@@ -55,11 +61,11 @@ export function ResearchAssistantPanel() {
       }
 
       const processedResults: ResearchFact[] = data.facts.map((fact: any) => ({
-        fact: fact.statement || fact.fact,
-        source: fact.source,
-        confidence: getConfidenceLevel(fact.confidence || data.confidence),
-        context: fact.context || data.context
-      }));
+        fact: fact.statement || fact.fact || '',
+        source: fact.source || '',
+        confidence: getConfidenceLevel(fact.confidence || data.confidence || 0),
+        context: fact.context || data.context || ''
+      })).filter(result => result.fact.trim() !== '');
 
       setResults(processedResults);
       
@@ -68,12 +74,18 @@ export function ResearchAssistantPanel() {
           title: "Research Complete",
           description: `Found ${processedResults.length} verified facts`,
         });
+      } else {
+        toast({
+          title: "No Valid Results",
+          description: "Could not process the research results. Try a different query.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Research failed:', error);
       toast({
         title: "Research Failed",
-        description: error instanceof Error ? error.message : "Unable to complete research. Please try again.",
+        description: "An unexpected error occurred while processing your request. Please try again.",
         variant: "destructive",
       });
     }
