@@ -15,15 +15,15 @@ router.post('/research', async (req, res) => {
     const { content } = req.body;
     console.log('Extracted content:', content); // Additional debug log
     
-    if (content === undefined || content === null || content === '') {
-      return res.status(400).json({ error: 'Content is required' });
+    if (!content || typeof content !== 'string') {
+      return res.status(400).json({ error: 'Content is required and must be a string' });
     }
 
-    const trimmedContent = String(content).trim();
+    const trimmedContent = content.trim();
     console.log('Trimmed content:', trimmedContent); // Additional debug log
     
-    if (!trimmedContent) {
-      return res.status(400).json({ error: 'Research topic is required' });
+    if (trimmedContent.length === 0) {
+      return res.status(400).json({ error: 'Research topic cannot be empty' });
     }
 
     const options = {
