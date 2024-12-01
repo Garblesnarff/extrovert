@@ -2,7 +2,6 @@ import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { cn } from "@/lib/utils"
-import { Slot } from "./slot"
 
 const Popover = PopoverPrimitive.Root
 
@@ -13,6 +12,7 @@ const PopoverTrigger = React.forwardRef<
   if (!asChild) {
     return <PopoverPrimitive.Trigger ref={ref} {...props} />
   }
+  
   return (
     <PopoverPrimitive.Trigger ref={ref} {...props} />
   )
