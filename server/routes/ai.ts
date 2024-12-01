@@ -24,7 +24,11 @@ router.post('/research', async (req, res) => {
     let results;
     try {
       results = await PythonShell.run('research_crew.py', options);
-      const research = results[0];
+      const research = JSON.parse(results[0]);
+
+      if (!research || typeof research !== 'object') {
+        throw new Error('Invalid research results format');
+      }
 
       return res.json({
         facts: research.facts || [],
@@ -35,6 +39,9 @@ router.post('/research', async (req, res) => {
       });
     } catch (pythonError) {
       console.error('Python execution error:', pythonError);
+      if (pythonError instanceof SyntaxError) {
+        throw new Error('Invalid response format from research service');
+      }
       throw new Error('Failed to execute research script');
     }
   } catch (error: unknown) {
