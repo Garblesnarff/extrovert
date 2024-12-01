@@ -11,7 +11,8 @@ router.post('/research', async (req, res) => {
       return res.status(400).json({ error: 'Content is required' });
     }
 
-    if (!content.trim()) {
+    const trimmedContent = content.trim();
+    if (!trimmedContent) {
       return res.status(400).json({ error: 'Research topic is required' });
     }
 

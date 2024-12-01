@@ -65,7 +65,7 @@ export function ResearchAssistantPanel() {
         source: fact.source || '',
         confidence: getConfidenceLevel(fact.confidence || data.confidence || 0),
         context: fact.context || data.context || ''
-      })).filter(result => result.fact.trim() !== '');
+      })).filter((result: ResearchFact) => result.fact.trim() !== '');
 
       setResults(processedResults);
       
