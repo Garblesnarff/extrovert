@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,14 +18,33 @@ interface ThemeSuggestion {
 
 export function ContentStrategyDashboard() {
   const [loading, setLoading] = useState(false);
-  const [trendingTopics, setTrendingTopics] = useState<Topic[]>(() => {
-    const saved = localStorage.getItem('trendingTopics');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [themeSuggestions, setThemeSuggestions] = useState<ThemeSuggestion[]>(() => {
-    const saved = localStorage.getItem('themeSuggestions');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [trendingTopics, setTrendingTopics] = useState<Topic[]>([]);
+  const [themeSuggestions, setThemeSuggestions] = useState<ThemeSuggestion[]>([]);
+
+  useEffect(() => {
+    const savedTopics = localStorage.getItem('trendingTopics');
+    const savedThemes = localStorage.getItem('themeSuggestions');
+    
+    if (savedTopics) {
+      try {
+        setTrendingTopics(JSON.parse(savedTopics));
+      } catch (e) {
+        console.warn('Failed to load saved topics:', e);
+      }
+    }
+    
+    if (savedThemes) {
+      try {
+        setThemeSuggestions(JSON.parse(savedThemes));
+      } catch (e) {
+        console.warn('Failed to load saved themes:', e);
+      }
+    }
+
+    if (!savedTopics && !savedThemes) {
+      fetchTrendingInsights();
+    }
+  }, []);
 
   const fetchTrendingInsights = async () => {
     setLoading(true);
