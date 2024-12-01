@@ -22,6 +22,11 @@ export function ResearchAssistantPanel() {
     if (!query.trim()) return;
 
     try {
+      if (!query.trim()) {
+        console.warn('Empty query provided');
+        return;
+      }
+
       const response = await contentResearch.mutateAsync({
         prompt: `Research and fact-check the following topic: ${query}
                 For each fact, please provide:
@@ -35,28 +40,70 @@ export function ResearchAssistantPanel() {
         model: 'gemini-pro'
       });
 
+      if (!response?.suggestedContent) {
+        throw new Error('Invalid response format from AI service');
+      }
+
       const parsedResults = parseResearchResponse(response.suggestedContent);
       setResults(parsedResults);
     } catch (error) {
       console.error('Research failed:', error);
+      // Add user feedback for the error
+      setResults([{
+        fact: 'Research query failed',
+        confidence: 'low',
+        context: error instanceof Error ? error.message : 'An unexpected error occurred',
+      }]);
     }
   };
 
   const parseResearchResponse = (content: string): ResearchResult[] => {
-    const sections = content.split('\n\n').filter(section => section.trim());
-    return sections.map(section => {
-      const lines = section.split('\n');
-      const fact = lines[0]?.replace(/^[\d\.\s-]*/, '').trim() || '';
-      const source = lines.find(line => line.includes('Source:'))?.replace('Source:', '').trim();
-      const contextLine = lines.find(line => line.includes('Context:'))?.replace('Context:', '').trim();
+    try {
+      // First try to split by double newline for structured content
+      let sections = content.split('\n\n').filter(section => section.trim());
       
-      return {
-        fact,
-        source,
-        confidence: determineConfidence(section),
-        context: contextLine || extractContext(fact)
-      };
-    });
+      // If we don't get any valid sections, try single newline
+      if (sections.length === 0) {
+        sections = [content]; // Treat entire content as one section
+      }
+
+      return sections.map(section => {
+        const lines = section.split('\n');
+        
+        // Extract fact - first non-empty line without numbering
+        const fact = lines
+          .find(line => line.trim().length > 0)
+          ?.replace(/^[\d\.\s-]*/, '')
+          .trim() || 'No fact found';
+
+        // Look for source and context in any line
+        const source = lines
+          .find(line => 
+            line.toLowerCase().includes('source:') || 
+            line.toLowerCase().includes('reference:'))
+          ?.replace(/^(source:|reference:)/i, '')
+          .trim();
+
+        const contextLine = lines
+          .find(line => line.toLowerCase().includes('context:'))
+          ?.replace(/^context:/i, '')
+          .trim();
+
+        return {
+          fact,
+          source,
+          confidence: determineConfidence(section),
+          context: contextLine || extractContext(fact)
+        };
+      });
+    } catch (error) {
+      console.error('Failed to parse research response:', error);
+      return [{
+        fact: 'Failed to parse research results',
+        confidence: 'low',
+        context: 'There was an error processing the AI response',
+      }];
+    }
   };
 
   const determineConfidence = (fact: string): 'high' | 'medium' | 'low' => {
