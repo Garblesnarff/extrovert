@@ -13,11 +13,15 @@ router.post('/research', async (req, res) => {
     }
 
     const { content } = req.body;
-    if (content === undefined || content === null) {
+    console.log('Extracted content:', content); // Additional debug log
+    
+    if (content === undefined || content === null || content === '') {
       return res.status(400).json({ error: 'Content is required' });
     }
 
     const trimmedContent = String(content).trim();
+    console.log('Trimmed content:', trimmedContent); // Additional debug log
+    
     if (!trimmedContent) {
       return res.status(400).json({ error: 'Research topic is required' });
     }
@@ -25,7 +29,7 @@ router.post('/research', async (req, res) => {
     const options = {
       mode: 'text' as const,
       scriptPath: path.join(__dirname, '../services'),
-      args: [JSON.stringify({ content: content.trim() })],
+      args: [JSON.stringify({ content: trimmedContent })],
     };
 
     let results;
