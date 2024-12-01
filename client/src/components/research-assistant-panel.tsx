@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useContentResearch } from '@/lib/crewai';
 import { ResizablePanel } from '@/components/ui/resizable';
+import { useToast } from '@/hooks/use-toast';
 
 interface ResearchResult {
   fact: string;
@@ -17,83 +18,121 @@ export function ResearchAssistantPanel() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ResearchResult[]>([]);
   const contentResearch = useContentResearch();
+  const { toast } = useToast();
 
   const handleResearch = async () => {
-    if (!query.trim()) return;
+    if (!query.trim()) {
+      toast({
+        title: "Empty Query",
+        description: "Please enter a topic to research.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
-      if (!query.trim()) {
-        console.warn('Empty query provided');
-        return;
-      }
-
       const response = await contentResearch.mutateAsync({
         prompt: `Research and fact-check the following topic: ${query}
-                For each fact, please provide:
-                1. The verified fact
-                2. Source: Reference or citation if available
-                3. Context: Additional background information
-                4. Confidence level indicators (use phrases like "Verified by multiple sources", "Likely based on evidence", or "Requires further verification")
+                Please provide verified facts with the following structure:
+                1. Fact: [The verified information]
+                2. Source: [Reference URL or citation]
+                3. Context: [Additional background information]
+                4. Confidence: [High/Medium/Low based on source reliability]
                 
-                Format each fact as a separate section with clear labels.`,
+                Format each fact as a clear section.`,
         provider: 'gemini',
-        model: 'gemini-pro'
+        model: 'gemini-1.5-pro'
       });
 
       if (!response?.suggestedContent) {
-        throw new Error('Invalid response format from AI service');
+        throw new Error('No research results available');
       }
 
       const parsedResults = parseResearchResponse(response.suggestedContent);
+      
+      if (parsedResults.length === 0) {
+        throw new Error('No valid research results found');
+      }
+
       setResults(parsedResults);
+      toast({
+        title: "Research Complete",
+        description: `Found ${parsedResults.length} relevant facts`,
+      });
     } catch (error) {
       console.error('Research failed:', error);
-      // Add user feedback for the error
       setResults([{
         fact: 'Research query failed',
         confidence: 'low',
         context: error instanceof Error ? error.message : 'An unexpected error occurred',
       }]);
+      
+      toast({
+        title: "Research Failed",
+        description: "Unable to complete the research. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const parseResearchResponse = (content: string): ResearchResult[] => {
     try {
-      // First try to split by double newline for structured content
-      let sections = content.split('\n\n').filter(section => section.trim());
-      
-      // If we don't get any valid sections, try single newline
+      // Split content into sections, handling both structured and unstructured responses
+      const sections = content.split(/(?:\r?\n){2,}/)
+        .filter(section => section.trim())
+        .map(section => section.trim());
+
       if (sections.length === 0) {
-        sections = [content]; // Treat entire content as one section
+        return [{
+          fact: 'No research results available',
+          confidence: 'low',
+          context: 'The AI service did not return any usable results'
+        }];
       }
 
       return sections.map(section => {
-        const lines = section.split('\n');
+        const lines = section.split('\n').map(line => line.trim());
         
-        // Extract fact - first non-empty line without numbering
-        const fact = lines
-          .find(line => line.trim().length > 0)
-          ?.replace(/^[\d\.\s-]*/, '')
-          .trim() || 'No fact found';
+        // Extract fact - first non-empty line that's not a label
+        const fact = lines.find(line => 
+          line.trim().length > 0 && 
+          !line.toLowerCase().startsWith('source:') &&
+          !line.toLowerCase().startsWith('context:') &&
+          !line.toLowerCase().startsWith('confidence:')
+        )?.replace(/^(?:\d+\.|\*|\-)\s*/, '').trim() || 'No fact found';
 
-        // Look for source and context in any line
-        const source = lines
-          .find(line => 
-            line.toLowerCase().includes('source:') || 
-            line.toLowerCase().includes('reference:'))
-          ?.replace(/^(source:|reference:)/i, '')
-          .trim();
+        // Extract source, context, and confidence from labeled lines
+        const source = lines.find(line => 
+          line.toLowerCase().includes('source:') || 
+          line.toLowerCase().includes('reference:')
+        )?.replace(/^(?:source:|reference:)/i, '').trim();
 
-        const contextLine = lines
-          .find(line => line.toLowerCase().includes('context:'))
-          ?.replace(/^context:/i, '')
-          .trim();
+        const context = lines.find(line => 
+          line.toLowerCase().includes('context:')
+        )?.replace(/^context:/i, '').trim();
+
+        let confidence: 'high' | 'medium' | 'low' = 'medium';
+        
+        // Determine confidence level
+        const confidenceLine = lines.find(line => 
+          line.toLowerCase().includes('confidence:')
+        )?.toLowerCase() || '';
+
+        if (confidenceLine.includes('high') || 
+            section.toLowerCase().includes('verified') || 
+            section.toLowerCase().includes('confirmed')) {
+          confidence = 'high';
+        } else if (confidenceLine.includes('low') || 
+                   section.toLowerCase().includes('uncertain') || 
+                   section.toLowerCase().includes('unverified')) {
+          confidence = 'low';
+        }
 
         return {
           fact,
           source,
-          confidence: determineConfidence(section),
-          context: contextLine || extractContext(fact)
+          confidence,
+          context: context || extractContext(fact)
         };
       });
     } catch (error) {
@@ -101,19 +140,9 @@ export function ResearchAssistantPanel() {
       return [{
         fact: 'Failed to parse research results',
         confidence: 'low',
-        context: 'There was an error processing the AI response',
+        context: 'There was an error processing the AI response'
       }];
     }
-  };
-
-  const determineConfidence = (fact: string): 'high' | 'medium' | 'low' => {
-    if (fact.toLowerCase().includes('verified') || fact.toLowerCase().includes('confirmed')) {
-      return 'high';
-    }
-    if (fact.toLowerCase().includes('likely') || fact.toLowerCase().includes('probably')) {
-      return 'medium';
-    }
-    return 'low';
   };
 
   const extractContext = (fact: string): string => {
@@ -135,6 +164,11 @@ export function ResearchAssistantPanel() {
               placeholder="Enter a topic to research..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !contentResearch.isPending) {
+                  handleResearch();
+                }
+              }}
               className="flex-1"
             />
             <Button 
