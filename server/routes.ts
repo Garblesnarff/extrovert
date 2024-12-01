@@ -362,11 +362,14 @@ export function registerRoutes(app: Express) {
       const enhancedPrompt = `Research the following topic and provide insights: ${prompt}`;
       const response = await getAIResponse(enhancedPrompt, provider);
       
-      res.json({
-        topics: response.hashtags,
-        insights: response.suggestedContent,
-        provider: response.provider
-      });
+      // Format the response for theme suggestions
+      const suggestions = {
+        topics: response.hashtags || [],
+        insights: response.suggestedContent || 'Content Strategy\nSocial Media Engagement\nTrending Topics Analysis',
+        provider: response.provider || 'default'
+      };
+      
+      res.json(suggestions);
     } catch (error) {
       console.error('AI research error:', error);
       res.status(500).json({ 

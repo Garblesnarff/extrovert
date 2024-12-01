@@ -64,9 +64,9 @@ export function ContentStrategyDashboard() {
         suggestions = insights.split('\n')
           .filter((line: string) => line.trim())
           .map((theme: string) => ({
-            theme: theme.split(':')[0]?.trim() || theme,
-            topics: trendsData.slice(0, 3).map((t: Topic) => t.name),
-            description: theme.split(':')[1]?.trim() || 'Emerging trend based on current search patterns',
+            theme: theme.trim().replace(/[[\]']/g, ''), // Clean up theme name
+            topics: trendsData.slice(0, 3).map((t: Topic) => t.name.replace(/[[\]']/g, '')), // Clean up topic names
+            description: 'Strategic content theme based on current trends',
           }));
       } catch (error) {
         console.warn('Error parsing theme suggestions:', error);
