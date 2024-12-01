@@ -23,8 +23,14 @@ export function ResearchAssistantPanel() {
 
     try {
       const response = await contentResearch.mutateAsync({
-        prompt: `Research and fact-check the following: ${query}. 
-                Provide verified facts, sources, and context where available.`,
+        prompt: `Research and fact-check the following topic: ${query}
+                For each fact, please provide:
+                1. The verified fact
+                2. Source: Reference or citation if available
+                3. Context: Additional background information
+                4. Confidence level indicators (use phrases like "Verified by multiple sources", "Likely based on evidence", or "Requires further verification")
+                
+                Format each fact as a separate section with clear labels.`,
         provider: 'gemini',
         model: 'gemini-pro'
       });
@@ -37,12 +43,20 @@ export function ResearchAssistantPanel() {
   };
 
   const parseResearchResponse = (content: string): ResearchResult[] => {
-    const lines = content.split('\n').filter(line => line.trim());
-    return lines.map(line => ({
-      fact: line,
-      confidence: determineConfidence(line),
-      context: extractContext(line)
-    }));
+    const sections = content.split('\n\n').filter(section => section.trim());
+    return sections.map(section => {
+      const lines = section.split('\n');
+      const fact = lines[0]?.replace(/^[\d\.\s-]*/, '').trim() || '';
+      const source = lines.find(line => line.includes('Source:'))?.replace('Source:', '').trim();
+      const contextLine = lines.find(line => line.includes('Context:'))?.replace('Context:', '').trim();
+      
+      return {
+        fact,
+        source,
+        confidence: determineConfidence(section),
+        context: contextLine || extractContext(fact)
+      };
+    });
   };
 
   const determineConfidence = (fact: string): 'high' | 'medium' | 'low' => {
