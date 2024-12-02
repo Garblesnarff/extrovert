@@ -96,43 +96,69 @@ def run(content: Dict = None):
 
     try:
         research_crew = ResearchCrew()
+        query = content['text']
         
-        # Direct search using SerperDev tool
-        search_results = research_crew.search_tool.search(content['text'])
-        
-        if not search_results or not search_results.get('organic'):
-            return {"insights": "No search results found"}
+        try:
+            # Perform the search with proper parameters
+            search_results = research_crew.search_tool.search({
+                "q": query,
+                "gl": "us",
+                "hl": "en",
+                "autocorrect": True,
+                "time": "d",
+                "num": 5
+            })
             
-        # Extract relevant information from search results
-        results = search_results['organic'][:5]  # Get top 5 results
-        
-        # Format results into insights
-        insights = []
-        for result in results:
-            if 'title' in result and 'snippet' in result:
-                insights.append(f"• {result['title']}\n{result['snippet']}")
+            print(f"Search results: {json.dumps(search_results, indent=2)}")
+            
+            if not search_results or not search_results.get('organic'):
+                return {"insights": "No search results found for the query"}
                 
-        if not insights:
-            return {"insights": "No relevant information found"}
+            # Extract and format relevant information
+            results = search_results['organic']
+            insights = []
             
-        formatted_insights = "\n\n".join(insights)
-        return {"insights": formatted_insights}
-        
+            for result in results:
+                title = result.get('title', '')
+                snippet = result.get('snippet', '')
+                link = result.get('link', '')
+                date = result.get('date', '')
+                
+                if title and snippet:
+                    formatted_result = f"• {title}\n"
+                    if date:
+                        formatted_result += f"Date: {date}\n"
+                    formatted_result += f"{snippet}\n"
+                    if link:
+                        formatted_result += f"Source: {link}\n"
+                    insights.append(formatted_result)
+            
+            if not insights:
+                return {"insights": "No relevant information found for the query"}
+                
+            formatted_insights = "\n\n".join(insights)
+            return {"insights": formatted_insights}
+            
+        except Exception as search_error:
+            print(f"Search error: {str(search_error)}")
+            return {"insights": f"Search failed: {str(search_error)}"}
+            
     except Exception as e:
-        print(f"Search error: {str(e)}")
-        return {"insights": f"Search failed: {str(e)}"}
-    except Exception as e:
-        print(f"Research error: {str(e)}")
+        print(f"Research crew error: {str(e)}")
         raise
 
 if __name__ == "__main__":
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    test_content = {
-        "text": f"What are the latest developments in AI as of {current_time}?"
-    }
-
+    import sys
+    
+    if len(sys.argv) != 2:
+        print("Usage: python main.py '<content_json>'")
+        sys.exit(1)
+        
     try:
-        result = run(test_content)
-        print(f"Research Results (as of {current_time}):", result)
+        content = json.loads(sys.argv[1])
+        result = run(content)
+        print(json.dumps(result))
+    except json.JSONDecodeError as e:
+        print(json.dumps({"error": f"Invalid JSON input: {str(e)}"}))
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(json.dumps({"error": f"Execution error: {str(e)}"}))
