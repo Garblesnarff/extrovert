@@ -9,7 +9,7 @@ router.post('/research', async (req, res) => {
     const { query } = req.body;
     
     if (!query || typeof query !== 'string' || query.trim().length === 0) {
-      return res.status(400).json({ error: 'Valid research query is required' });
+      return res.status(400).json({ error: 'Research topic is required' });
     }
 
     const options = {
@@ -21,13 +21,17 @@ router.post('/research', async (req, res) => {
 
     try {
       const results = await PythonShell.run('research_crew.py', options);
-      console.log('Research results:', results); // Debug log
       
       if (!results || results.length === 0) {
         throw new Error('No results from research service');
       }
 
       const research = JSON.parse(results[0]);
+      
+      if (research.error) {
+        throw new Error(research.error);
+      }
+
       return res.json(research);
       
     } catch (pythonError) {
@@ -37,8 +41,7 @@ router.post('/research', async (req, res) => {
   } catch (error: unknown) {
     console.error('Research error:', error);
     res.status(500).json({ 
-      error: 'Research service error', 
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Research service error'
     });
   }
 });

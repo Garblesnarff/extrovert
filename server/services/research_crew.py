@@ -1,183 +1,110 @@
 from typing import Dict, List, Optional
-from datetime import datetime
+import json
+import sys
 import os
-from pydantic import BaseModel
-from crewai import Agent, Task, Crew, Process, LLM
-from crewai.project import CrewBase, agent, crew, task
+from crewai import Agent, Task, Crew, Process
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from crewai_tools import SerperDevTool, WebsiteSearchTool
 
-class ResearchResult(BaseModel):
-    """Structure for research findings"""
-    facts: List[Dict[str, str]]
-    sources: List[str]
-    confidence_score: float
-    context: str
-    enhancement_suggestions: List[str]
-
-class TwitterResearchCrew(CrewBase):
-    """Research crew for validating and enhancing Twitter content"""
+def create_research_crew(query: str):
+    """Create and configure the research crew"""
     
-    def __init__(self):
-        super().__init__()
-        # Initialize tools
-        self.search_tool = SerperDevTool()
-        self.web_tool = WebsiteSearchTool()
-        
-        # Initialize LLMs following best practices
-        self.gemini_config = {
-            "model": "gemini-1.5-pro",
-            "api_key": os.getenv("GEMINI_API_KEY")
-        }
-        
-        self.groq_config = {
-            "model": "llama3-70b-8192",
-            "base_url": "https://api.groq.com/v1",
-            "api_key": os.getenv("GROQ_API_KEY")
-        }
-
-    @agent
-    def fact_checker(self) -> Agent:
-        return Agent(
-            role="Research Validator & Fact Checker",
-            goal="Thoroughly verify claims and gather supporting evidence",
-            backstory="""You are a meticulous fact-checker with expertise in 
-            research and verification. You excel at finding and validating 
-            information from reliable sources.""",
-            tools=[self.search_tool, self.web_tool],
-            llm=LLM(config=self.gemini_config),
-            verbose=True
-        )
-
-    @agent
-    def context_researcher(self) -> Agent:
-        return Agent(
-            role="Context & Background Researcher",
-            goal="Provide comprehensive context and background information",
-            backstory="""You are an expert at synthesizing relevant background 
-            information and context to create a complete picture.""",
-            tools=[self.search_tool, self.web_tool],
-            llm=LLM(config=self.groq_config),
-            verbose=True
-        )
-
-    @task
-    def verify_facts(self) -> Task:
-        return Task(
-            description="""Verify all claims in the provided content:
-            1. Find primary sources
-            2. Cross-reference with reliable sources
-            3. Note any discrepancies
-            4. Provide confidence score
-            5. List all sources""",
-            agent=self.fact_checker()
-        )
-
-    @task
-    def research_context(self) -> Task:
-        return Task(
-            description="""Research broader context:
-            1. Find relevant background
-            2. Identify related trends
-            3. Find recent developments
-            4. Gather statistics
-            5. Collect expert opinions""",
-            agent=self.context_researcher(),
-            context=[self.verify_facts()]
-        )
-
-    @crew
-    def research_crew(self) -> Crew:
-        return Crew(
-            agents=[
-                self.fact_checker(),
-                self.context_researcher()
-            ],
-            tasks=[
-                self.verify_facts(),
-                self.research_context()
-            ],
-            process=Process.sequential,
-            verbose=True
-        )
-
-def process_research(content: str) -> ResearchResult:
-    """Process content through the research crew"""
-    try:
-        research_crew = TwitterResearchCrew()
-        results = research_crew.research_crew().kickoff(inputs={"content": content})
-
-        # Extract facts from verification task
-        facts = []
-        if results.tasks[0].output:
-            facts = [
-                {
-                    "statement": fact.get("statement", ""),
-                    "source": fact.get("source", ""),
-                    "confidence": fact.get("confidence", 0.0)
-                }
-                for fact in results.tasks[0].output.get("verified_facts", [])
-            ]
-
-        return ResearchResult(
-            facts=facts,
-            sources=results.tasks[0].output.get("sources", []),
-            confidence_score=results.tasks[0].output.get("average_confidence", 0.0),
-            context=results.tasks[1].output.get("context", ""),
-            enhancement_suggestions=[]
-        )
-
-    except Exception as e:
-        raise Exception(f"Research crew error: {str(e)}")
-
-if __name__ == "__main__":
-    import sys
-    import json
+    # Initialize tools
+    search_tool = SerperDevTool()
+    web_tool = WebsiteSearchTool()
     
+    # Initialize LLM configurations
+    gemini = ChatGoogleGenerativeAI(
+        model="gemini-1.0-pro",
+        google_api_key=os.getenv("GEMINI_API_KEY"),
+        convert_system_message_to_human=True
+    )
+    
+    groq = ChatGroq(
+        model_name="mixtral-8x7b-32768",
+        api_key=os.getenv("GROQ_API_KEY")
+    )
+
+    # Create agents
+    fact_checker = Agent(
+        role="Research Validator & Fact Checker",
+        goal="Thoroughly verify claims and gather supporting evidence",
+        backstory="""You are a meticulous fact-checker with expertise in research and verification. 
+        You excel at finding and validating information from reliable sources.""",
+        tools=[search_tool, web_tool],
+        llm=gemini,
+        verbose=True
+    )
+
+    context_researcher = Agent(
+        role="Context & Background Researcher",
+        goal="Provide comprehensive context and background information",
+        backstory="""You are an expert at synthesizing relevant background information and context 
+        to create a complete picture.""",
+        tools=[search_tool, web_tool],
+        llm=groq,
+        verbose=True
+    )
+
+    # Create tasks
+    verify_facts = Task(
+        description=f"""Research and verify facts about: {query}
+        1. Find primary sources
+        2. Cross-reference with reliable sources
+        3. Note any discrepancies
+        4. List key findings
+        5. Cite sources used""",
+        agent=fact_checker
+    )
+
+    research_context = Task(
+        description=f"""Research broader context about: {query}
+        1. Find relevant background
+        2. Identify related trends
+        3. Find recent developments
+        4. Gather statistics
+        5. Collect expert opinions""",
+        agent=context_researcher
+    )
+
+    # Create and return the crew
+    return Crew(
+        agents=[fact_checker, context_researcher],
+        tasks=[verify_facts, research_context],
+        process=Process.sequential,
+        verbose=True
+    )
+
+def main():
     try:
-        # Read input from command line
+        # Parse input
         input_data = json.loads(sys.argv[1])
-        query = input_data.get("query", "")
+        query = input_data.get("query", "").strip()
         
         if not query:
             raise ValueError("Query is required")
-            
-        # Initialize the research crew
-        research_crew = TwitterResearchCrew()
         
-        # Process the research using only fact checking and context research
-        crew = Crew(
-            agents=[
-                research_crew.fact_checker(),
-                research_crew.context_researcher()
-            ],
-            tasks=[
-                research_crew.verify_facts(),
-                research_crew.research_context()
-            ],
-            process=Process.sequential,
-            verbose=True
-        )
+        # Create and run the crew
+        crew = create_research_crew(query)
+        results = crew.kickoff(inputs={"query": query})
         
-        # Run the research
-        results = crew.kickoff(inputs={"content": query})
-        
-        # Format the results
+        # Process results
         response = {
-            "insights": results.tasks[0].output,
-            "context": results.tasks[1].output if len(results.tasks) > 1 else "",
+            "insights": results.tasks[0].output,  # Fact checking results
+            "context": results.tasks[1].output if len(results.tasks) > 1 else "",  # Context results
         }
         
-        # Output the result as JSON
+        # Return results
         print(json.dumps(response))
         
-        # Output the result as JSON
-        print(json.dumps(result.dict()))
     except Exception as e:
-        print(json.dumps({
+        error_response = {
             "error": str(e),
-            "facts": [],
-            "sources": [],
-            "confidence_score": 0.0,
-            "context": "",
-            "enhancement_suggestions": []
-        }))
+            "insights": "",
+            "context": ""
+        }
+        print(json.dumps(error_response))
+
+if __name__ == "__main__":
+    main()
