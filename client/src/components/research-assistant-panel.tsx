@@ -50,16 +50,21 @@ export function ResearchAssistantPanel() {
         throw new Error('No research results available');
       }
 
-      // Process both insights and suggested content if available
-      const insights = data.insights || '';
-      const suggestedContent = data.suggestedContent || '';
+      // Get the raw insights from the response
+      const insights = data.insights;
       
-      // Combine and parse all available content
-      const combinedContent = [insights, suggestedContent]
-        .filter(content => content)
-        .join('\n\n');
+      if (!insights) {
+        throw new Error('No research results available');
+      }
+
+      // Create a single result with the raw insights to preserve accuracy
+      const results = [{
+        fact: insights.split('\n')[0] || 'Research Results',
+        confidence: 'high',
+        context: insights
+      }];
       
-      const parsedResults = parseResearchResponse(combinedContent);
+      setResults(results);
       setResults(parsedResults);
       toast({
         title: "Research Complete",

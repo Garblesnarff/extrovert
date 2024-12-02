@@ -70,7 +70,25 @@ router.post('/api/ai/research', async (req, res) => {
     // Parse and format the research results
     let researchResults;
     try {
-      researchResults = JSON.parse(result);
+      // First try to parse as JSON
+      try {
+        researchResults = JSON.parse(result);
+      } catch {
+        // If not JSON, use the raw result as insights
+        researchResults = { insights: result.trim() };
+      }
+
+      // Clean and validate the response
+      const cleanedInsights = researchResults?.insights?.trim();
+      if (!cleanedInsights) {
+        throw new Error('No valid research results found');
+      }
+
+      // Return the raw insights to preserve accuracy
+      return res.json({
+        insights: cleanedInsights,
+        raw_response: result.trim() // Include raw response for debugging
+      });
     } catch (parseError) {
       console.error('Failed to parse research results:', parseError);
       return res.status(500).json({
@@ -78,12 +96,6 @@ router.post('/api/ai/research', async (req, res) => {
         details: 'Invalid response format from research service'
       });
     }
-    
-    return res.json({
-      topics: researchResults?.topics || [],
-      insights: researchResults?.insights || '',
-      suggestedContent: researchResults?.enhanced_content || ''
-    });
 
   } catch (error) {
     console.error('Research error:', error);
