@@ -6,9 +6,9 @@ const router = Router();
 
 router.post('/research', async (req, res) => {
   try {
-    const { query } = req.body;
+    const { content } = req.body;
     
-    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+    if (!content || typeof content !== 'string' || content.trim().length === 0) {
       return res.status(400).json({ error: 'Research topic is required' });
     }
 
@@ -16,7 +16,7 @@ router.post('/research', async (req, res) => {
       mode: 'text' as const,
       scriptPath: path.join(__dirname, '../services'),
       pythonPath: 'python3',
-      args: [JSON.stringify({ query: query.trim() })]
+      args: [JSON.stringify({ query: content.trim() })]
     };
 
     try {

@@ -37,7 +37,7 @@ export function ResearchAssistantPanel() {
       const response = await fetch('/api/ai/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim() }),
+        body: JSON.stringify({ content: query.trim() }),
       });
 
       const data = await response.json();
