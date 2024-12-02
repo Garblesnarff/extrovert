@@ -1,0 +1,35 @@
+# Research crew task configurations
+verify_facts:
+    description: >
+        Verify all claims in the provided content. For each claim:
+        1. Find primary sources
+        2. Cross-reference with multiple reliable sources
+        3. Note any discrepancies or nuances
+        4. Provide confidence score for each verified fact
+        5. List all sources used
+    expected_output: Detailed fact-check report with sources and confidence scores
+    agent: fact_checker
+
+research_context:
+    description: >
+        Research broader context around the topic:
+        1. Find relevant background information
+        2. Identify related trending discussions
+        3. Look for recent developments
+        4. Find relevant statistics and data
+        5. Identify expert opinions and analysis
+    expected_output: Comprehensive context report with background information
+    agent: context_researcher
+    context: [verify_facts]
+
+enhance_content:
+    description: >
+        Using verified facts and contextual research:
+        1. Suggest ways to enhance the content
+        2. Provide relevant data points
+        3. Identify potential angles for engagement
+        4. Suggest credible sources to reference
+        5. Format information for social media impact
+    expected_output: Enhanced content suggestions with supporting data
+    agent: content_enhancer
+    context: [verify_facts, research_context]

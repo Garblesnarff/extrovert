@@ -31,24 +31,26 @@ export function ResearchAssistantPanel() {
     }
 
     try {
-      const response = await contentResearch.mutateAsync({
-        prompt: `Research and fact-check the following topic: ${query}
-                Please provide verified facts with the following structure:
-                1. Fact: [The verified information]
-                2. Source: [Reference URL or citation]
-                3. Context: [Additional background information]
-                4. Confidence: [High/Medium/Low based on source reliability]
-                
-                Format each fact as a clear section.`,
-        provider: 'gemini',
-        model: 'gemini-1.5-pro'
+      const response = await fetch('/api/ai/research', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: query,
+        }),
       });
 
-      if (!response?.suggestedContent) {
+      if (!response.ok) {
+        throw new Error('Research request failed');
+      }
+
+      const data = await response.json();
+      if (!data.suggestedContent) {
         throw new Error('No research results available');
       }
 
-      const parsedResults = parseResearchResponse(response.suggestedContent);
+      const parsedResults = parseResearchResponse(data.suggestedContent);
       
       if (parsedResults.length === 0) {
         throw new Error('No valid research results found');
