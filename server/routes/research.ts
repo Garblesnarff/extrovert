@@ -14,8 +14,13 @@ router.post('/api/ai/research', async (req, res) => {
     // Create content object for research crew with search requirements
     const content = {
       text: prompt,
-      requireSearch: true,
-      searchRecent: true
+      timestamp: new Date().toISOString(),
+      search_config: {
+        require_recent: true,
+        time_range: 'last_24h',
+        include_news: true,
+        sort_by: 'date'
+      }
     };
 
     // Spawn Python process to run research crew

@@ -1,4 +1,4 @@
-# Research crew agent configurations
+# src/research_crew/config/agents.yaml
 fact_checker:
     role: Research Validator & Fact Checker
     goal: Thoroughly verify claims and gather supporting evidence
@@ -7,8 +7,7 @@ fact_checker:
         Your expertise lies in finding and validating information from reliable sources,
         ensuring accuracy in every detail.
     verbose: true
-    tools: [search_tool, web_tool]
-    llm: gemini/gemini-flash-8b
+    llm: groq/llama3-70b-8192
 
 context_researcher:
     role: Context & Background Researcher
@@ -18,16 +17,13 @@ context_researcher:
         and context. You excel at connecting different pieces of information to create
         a complete picture.
     verbose: true
-    tools: [search_tool, web_tool]
-    llm: groq/llama3-70b-8192
+    llm: gemini/gemini-flash-8b
 
 content_enhancer:
     role: Content Enhancement Specialist
     goal: Enhance content with verified data and engaging context
     backstory: >
         You are skilled at taking verified information and transforming it into engaging,
-        shareable content while maintaining accuracy. You know how to present facts
-        in a way that resonates with social media audiences.
+        shareable content while maintaining accuracy.
     verbose: true
-    tools: [web_tool]
     llm: groq/mixtral-8x7b-32768
