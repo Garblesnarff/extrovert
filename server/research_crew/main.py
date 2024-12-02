@@ -88,14 +88,32 @@ def run(content: Dict = None):
         raise Exception(f"Error running research crew: {str(e)}")
 
 if __name__ == "__main__":
-    # Example usage
-    content = {
-        "text": """AI has reduced software development time by 80% across all industries 
-        in 2024, leading to a significant shift in how companies approach technical hiring."""
-    }
+    import sys
+    import json
 
     try:
+        # Get content from command line argument
+        if len(sys.argv) < 2:
+            raise ValueError("No content provided")
+            
+        content = json.loads(sys.argv[1])
         result = run(content)
-        print("Research Results:", result)
+        
+        # Format output as JSON
+        output = {
+            "topics": [],  # Add topics if available
+            "insights": str(result),
+            "enhanced_content": str(result)
+        }
+        print(json.dumps(output))
+        
+    except json.JSONDecodeError as e:
+        print(json.dumps({
+            "error": "Invalid JSON input",
+            "details": str(e)
+        }))
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(json.dumps({
+            "error": str(e),
+            "details": "Error processing research request"
+        }))

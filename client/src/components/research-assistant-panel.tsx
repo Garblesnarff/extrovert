@@ -63,15 +63,19 @@ export function ResearchAssistantPanel() {
       });
     } catch (error) {
       console.error('Research failed:', error);
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unexpected error occurred';
+      
       setResults([{
         fact: 'Research query failed',
         confidence: 'low',
-        context: error instanceof Error ? error.message : 'An unexpected error occurred',
+        context: `Error details: ${errorMessage}. Please try again or contact support if the issue persists.`,
       }]);
       
       toast({
         title: "Research Failed",
-        description: "Unable to complete the research. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

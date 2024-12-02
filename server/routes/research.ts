@@ -18,11 +18,12 @@ router.post('/api/ai/research', async (req, res) => {
 
     // Spawn Python process to run research crew
     const pythonProcess = spawn('python3', [
-      path.join(__dirname, '../research_crew/main.py')
+      path.join(__dirname, '../research_crew/main.py'),
+      JSON.stringify(content)  // Pass content as command line argument
     ], {
       env: {
         ...process.env,
-        RESEARCH_CONTENT: JSON.stringify(content)
+        PYTHONUNBUFFERED: '1'  // Ensure Python output is not buffered
       }
     });
 
