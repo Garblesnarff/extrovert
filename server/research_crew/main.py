@@ -71,6 +71,11 @@ class ResearchCrew(CrewBase):
 def run(content: Dict = None):
     """Run the crew with the provided content"""
     try:
+        if not content or 'text' not in content:
+            raise ValueError("Content must include 'text' field")
+
+        print(f"Starting research with content: {content['text'][:100]}...")
+
         # Check for required environment variables
         required_vars = ["GEMINI_API_KEY", "GROQ_API_KEY", "SERPER_API_KEY"]
         missing_vars = [var for var in required_vars if not os.getenv(var)]
@@ -80,11 +85,17 @@ def run(content: Dict = None):
             )
 
         # Initialize and run the crew
+        print("Initializing research crew...")
         crew = ResearchCrew().crew()
-        result = crew.kickoff(inputs=content)
+        
+        print("Starting research process...")
+        result = crew.kickoff(inputs={'query': content['text']})
+        
+        print("Research completed successfully")
         return result
 
     except Exception as e:
+        print(f"Error in research process: {str(e)}", file=sys.stderr)
         raise Exception(f"Error running research crew: {str(e)}")
 
 if __name__ == "__main__":

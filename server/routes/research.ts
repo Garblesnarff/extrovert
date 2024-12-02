@@ -17,13 +17,15 @@ router.post('/api/ai/research', async (req, res) => {
     };
 
     // Spawn Python process to run research crew
+    console.log('Starting research process with content:', JSON.stringify({ text: content.text }));
+    
     const pythonProcess = spawn('python3', [
       path.join(__dirname, '../research_crew/main.py'),
-      JSON.stringify(content)  // Pass content as command line argument
+      JSON.stringify(content)
     ], {
       env: {
         ...process.env,
-        PYTHONUNBUFFERED: '1'  // Ensure Python output is not buffered
+        PYTHONUNBUFFERED: '1'
       }
     });
 
@@ -31,26 +33,31 @@ router.post('/api/ai/research', async (req, res) => {
     let error = '';
 
     pythonProcess.stdout.on('data', (data) => {
-      result += data.toString();
+      const chunk = data.toString();
+      console.log('Python stdout:', chunk);
+      result += chunk;
     });
 
     pythonProcess.stderr.on('data', (data) => {
-      error += data.toString();
+      const chunk = data.toString();
+      console.error('Python stderr:', chunk);
+      error += chunk;
     });
 
     await new Promise((resolve, reject) => {
       pythonProcess.on('close', (code) => {
+        console.log('Python process exited with code:', code);
         if (code === 0) {
           resolve(null);
         } else {
-          reject(new Error(`Process exited with code ${code}`));
+          reject(new Error(`Process exited with code ${code}. Error: ${error}`));
         }
       });
     });
 
     if (error) {
       console.error('Research error:', error);
-      throw new Error('Failed to complete research');
+      throw new Error(`Failed to complete research: ${error}`);
     }
 
     // Parse and format the research results
