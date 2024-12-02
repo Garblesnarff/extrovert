@@ -1,14 +1,16 @@
 # Research crew task configurations
 verify_facts:
     description: >
-        Verify all claims in the provided content. For each claim:
-        1. Find primary sources
-        2. Cross-reference with multiple reliable sources
-        3. Note any discrepancies or nuances
-        4. Provide confidence score for each verified fact
-        5. List all sources used
-    expected_output: Detailed fact-check report with sources and confidence scores
+        Verify all claims and search for current information. Required steps:
+        1. Use search_tool to find latest information about the topic
+        2. Find and verify primary sources from the last 24 hours
+        3. Cross-reference with multiple reliable news sources
+        4. Note any discrepancies or recent developments
+        5. Provide confidence score and timestamp for each fact
+        6. List all sources with their publication dates
+    expected_output: Detailed fact-check report with recent sources and confidence scores
     agent: fact_checker
+    required_tools: [search_tool]
 
 research_context:
     description: >

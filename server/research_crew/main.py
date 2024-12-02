@@ -25,7 +25,12 @@ class ResearchCrew(CrewBase):
         """Creates the fact checking agent"""
         return Agent(
             config=self.agents_config["fact_checker"],
-            tools=[self.search_tool, self.web_tool]
+            tools=[self.search_tool, self.web_tool],
+            llm_config={
+                "request_timeout": 120,
+                "temperature": 0.5,
+                "max_tokens": 2000
+            }
         )
 
     @agent
@@ -96,11 +101,16 @@ def run(content: Dict = None):
         crew = research_crew.crew()
         
         print("Starting research process...")
-        # Add the query parameter to trigger internet search
+        # Configure search parameters for real-time information
         result = crew.kickoff(inputs={
             'query': content['text'],
-            'require_search': True,  # Flag to ensure internet search is performed
-            'search_recent': True    # Flag to prioritize recent results
+            'require_search': True,
+            'search_recent': True,
+            'search_params': {
+                'time_range': 'last_24h',
+                'include_domains': ['reuters.com', 'apnews.com', 'bloomberg.com'],
+                'num_results': 10
+            }
         })
         
         print("Research completed successfully")
