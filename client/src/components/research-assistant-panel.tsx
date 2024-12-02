@@ -46,17 +46,23 @@ export function ResearchAssistantPanel() {
       }
 
       const data = await response.json();
-      if (!data.suggestedContent) {
+      if (!data.insights && !data.suggestedContent) {
         throw new Error('No research results available');
       }
 
-      const parsedResults = parseResearchResponse(data.suggestedContent);
+      const contentToProcess = data.suggestedContent || data.insights;
+      const parsedResults = parseResearchResponse(contentToProcess);
       
       if (parsedResults.length === 0) {
-        throw new Error('No valid research results found');
+        // If no structured results, create a single result from raw insights
+        setResults([{
+          fact: 'Research Results',
+          confidence: 'high',
+          context: contentToProcess
+        }]);
+      } else {
+        setResults(parsedResults);
       }
-
-      setResults(parsedResults);
       toast({
         title: "Research Complete",
         description: `Found ${parsedResults.length} relevant facts`,
