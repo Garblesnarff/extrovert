@@ -24,11 +24,12 @@ router.post('/api/ai/research', async (req, res) => {
     };
 
     // Spawn Python process to run research crew
-    console.log('Starting research process with content:', JSON.stringify(content));
+    const contentArg = JSON.stringify(content);
+    console.log('Starting research process with content:', contentArg);
     
     const pythonProcess = spawn('python3', [
       path.join(__dirname, '../research_crew/main.py'),
-      JSON.stringify(content)
+      contentArg
     ], {
       env: {
         ...process.env,

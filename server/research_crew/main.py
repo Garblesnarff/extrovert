@@ -96,33 +96,31 @@ def run(content: Dict = None):
 
     try:
         research_crew = ResearchCrew()
-        crew = research_crew.crew()
         
-        print(f"Starting research process for query: {content['text']}")
+        # Direct search using SerperDev tool
+        search_results = research_crew.search_tool.search(content['text'])
         
-        # Configure search parameters
-        search_config = {
-            'query': content['text'],
-            'search_params': {
-                'time_range': 'last_24h',
-                'include_news': True,
-                'sort_by': 'date',
-                'num_results': 10
-            }
-        }
+        if not search_results or not search_results.get('organic'):
+            return {"insights": "No search results found"}
+            
+        # Extract relevant information from search results
+        results = search_results['organic'][:5]  # Get top 5 results
         
-        # Execute research with configured parameters
-        result = crew.kickoff(inputs=search_config)
+        # Format results into insights
+        insights = []
+        for result in results:
+            if 'title' in result and 'snippet' in result:
+                insights.append(f"• {result['title']}\n{result['snippet']}")
+                
+        if not insights:
+            return {"insights": "No relevant information found"}
+            
+        formatted_insights = "\n\n".join(insights)
+        return {"insights": formatted_insights}
         
-        # Format and validate results
-        if isinstance(result, str):
-            try:
-                parsed_result = json.loads(result)
-                return parsed_result
-            except json.JSONDecodeError:
-                return {"insights": result}
-        
-        return result
+    except Exception as e:
+        print(f"Search error: {str(e)}")
+        return {"insights": f"Search failed: {str(e)}"}
     except Exception as e:
         print(f"Research error: {str(e)}")
         raise
