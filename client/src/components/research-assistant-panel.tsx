@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Search, BookOpen, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useContentResearch } from '@/lib/crewai';
 import { ResizablePanel } from '@/components/ui/resizable';
 import { useToast } from '@/hooks/use-toast';
 
-interface ResearchFact {
+interface ResearchResult {
   fact: string;
   source?: string;
   confidence: 'high' | 'medium' | 'low';
@@ -16,95 +16,138 @@ interface ResearchFact {
 
 export function ResearchAssistantPanel() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ResearchFact[]>([]);
+  const [results, setResults] = useState<ResearchResult[]>([]);
   const contentResearch = useContentResearch();
   const { toast } = useToast();
 
   const handleResearch = async () => {
-    try {
-      setResults([]);
-      
-      if (!query.trim()) {
-        toast({
-          title: "Empty Query",
-          description: "Please enter a topic to research.",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!query.trim()) {
+      toast({
+        title: "Empty Query",
+        description: "Please enter a topic to research.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-      console.log('Sending research query:', { content: query.trim() }); // Debug log
-      const response = await fetch('/api/ai/research', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: query.trim() }),
+    try {
+      const response = await contentResearch.mutateAsync({
+        prompt: `Research and fact-check the following topic: ${query}
+                Please provide verified facts with the following structure:
+                1. Fact: [The verified information]
+                2. Source: [Reference URL or citation]
+                3. Context: [Additional background information]
+                4. Confidence: [High/Medium/Low based on source reliability]
+                
+                Format each fact as a clear section.`,
+        provider: 'gemini',
+        model: 'gemini-1.5-pro'
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorMessage = data.error || 'Research service error';
-        toast({
-          title: "Research Failed",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        return;
+      if (!response?.suggestedContent) {
+        throw new Error('No research results available');
       }
 
-      const processedResults: ResearchFact[] = [];
+      const parsedResults = parseResearchResponse(response.suggestedContent);
       
-      if (data.insights) {
-        // Split insights into individual facts
-        const facts = data.insights.split('\n').filter(Boolean);
-        facts.forEach((fact: string) => {
-          if (fact.trim()) {
-            processedResults.push({
-              fact: fact.trim(),
-              confidence: 'high',
-              context: data.context || ''
-            });
-          }
-        });
+      if (parsedResults.length === 0) {
+        throw new Error('No valid research results found');
       }
 
-      if (processedResults.length === 0) {
-        toast({
-          title: "No Results",
-          description: "No research results available for this query. Try being more specific.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setResults(processedResults);
-      
-      if (processedResults.length > 0) {
-        toast({
-          title: "Research Complete",
-          description: `Found ${processedResults.length} verified facts`,
-        });
-      } else {
-        toast({
-          title: "No Valid Results",
-          description: "Could not process the research results. Try a different query.",
-          variant: "destructive",
-        });
-      }
+      setResults(parsedResults);
+      toast({
+        title: "Research Complete",
+        description: `Found ${parsedResults.length} relevant facts`,
+      });
     } catch (error) {
       console.error('Research failed:', error);
+      setResults([{
+        fact: 'Research query failed',
+        confidence: 'low',
+        context: error instanceof Error ? error.message : 'An unexpected error occurred',
+      }]);
+      
       toast({
         title: "Research Failed",
-        description: "An unexpected error occurred while processing your request. Please try again.",
+        description: "Unable to complete the research. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const getConfidenceLevel = (score: number): 'high' | 'medium' | 'low' => {
-    if (score >= 0.8) return 'high';
-    if (score >= 0.5) return 'medium';
-    return 'low';
+  const parseResearchResponse = (content: string): ResearchResult[] => {
+    try {
+      // Split content into sections, handling both structured and unstructured responses
+      const sections = content.split(/(?:\r?\n){2,}/)
+        .filter(section => section.trim())
+        .map(section => section.trim());
+
+      if (sections.length === 0) {
+        return [{
+          fact: 'No research results available',
+          confidence: 'low',
+          context: 'The AI service did not return any usable results'
+        }];
+      }
+
+      return sections.map(section => {
+        const lines = section.split('\n').map(line => line.trim());
+        
+        // Extract fact - first non-empty line that's not a label
+        const fact = lines.find(line => 
+          line.trim().length > 0 && 
+          !line.toLowerCase().startsWith('source:') &&
+          !line.toLowerCase().startsWith('context:') &&
+          !line.toLowerCase().startsWith('confidence:')
+        )?.replace(/^(?:\d+\.|\*|\-)\s*/, '').trim() || 'No fact found';
+
+        // Extract source, context, and confidence from labeled lines
+        const source = lines.find(line => 
+          line.toLowerCase().includes('source:') || 
+          line.toLowerCase().includes('reference:')
+        )?.replace(/^(?:source:|reference:)/i, '').trim();
+
+        const context = lines.find(line => 
+          line.toLowerCase().includes('context:')
+        )?.replace(/^context:/i, '').trim();
+
+        let confidence: 'high' | 'medium' | 'low' = 'medium';
+        
+        // Determine confidence level
+        const confidenceLine = lines.find(line => 
+          line.toLowerCase().includes('confidence:')
+        )?.toLowerCase() || '';
+
+        if (confidenceLine.includes('high') || 
+            section.toLowerCase().includes('verified') || 
+            section.toLowerCase().includes('confirmed')) {
+          confidence = 'high';
+        } else if (confidenceLine.includes('low') || 
+                   section.toLowerCase().includes('uncertain') || 
+                   section.toLowerCase().includes('unverified')) {
+          confidence = 'low';
+        }
+
+        return {
+          fact,
+          source,
+          confidence,
+          context: context || extractContext(fact)
+        };
+      });
+    } catch (error) {
+      console.error('Failed to parse research response:', error);
+      return [{
+        fact: 'Failed to parse research results',
+        confidence: 'low',
+        context: 'There was an error processing the AI response'
+      }];
+    }
+  };
+
+  const extractContext = (fact: string): string => {
+    const contextMatch = fact.match(/\((.*?)\)/);
+    return contextMatch ? contextMatch[1] : '';
   };
 
   return (
@@ -122,12 +165,11 @@ export function ResearchAssistantPanel() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !contentResearch.isPending && query.trim()) {
+                if (e.key === 'Enter' && !contentResearch.isPending) {
                   handleResearch();
                 }
               }}
               className="flex-1"
-              aria-label="Research topic input"
             />
             <Button 
               onClick={handleResearch}
@@ -153,7 +195,7 @@ export function ResearchAssistantPanel() {
 
             {results.map((result, index) => (
               <Card key={index}>
-                <CardContent className="p-4">
+                <CardHeader className="p-4">
                   <div className="flex items-start gap-2">
                     {result.confidence === 'high' ? (
                       <CheckCircle className="h-4 w-4 text-green-500 mt-1" />
@@ -162,21 +204,29 @@ export function ResearchAssistantPanel() {
                     ) : (
                       <AlertCircle className="h-4 w-4 text-red-500 mt-1" />
                     )}
-                    <div className="space-y-2">
+                    <div>
                       <p className="font-medium">{result.fact}</p>
-                      {result.context && (
-                        <p className="text-sm text-muted-foreground">{result.context}</p>
-                      )}
-                      {result.source && (
-                        <div className="flex items-center gap-1 text-sm text-blue-500">
-                          <ExternalLink className="h-3 w-3" />
-                          <a href={result.source} target="_blank" rel="noopener noreferrer">
-                            Source
-                          </a>
-                        </div>
-                      )}
+                      <p className="text-sm text-muted-foreground">
+                        Confidence: {result.confidence}
+                      </p>
                     </div>
                   </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  {result.context && (
+                    <div className="text-sm text-muted-foreground">
+                      <p className="font-medium">Context:</p>
+                      <p>{result.context}</p>
+                    </div>
+                  )}
+                  {result.source && (
+                    <div className="flex items-center gap-1 text-sm text-blue-500 mt-2">
+                      <ExternalLink className="h-3 w-3" />
+                      <a href={result.source} target="_blank" rel="noopener noreferrer">
+                        Source
+                      </a>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
