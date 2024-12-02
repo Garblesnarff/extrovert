@@ -50,19 +50,17 @@ export function ResearchAssistantPanel() {
         throw new Error('No research results available');
       }
 
-      const contentToProcess = data.suggestedContent || data.insights;
-      const parsedResults = parseResearchResponse(contentToProcess);
+      // Process both insights and suggested content if available
+      const insights = data.insights || '';
+      const suggestedContent = data.suggestedContent || '';
       
-      if (parsedResults.length === 0) {
-        // If no structured results, create a single result from raw insights
-        setResults([{
-          fact: 'Research Results',
-          confidence: 'high',
-          context: contentToProcess
-        }]);
-      } else {
-        setResults(parsedResults);
-      }
+      // Combine and parse all available content
+      const combinedContent = [insights, suggestedContent]
+        .filter(content => content)
+        .join('\n\n');
+      
+      const parsedResults = parseResearchResponse(combinedContent);
+      setResults(parsedResults);
       toast({
         title: "Research Complete",
         description: `Found ${parsedResults.length} relevant facts`,
@@ -89,64 +87,46 @@ export function ResearchAssistantPanel() {
 
   const parseResearchResponse = (content: string): ResearchResult[] => {
     try {
-      // Split content into sections, handling both structured and unstructured responses
-      const sections = content.split(/(?:\r?\n){2,}/)
-        .filter(section => section.trim())
-        .map(section => section.trim());
-
-      if (sections.length === 0) {
+      if (!content) {
         return [{
           fact: 'No research results available',
           confidence: 'low',
-          context: 'The AI service did not return any usable results'
+          context: 'The AI service did not return any results'
         }];
       }
 
-      return sections.map(section => {
-        const lines = section.split('\n').map(line => line.trim());
-        
-        // Extract fact - first non-empty line that's not a label
-        const fact = lines.find(line => 
-          line.trim().length > 0 && 
-          !line.toLowerCase().startsWith('source:') &&
-          !line.toLowerCase().startsWith('context:') &&
-          !line.toLowerCase().startsWith('confidence:')
-        )?.replace(/^(?:\d+\.|\*|\-)\s*/, '').trim() || 'No fact found';
+      // First try to parse markdown-style sections
+      const markdownSections = content.split(/(?:^|\n)(?:#{1,6}|\*{1,3}|\-)\s+/)
+        .filter(section => section.trim())
+        .map(section => section.trim());
 
-        // Extract source, context, and confidence from labeled lines
-        const source = lines.find(line => 
-          line.toLowerCase().includes('source:') || 
-          line.toLowerCase().includes('reference:')
-        )?.replace(/^(?:source:|reference:)/i, '').trim();
+      if (markdownSections.length > 1) {
+        return markdownSections.map(section => {
+          const lines = section.split('\n');
+          const fact = lines[0]?.trim() || 'No fact found';
+          
+          // Look for source links in markdown format
+          const sourceMatch = section.match(/\[([^\]]+)\]\(([^)]+)\)/);
+          const source = sourceMatch ? sourceMatch[2] : undefined;
+          
+          // Extract any additional context
+          const contextLines = lines.slice(1).join('\n').trim();
+          
+          return {
+            fact,
+            source,
+            confidence: 'high', // Default to high for recent search results
+            context: contextLines || undefined
+          };
+        });
+      }
 
-        const context = lines.find(line => 
-          line.toLowerCase().includes('context:')
-        )?.replace(/^context:/i, '').trim();
-
-        let confidence: 'high' | 'medium' | 'low' = 'medium';
-        
-        // Determine confidence level
-        const confidenceLine = lines.find(line => 
-          line.toLowerCase().includes('confidence:')
-        )?.toLowerCase() || '';
-
-        if (confidenceLine.includes('high') || 
-            section.toLowerCase().includes('verified') || 
-            section.toLowerCase().includes('confirmed')) {
-          confidence = 'high';
-        } else if (confidenceLine.includes('low') || 
-                   section.toLowerCase().includes('uncertain') || 
-                   section.toLowerCase().includes('unverified')) {
-          confidence = 'low';
-        }
-
-        return {
-          fact,
-          source,
-          confidence,
-          context: context || extractContext(fact)
-        };
-      });
+      // If no markdown sections, treat as a single result
+      return [{
+        fact: content.split('\n')[0] || 'Research Results',
+        confidence: 'high',
+        context: content
+      }];
     } catch (error) {
       console.error('Failed to parse research response:', error);
       return [{
