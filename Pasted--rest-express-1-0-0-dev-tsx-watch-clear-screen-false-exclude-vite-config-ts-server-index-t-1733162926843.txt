@@ -1,0 +1,59 @@
+> rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --exclude vite.config.ts.* server/index.ts
+
+04:01:52 PM [express] serving on port 5000
+04:01:59 PM [express] GET /api/posts/scheduled 200 in 386ms :: []
+04:01:59 PM [express] GET /api/posts/drafts 200 in 431ms :: [{"id":24,"content":"🚨 Calling all innov…
+04:01:59 PM [express] GET /api/ai/providers 200 in 602ms :: [{"name":"gemini","models":[{"name":"gemi…
+04:02:00 PM [express] GET /api/ai/providers 304 in 2ms :: [{"name":"gemini","models":[{"name":"gemini…
+04:02:00 PM [express] GET /api/posts/scheduled 304 in 66ms :: []
+04:02:00 PM [express] GET /api/posts/drafts 304 in 71ms :: [{"id":24,"content":"🚨 Calling all innova…
+04:02:00 PM [express] GET /api/ai/providers 304 in 7ms :: [{"name":"gemini","models":[{"name":"gemini…
+04:02:00 PM [express] GET /api/posts/drafts 304 in 69ms :: [{"id":24,"content":"🚨 Calling all innova…
+04:02:00 PM [express] GET /api/posts/scheduled 304 in 69ms :: []
+04:02:01 PM [express] GET /api/ai/providers 304 in 5ms :: [{"name":"gemini","models":[{"name":"gemini…
+04:02:01 PM [express] GET /api/posts/drafts 304 in 81ms :: [{"id":24,"content":"🚨 Calling all innova…
+04:02:01 PM [express] GET /api/posts/scheduled 304 in 78ms :: []
+04:02:01 PM [express] GET /api/ai/providers 304 in 4ms :: [{"name":"gemini","models":[{"name":"gemini…
+04:02:02 PM [express] GET /api/posts/scheduled 304 in 71ms :: []
+04:02:02 PM [express] GET /api/posts/drafts 304 in 89ms :: [{"id":24,"content":"🚨 Calling all innova…
+
+ ERROR(TypeScript)  Argument of type '{ fact: any; confidence: string; context: any; }[]' is not assignable to parameter of type 'SetStateAction<ResearchResult[]>'.
+  Type '{ fact: any; confidence: string; context: any; }[]' is not assignable to type 'ResearchResult[]'.
+    Type '{ fact: any; confidence: string; context: any; }' is not assignable to type 'ResearchResult'.
+      Types of property 'confidence' are incompatible.
+        Type 'string' is not assignable to type '"high" | "medium" | "low"'.
+ FILE  /home/runner/workspace/client/src/components/research-assistant-panel.tsx:67:18
+
+    65 |       }];
+    66 |       
+  > 67 |       setResults(results);
+       |                  ^^^^^^^
+    68 |       setResults(parsedResults);
+    69 |       toast({
+    70 |         title: "Research Complete",
+
+ ERROR(TypeScript)  Cannot find name 'parsedResults'. Did you mean 'setResults'?
+ FILE  /home/runner/workspace/client/src/components/research-assistant-panel.tsx:68:18
+
+    66 |       
+    67 |       setResults(results);
+  > 68 |       setResults(parsedResults);
+       |                  ^^^^^^^^^^^^^
+    69 |       toast({
+    70 |         title: "Research Complete",
+    71 |         description: `Found ${parsedResults.length} relevant facts`,
+
+ ERROR(TypeScript)  Cannot find name 'parsedResults'. Did you mean 'setResults'?
+ FILE  /home/runner/workspace/client/src/components/research-assistant-panel.tsx:71:31
+
+    69 |       toast({
+    70 |         title: "Research Complete",
+  > 71 |         description: `Found ${parsedResults.length} relevant facts`,
+       |                               ^^^^^^^^^^^^^
+    72 |       });
+    73 |     } catch (error) {
+    74 |       console.error('Research failed:', error);
+
+[TypeScript] Found 3 errors. Watching for file changes.
+06:08:17 PM [express] POST /api/ai/research 200 in 971ms :: {"topics":[],"insights":"President Biden

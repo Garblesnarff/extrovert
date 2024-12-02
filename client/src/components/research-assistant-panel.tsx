@@ -57,18 +57,17 @@ export function ResearchAssistantPanel() {
         throw new Error('No research results available');
       }
 
-      // Create a single result with the raw insights to preserve accuracy
+      // Create a result with the raw insights to preserve accuracy
       const results = [{
         fact: insights.split('\n')[0] || 'Research Results',
-        confidence: 'high',
+        confidence: 'high' as const,
         context: insights
       }];
       
       setResults(results);
-      setResults(parsedResults);
       toast({
         title: "Research Complete",
-        description: `Found ${parsedResults.length} relevant facts`,
+        description: "Research results found",
       });
     } catch (error) {
       console.error('Research failed:', error);
