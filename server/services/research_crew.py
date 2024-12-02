@@ -87,12 +87,25 @@ def main():
         
         # Create and run the crew
         crew = create_research_crew(query)
-        results = crew.kickoff(inputs={"query": query})
+        results = crew.kickoff()
         
-        # Process results
+        # Format the results
+        facts = []
+        context = ""
+        
+        if results and results.tasks:
+            # Process fact checking results
+            if results.tasks[0].output:
+                fact_output = str(results.tasks[0].output)
+                facts = [fact.strip() for fact in fact_output.split('\n') if fact.strip()]
+            
+            # Process context results
+            if len(results.tasks) > 1 and results.tasks[1].output:
+                context = str(results.tasks[1].output)
+        
         response = {
-            "insights": results.tasks[0].output,  # Fact checking results
-            "context": results.tasks[1].output if len(results.tasks) > 1 else "",  # Context results
+            "insights": "\n".join(facts),
+            "context": context
         }
         
         # Return results
