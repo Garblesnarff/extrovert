@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from typing import Dict
 import os
+import sys
+import json
 from crewai import Agent, Crew, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool, WebsiteSearchTool
@@ -10,8 +12,12 @@ class ResearchCrew(CrewBase):
 
     def __init__(self):
         super().__init__()
-        # Initialize tools
-        self.search_tool = SerperDevTool()
+        # Initialize tools with API key
+        serper_api_key = os.getenv('SERPER_API_KEY')
+        if not serper_api_key:
+            raise EnvironmentError("SERPER_API_KEY environment variable is required")
+        
+        self.search_tool = SerperDevTool(api_key=serper_api_key)
         self.web_tool = WebsiteSearchTool()
 
     @agent
@@ -86,10 +92,16 @@ def run(content: Dict = None):
 
         # Initialize and run the crew
         print("Initializing research crew...")
-        crew = ResearchCrew().crew()
+        research_crew = ResearchCrew()
+        crew = research_crew.crew()
         
         print("Starting research process...")
-        result = crew.kickoff(inputs={'query': content['text']})
+        # Add the query parameter to trigger internet search
+        result = crew.kickoff(inputs={
+            'query': content['text'],
+            'require_search': True,  # Flag to ensure internet search is performed
+            'search_recent': True    # Flag to prioritize recent results
+        })
         
         print("Research completed successfully")
         return result
@@ -99,9 +111,6 @@ def run(content: Dict = None):
         raise Exception(f"Error running research crew: {str(e)}")
 
 if __name__ == "__main__":
-    import sys
-    import json
-
     try:
         # Get content from command line argument
         if len(sys.argv) < 2:
@@ -110,7 +119,7 @@ if __name__ == "__main__":
         content = json.loads(sys.argv[1])
         result = run(content)
         
-        # Format output as JSON
+        # Format output as JSON with more structured data
         output = {
             "topics": [],  # Add topics if available
             "insights": str(result),

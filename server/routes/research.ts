@@ -11,13 +11,15 @@ router.post('/api/ai/research', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Create content object for research crew
+    // Create content object for research crew with search requirements
     const content = {
-      text: prompt
+      text: prompt,
+      requireSearch: true,
+      searchRecent: true
     };
 
     // Spawn Python process to run research crew
-    console.log('Starting research process with content:', JSON.stringify({ text: content.text }));
+    console.log('Starting research process with content:', JSON.stringify(content));
     
     const pythonProcess = spawn('python3', [
       path.join(__dirname, '../research_crew/main.py'),
