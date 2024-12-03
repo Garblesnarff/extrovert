@@ -11,25 +11,17 @@ router.post('/api/ai/research', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Create content object for research crew with search requirements
+    // Create content object for research crew
     const content = {
-      text: prompt,
-      timestamp: new Date().toISOString(),
-      search_config: {
-        require_recent: true,
-        time_range: 'last_24h',
-        include_news: true,
-        sort_by: 'date'
-      }
+      text: prompt
     };
 
     // Spawn Python process to run research crew
-    const contentArg = JSON.stringify(content);
-    console.log('Starting research process with content:', contentArg);
+    console.log('Starting research process with content:', JSON.stringify({ text: content.text }));
     
     const pythonProcess = spawn('python3', [
       path.join(__dirname, '../research_crew/main.py'),
-      contentArg
+      JSON.stringify(content)
     ], {
       env: {
         ...process.env,
@@ -71,25 +63,7 @@ router.post('/api/ai/research', async (req, res) => {
     // Parse and format the research results
     let researchResults;
     try {
-      // First try to parse as JSON
-      try {
-        researchResults = JSON.parse(result);
-      } catch {
-        // If not JSON, use the raw result as insights
-        researchResults = { insights: result.trim() };
-      }
-
-      // Clean and validate the response
-      const cleanedInsights = researchResults?.insights?.trim();
-      if (!cleanedInsights) {
-        throw new Error('No valid research results found');
-      }
-
-      // Return the raw insights to preserve accuracy
-      return res.json({
-        insights: cleanedInsights,
-        raw_response: result.trim() // Include raw response for debugging
-      });
+      researchResults = JSON.parse(result);
     } catch (parseError) {
       console.error('Failed to parse research results:', parseError);
       return res.status(500).json({
@@ -97,6 +71,12 @@ router.post('/api/ai/research', async (req, res) => {
         details: 'Invalid response format from research service'
       });
     }
+    
+    return res.json({
+      topics: researchResults?.topics || [],
+      insights: researchResults?.insights || '',
+      suggestedContent: researchResults?.enhanced_content || ''
+    });
 
   } catch (error) {
     console.error('Research error:', error);

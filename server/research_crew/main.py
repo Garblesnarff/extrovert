@@ -1,89 +1,67 @@
 #!/usr/bin/env python
 from typing import Dict
 import os
-import json
-from datetime import datetime, timedelta
 from crewai import Agent, Crew, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import SerperDevTool
+from crewai_tools import SerperDevTool, WebsiteSearchTool
 
 class ResearchCrew(CrewBase):
+    """Research crew for validating and enhancing Twitter content"""
+
     def __init__(self):
         super().__init__()
-        api_key = os.getenv("SERPER_API_KEY")
-        if not api_key:
-            raise EnvironmentError("SERPER_API_KEY environment variable is required")
-            
-        self.search_tool = SerperDevTool(
-            api_key=api_key,
-            n_results=10,
-            search_url="https://google.serper.dev/search",
-            params={
-                "gl": "us",
-                "hl": "en",
-                "autocorrect": True,
-                "time": "d",  # Last 24 hours
-                "type": "search"
-            }
-        )
-        print("Initialized SerperDev search tool with parameters")
+        # Initialize tools
+        self.search_tool = SerperDevTool()
+        self.web_tool = WebsiteSearchTool()
 
     @agent
     def fact_checker(self) -> Agent:
+        """Creates the fact checking agent"""
         return Agent(
             config=self.agents_config["fact_checker"],
-            tools=[self.search_tool],
-            llm_config={
-                "temperature": 0.5,
-                "timeout": 120,
-                "max_tokens": 2000
-            }
+            tools=[self.search_tool, self.web_tool]
         )
 
     @agent
     def context_researcher(self) -> Agent:
+        """Creates the context research agent"""
         return Agent(
             config=self.agents_config["context_researcher"],
-            tools=[self.search_tool],
-            llm_config={
-                "temperature": 0.7,
-                "timeout": 120,
-                "max_tokens": 2000
-            }
+            tools=[self.search_tool, self.web_tool]
         )
 
     @agent
     def content_enhancer(self) -> Agent:
+        """Creates the content enhancement agent"""
         return Agent(
             config=self.agents_config["content_enhancer"],
-            tools=[self.search_tool],
-            llm_config={
-                "temperature": 0.6,
-                "timeout": 120,
-                "max_tokens": 2000
-            }
+            tools=[self.web_tool]
         )
 
     @task
     def verify_facts(self) -> Task:
+        """Task for fact verification"""
         return Task(
             config=self.tasks_config["verify_facts"]
         )
 
     @task
     def research_context(self) -> Task:
+        """Task for context research"""
         return Task(
             config=self.tasks_config["research_context"]
         )
 
     @task
     def enhance_content(self) -> Task:
+        """Task for content enhancement"""
         return Task(
             config=self.tasks_config["enhance_content"]
         )
 
     @crew
     def crew(self) -> Crew:
+        """Assembles the research crew"""
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
@@ -91,74 +69,62 @@ class ResearchCrew(CrewBase):
         )
 
 def run(content: Dict = None):
-    if not content or not content.get('text'):
-        raise ValueError("Content text is required")
-
+    """Run the crew with the provided content"""
     try:
-        research_crew = ResearchCrew()
-        query = content['text']
+        if not content or 'text' not in content:
+            raise ValueError("Content must include 'text' field")
+
+        print(f"Starting research with content: {content['text'][:100]}...")
+
+        # Check for required environment variables
+        required_vars = ["GEMINI_API_KEY", "GROQ_API_KEY", "SERPER_API_KEY"]
+        missing_vars = [var for var in required_vars if not os.getenv(var)]
+        if missing_vars:
+            raise EnvironmentError(
+                f"Missing required environment variables: {', '.join(missing_vars)}"
+            )
+
+        # Initialize and run the crew
+        print("Initializing research crew...")
+        crew = ResearchCrew().crew()
         
-        try:
-            # Perform the search with proper parameters
-            search_results = research_crew.search_tool.search({
-                "q": query,
-                "gl": "us",
-                "hl": "en",
-                "autocorrect": True,
-                "time": "d",
-                "num": 5
-            })
-            
-            print(f"Search results: {json.dumps(search_results, indent=2)}")
-            
-            if not search_results or not search_results.get('organic'):
-                return {"insights": "No search results found for the query"}
-                
-            # Extract and format relevant information
-            results = search_results['organic']
-            insights = []
-            
-            for result in results:
-                title = result.get('title', '')
-                snippet = result.get('snippet', '')
-                link = result.get('link', '')
-                date = result.get('date', '')
-                
-                if title and snippet:
-                    formatted_result = f"• {title}\n"
-                    if date:
-                        formatted_result += f"Date: {date}\n"
-                    formatted_result += f"{snippet}\n"
-                    if link:
-                        formatted_result += f"Source: {link}\n"
-                    insights.append(formatted_result)
-            
-            if not insights:
-                return {"insights": "No relevant information found for the query"}
-                
-            formatted_insights = "\n\n".join(insights)
-            return {"insights": formatted_insights}
-            
-        except Exception as search_error:
-            print(f"Search error: {str(search_error)}")
-            return {"insights": f"Search failed: {str(search_error)}"}
-            
+        print("Starting research process...")
+        result = crew.kickoff(inputs={'query': content['text']})
+        
+        print("Research completed successfully")
+        return result
+
     except Exception as e:
-        print(f"Research crew error: {str(e)}")
-        raise
+        print(f"Error in research process: {str(e)}", file=sys.stderr)
+        raise Exception(f"Error running research crew: {str(e)}")
 
 if __name__ == "__main__":
     import sys
-    
-    if len(sys.argv) != 2:
-        print("Usage: python main.py '<content_json>'")
-        sys.exit(1)
-        
+    import json
+
     try:
+        # Get content from command line argument
+        if len(sys.argv) < 2:
+            raise ValueError("No content provided")
+            
         content = json.loads(sys.argv[1])
         result = run(content)
-        print(json.dumps(result))
+        
+        # Format output as JSON
+        output = {
+            "topics": [],  # Add topics if available
+            "insights": str(result),
+            "enhanced_content": str(result)
+        }
+        print(json.dumps(output))
+        
     except json.JSONDecodeError as e:
-        print(json.dumps({"error": f"Invalid JSON input: {str(e)}"}))
+        print(json.dumps({
+            "error": "Invalid JSON input",
+            "details": str(e)
+        }))
     except Exception as e:
-        print(json.dumps({"error": f"Execution error: {str(e)}"}))
+        print(json.dumps({
+            "error": str(e),
+            "details": "Error processing research request"
+        }))
