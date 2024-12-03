@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 from typing import Dict
 import os
+import sys
+import json
 from crewai import Agent, Crew, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import SerperDevTool, WebsiteSearchTool
+from crewai_tools import WebsiteSearchTool
+from tools.search_tools import DualSearchTool
 
 class ResearchCrew(CrewBase):
     """Research crew for validating and enhancing Twitter content"""
@@ -11,7 +14,7 @@ class ResearchCrew(CrewBase):
     def __init__(self):
         super().__init__()
         # Initialize tools
-        self.search_tool = SerperDevTool()
+        self.search_tool = DualSearchTool()
         self.web_tool = WebsiteSearchTool()
 
     @agent
@@ -77,12 +80,14 @@ def run(content: Dict = None):
         print(f"Starting research with content: {content['text'][:100]}...")
 
         # Check for required environment variables
-        required_vars = ["GEMINI_API_KEY", "GROQ_API_KEY", "SERPER_API_KEY"]
+        required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
         missing_vars = [var for var in required_vars if not os.getenv(var)]
         if missing_vars:
             raise EnvironmentError(
                 f"Missing required environment variables: {', '.join(missing_vars)}"
             )
+            
+        print("All required API keys are present")
 
         # Initialize and run the crew
         print("Initializing research crew...")

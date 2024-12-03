@@ -3168,20 +3168,24 @@ name = "repl-nix-workspace"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "crewai" },
     { name = "crewai-tools" },
     { name = "langchain" },
     { name = "openai" },
     { name = "pytrends" },
+    { name = "requests" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.11.7" },
     { name = "crewai", specifier = ">=0.83.0" },
     { name = "crewai-tools", specifier = ">=0.14.0" },
     { name = "langchain", specifier = ">=0.3.8" },
     { name = "openai", specifier = ">=1.55.1" },
     { name = "pytrends", specifier = ">=4.9.2" },
+    { name = "requests", specifier = ">=2.32.3" },
 ]
 
 [[package]]
