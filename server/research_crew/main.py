@@ -89,15 +89,40 @@ def run(content: Dict = None):
             
         print("All required API keys are present")
 
-        # Initialize and run the crew
-        print("Initializing research crew...")
-        crew = ResearchCrew().crew()
+        # Initialize CrewAI components
+        crew_instance = ResearchCrew()
         
-        print("Starting research process...")
-        result = crew.kickoff(inputs={'query': content['text']})
+        # Create specific research tasks with proper configurations
+        verify_task = crew_instance.verify_facts()
+        verify_task.add_context({'query': content['text']})
+        verify_task.set_expected_output('Detailed fact verification report')
         
-        print("Research completed successfully")
-        return result
+        research_task = crew_instance.research_context()
+        research_task.add_context({'query': content['text']})
+        research_task.set_expected_output('Comprehensive context analysis')
+        
+        enhance_task = crew_instance.enhance_content()
+        enhance_task.add_context({'query': content['text']})
+        enhance_task.set_expected_output('Enhanced content suggestions')
+
+        # Initialize and run the crew with configured tasks
+        print("Initializing research crew with configured tasks...")
+        crew = crew_instance.crew()
+        
+        print("Starting research process with proper task chain...")
+        try:
+            result = crew.kickoff(
+                inputs={
+                    'query': content['text'],
+                    'max_retries': 3,
+                    'timeout': 60
+                }
+            )
+            print("Research completed successfully")
+            return result
+        except Exception as task_error:
+            print(f"Error during task execution: {str(task_error)}")
+            raise
 
     except Exception as e:
         print(f"Error in research process: {str(e)}", file=sys.stderr)
@@ -115,12 +140,33 @@ if __name__ == "__main__":
         content = json.loads(sys.argv[1])
         result = run(content)
         
-        # Format output as JSON
-        output = {
-            "topics": [],  # Add topics if available
-            "insights": str(result),
-            "enhanced_content": str(result)
-        }
+        # Process and format the research results
+        try:
+            result_data = json.loads(result)
+            topics = [item['title'] for item in result_data.get('results', [])]
+            insights = "\n".join([
+                f"- {item['snippet']}" 
+                for item in result_data.get('results', [])
+                if item['snippet']
+            ])
+            
+            # Format output with structured data
+            output = {
+                "topics": topics[:5],  # Top 5 relevant topics
+                "insights": insights,
+                "enhanced_content": result,
+                "sources": [
+                    {"title": item['title'], "url": item['url']}
+                    for item in result_data.get('results', [])
+                ]
+            }
+        except json.JSONDecodeError:
+            # Fallback for non-JSON results
+            output = {
+                "topics": [],
+                "insights": str(result),
+                "enhanced_content": str(result)
+            }
         print(json.dumps(output))
         
     except json.JSONDecodeError as e:
