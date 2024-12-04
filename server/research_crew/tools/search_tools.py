@@ -12,6 +12,11 @@ class DualSearchTool(BaseTool):
     def __init__(self):
         self.brave_api_key = os.getenv('BRAVE_API_KEY')
         self.serper_api_key = os.getenv('SERPER_API_KEY')
+        
+        if not self.brave_api_key or not self.serper_api_key:
+            raise ValueError("Missing required API keys: BRAVE_API_KEY and SERPER_API_KEY must be set")
+            
+        print("Initialized DualSearchTool with required API keys")
 
     def name(self) -> str:
         return "dual_search_tool"
@@ -29,11 +34,13 @@ class DualSearchTool(BaseTool):
             params = {
                 'q': query,
                 'count': 10,
-                'freshness': '1d',
+                'freshness': 'h',  # Last hour for real-time results
                 'text_decorations': 'false',
                 'search_lang': 'en',
                 'country': 'US',
-                'safesearch': 'moderate'
+                'safesearch': 'moderate',
+                'format': 'json',
+                'sort_by': 'freshness'  # Prioritize recent results
             }
             
             async with session.get(
@@ -68,8 +75,10 @@ class DualSearchTool(BaseTool):
                 'hl': 'en',
                 'autocorrect': True,
                 'type': 'search',
-                'time': 'd',  # Last 24 hours
-                'num': 10
+                'time': 'h',  # Last hour for real-time results
+                'num': 10,
+                'tbs': 'qdr:h',  # Restrict to last hour
+                'sort': 'date'  # Sort by date for recent results
             }
             
             async with session.post(
@@ -103,7 +112,14 @@ class DualSearchTool(BaseTool):
                 })
 
             query = query.strip()
-            print(f"Executing dual search for query: {query}")
+            print(f"Executing real-time dual search for query: {query}")
+            
+            # Verify API keys are present
+            if not self.brave_api_key or not self.serper_api_key:
+                return json.dumps({
+                    "error": "Missing API keys",
+                    "results": []
+                })
 
             async with aiohttp.ClientSession() as session:
                 # Run both searches concurrently with individual timeouts
@@ -137,25 +153,32 @@ class DualSearchTool(BaseTool):
                             if 'web' in result:  # Brave results
                                 for item in result['web'].get('results', []):
                                     if isinstance(item, dict):
-                                        combined_results.append({
-                                            'title': item.get('title', '').strip(),
-                                            'link': item.get('url', ''),
-                                            'snippet': item.get('description', '').strip(),
-                                            'source': 'Brave',
-                                            'timestamp': item.get('age', ''),
-                                            'score': len(item.get('description', '')) / 100  # Relevance score
-                                        })
+                                        timestamp = item.get('age', '')
+                                        # Only include recent results
+                                        if timestamp and ('minute' in timestamp.lower() or 'hour' in timestamp.lower()):
+                                            combined_results.append({
+                                                'title': item.get('title', '').strip(),
+                                                'link': item.get('url', ''),
+                                                'snippet': item.get('description', '').strip(),
+                                                'source': 'Brave',
+                                                'timestamp': timestamp,
+                                                'score': len(item.get('description', '')) / 100  # Base score
+                                            })
                             elif 'organic' in result:  # Serper results
                                 for item in result['organic']:
                                     if isinstance(item, dict):
-                                        combined_results.append({
-                                            'title': item.get('title', '').strip(),
-                                            'link': item.get('link', ''),
-                                            'snippet': item.get('snippet', '').strip(),
-                                            'source': 'Serper',
-                                            'timestamp': item.get('date', ''),
-                                            'score': len(item.get('snippet', '')) / 100  # Relevance score
-                                        })
+                                        timestamp = item.get('date', '')
+                                        # Only include results with timestamps and ensure they're recent
+                                        if timestamp:
+                                            combined_results.append({
+                                                'title': item.get('title', '').strip(),
+                                                'link': item.get('link', ''),
+                                                'snippet': item.get('snippet', '').strip(),
+                                                'source': 'Serper',
+                                                'timestamp': timestamp,
+                                                'score': len(item.get('snippet', '')) / 100 + 
+                                                        (50 if 'hour' in timestamp.lower() or 'minute' in timestamp.lower() else 0)  # Boost recent results
+                                            })
                     except Exception as e:
                         print(f"Error processing search results: {str(e)}")
                         continue
@@ -180,7 +203,15 @@ class DualSearchTool(BaseTool):
                         words = set(query.lower().split())
                         snippet_words = set(result['snippet'].lower().split())
                         keyword_matches = len(words.intersection(snippet_words))
-                        score = (keyword_matches * 10) + (len(result['snippet'].split()) / 50)
+                        # Score based on content relevance and recency
+                        base_score = (keyword_matches * 10) + (len(result['snippet'].split()) / 50)
+                        
+                        # Boost score for recent content
+                        if result['timestamp']:
+                            if 'minute' in result['timestamp'].lower() or 'hour' in result['timestamp'].lower():
+                                base_score *= 1.5  # 50% boost for very recent content
+                                
+                        score = base_score
                         
                     result['relevance_score'] = score
                     unique_results.append(result)

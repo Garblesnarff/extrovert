@@ -74,8 +74,17 @@ class ResearchCrew(CrewBase):
 def run(content: Dict = None):
     """Run the crew with the provided content"""
     try:
+        # Initialize logging
+        print("Starting research crew execution...")
+        
         if not content or 'text' not in content:
             raise ValueError("Content must include 'text' field")
+            
+        # Validate environment
+        required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
+        missing_vars = [var for var in required_vars if not os.getenv(var)]
+        if missing_vars:
+            raise EnvironmentError(f"Missing required API keys: {', '.join(missing_vars)}")
 
         print(f"Starting research with content: {content['text'][:100]}...")
 
