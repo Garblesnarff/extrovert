@@ -8,11 +8,9 @@ fact_checker:
         ensuring accuracy in every detail. You excel at cross-referencing information 
         across multiple search engines to ensure comprehensive coverage.
     verbose: true
-    tools: [search_tool, web_tool, file_read_tool]
+    tools: [search_tool, web_tool]
     allow_delegation: true
     planning: true
-    max_iterations: 3
-    max_rpm: 10
     llm: gemini/gemini-flash-8b
 
 context_researcher:

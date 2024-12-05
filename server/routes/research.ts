@@ -11,22 +11,13 @@ router.post('/api/ai/research', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Verify required environment variables
-    const requiredEnvVars = ['BRAVE_API_KEY', 'SERPER_API_KEY'];
-    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-    if (missingVars.length > 0) {
-      return res.status(500).json({
-        error: 'Missing required API keys',
-        details: `Missing: ${missingVars.join(', ')}`
-      });
-    }
-
     // Create content object for research crew
     const content = {
-      text: prompt.trim()
+      text: prompt
     };
 
-    console.log('Starting real-time research process for:', content.text.substring(0, 100));
+    // Spawn Python process to run research crew
+    console.log('Starting research process with content:', JSON.stringify({ text: content.text }));
     
     const pythonProcess = spawn('python3', [
       path.join(__dirname, '../research_crew/main.py'),
@@ -43,88 +34,56 @@ router.post('/api/ai/research', async (req, res) => {
 
     pythonProcess.stdout.on('data', (data) => {
       const chunk = data.toString();
-      console.log('Research progress:', chunk);
+      console.log('Python stdout:', chunk);
       result += chunk;
     });
 
     pythonProcess.stderr.on('data', (data) => {
       const chunk = data.toString();
-      console.error('Research error:', chunk);
+      console.error('Python stderr:', chunk);
       error += chunk;
     });
 
-    // Set a timeout of 30 seconds
-    const timeout = 30000;
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Research timeout')), timeout);
+    await new Promise((resolve, reject) => {
+      pythonProcess.on('close', (code) => {
+        console.log('Python process exited with code:', code);
+        if (code === 0) {
+          resolve(null);
+        } else {
+          reject(new Error(`Process exited with code ${code}. Error: ${error}`));
+        }
+      });
     });
 
-    try {
-      await Promise.race([
-        new Promise((resolve, reject) => {
-          pythonProcess.on('close', (code) => {
-            console.log('Research process completed with code:', code);
-            if (code === 0) {
-              resolve(null);
-            } else {
-              reject(new Error(`Process failed with code ${code}`));
-            }
-          });
-        }),
-        timeoutPromise
-      ]);
-    } catch (execError) {
-      pythonProcess.kill();
-      throw execError;
-    }
-
     if (error) {
-      console.error('Research process error:', error);
-      throw new Error('Research process failed');
+      console.error('Research error:', error);
+      throw new Error(`Failed to complete research: ${error}`);
     }
 
-    // Parse and validate research results
+    // Parse and format the research results
     let researchResults;
     try {
       researchResults = JSON.parse(result);
-      
-      // Validate response structure
-      if (!researchResults || typeof researchResults !== 'object') {
-        throw new Error('Invalid response format');
-      }
-    
-    // Format and send response
-      return res.json({
-        query: content.text,
-        timestamp: new Date().toISOString(),
-        topics: researchResults?.topics || [],
-        insights: researchResults?.insights || '',
-        suggestedContent: researchResults?.enhanced_content || '',
-        sources: researchResults?.sources || [],
-        metadata: {
-          total_results: researchResults?.total_results || 0,
-          execution_time: researchResults?.metadata?.execution_time || 0,
-          providers: researchResults?.sources || ['Brave Search', 'Serper']
-        }
-      });
-
     } catch (parseError) {
       console.error('Failed to parse research results:', parseError);
       return res.status(500).json({
-        error: 'Invalid research results',
-        details: parseError instanceof Error ? parseError.message : 'Failed to parse response'
+        error: 'Failed to parse research results',
+        details: 'Invalid response format from research service'
       });
     }
+    
+    return res.json({
+      topics: researchResults?.topics || [],
+      insights: researchResults?.insights || '',
+      suggestedContent: researchResults?.enhanced_content || ''
+    });
 
   } catch (error) {
-    console.error('Research process failed:', error);
+    console.error('Research error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    const statusCode = errorMessage.includes('timeout') ? 504 : 500;
-    
-    return res.status(statusCode).json({ 
-      error: 'Research process failed',
-      details: errorMessage,
-      timestamp: new Date().toISOString()
+    return res.status(500).json({ 
+      error: 'Failed to complete research',
+      details: errorMessage
     });
   }
 });
