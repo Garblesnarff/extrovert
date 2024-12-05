@@ -4,20 +4,36 @@ import os
 import sys
 import json
 from crewai import Agent, Crew, Task
-from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import WebsiteSearchTool
 from tools.search_tools import DualSearchTool
 
-class ResearchCrew(CrewBase):
+class ResearchCrew:
     """Research crew for validating and enhancing Twitter content"""
 
     def __init__(self):
-        super().__init__()
+        # Load configuration files
+        try:
+            import yaml
+            config_dir = os.path.join(os.path.dirname(__file__), 'config')
+            
+            # Load agents config
+            with open(os.path.join(config_dir, 'agents.yaml'), 'r') as f:
+                self.agents_config = yaml.safe_load(f)
+            
+            # Load tasks config
+            with open(os.path.join(config_dir, 'tasks.yaml'), 'r') as f:
+                self.tasks_config = yaml.safe_load(f)
+                
+            print("Configuration files loaded successfully")
+        except Exception as e:
+            print(f"Error loading configuration: {str(e)}")
+            self.agents_config = {}
+            self.tasks_config = {}
+            
         # Initialize tools
         self.search_tool = DualSearchTool()
         self.web_tool = WebsiteSearchTool()
 
-    @agent
     def fact_checker(self) -> Agent:
         """Creates the fact checking agent"""
         return Agent(
@@ -25,7 +41,6 @@ class ResearchCrew(CrewBase):
             tools=[self.search_tool, self.web_tool]
         )
 
-    @agent
     def context_researcher(self) -> Agent:
         """Creates the context research agent"""
         return Agent(
@@ -33,7 +48,6 @@ class ResearchCrew(CrewBase):
             tools=[self.search_tool, self.web_tool]
         )
 
-    @agent
     def content_enhancer(self) -> Agent:
         """Creates the content enhancement agent"""
         return Agent(
@@ -41,28 +55,24 @@ class ResearchCrew(CrewBase):
             tools=[self.web_tool]
         )
 
-    @task
     def verify_facts(self) -> Task:
         """Task for fact verification"""
         return Task(
             config=self.tasks_config["verify_facts"]
         )
 
-    @task
     def research_context(self) -> Task:
         """Task for context research"""
         return Task(
             config=self.tasks_config["research_context"]
         )
 
-    @task
     def enhance_content(self) -> Task:
         """Task for content enhancement"""
         return Task(
             config=self.tasks_config["enhance_content"]
         )
 
-    @crew
     def crew(self) -> Crew:
         """Assembles the research crew"""
         return Crew(
