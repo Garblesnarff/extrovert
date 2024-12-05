@@ -74,19 +74,38 @@ class ResearchCrew(CrewBase):
 def run(content: Dict = None):
     """Run the crew with the provided content"""
     try:
-        # Initialize logging
         print("Starting research crew execution...")
         
         if not content or 'text' not in content:
             raise ValueError("Content must include 'text' field")
-            
-        # Validate environment
-        required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
-        missing_vars = [var for var in required_vars if not os.getenv(var)]
-        if missing_vars:
-            raise EnvironmentError(f"Missing required API keys: {', '.join(missing_vars)}")
 
-        print(f"Starting research with content: {content['text'][:100]}...")
+        query_text = content['text'].strip()
+        print(f"Starting research with query: {query_text[:100]}...")
+        
+        # Initialize the research crew
+        crew_instance = ResearchCrew()
+        
+        # Create agents with specific tasks
+        fact_checker = crew_instance.fact_checker()
+        context_researcher = crew_instance.context_researcher()
+        content_enhancer = crew_instance.content_enhancer()
+        
+        # Configure tasks with the query context
+        verify_facts = crew_instance.verify_facts()
+        verify_facts.agent = fact_checker
+        verify_facts.context = {"query": query_text}
+        
+        research_context = crew_instance.research_context()
+        research_context.agent = context_researcher
+        research_context.context = {"query": query_text, "verified_facts": "{verified_facts}"}
+        
+        enhance_content = crew_instance.enhance_content()
+        enhance_content.agent = content_enhancer
+        enhance_content.context = {
+            "query": query_text,
+            "verified_facts": "{verified_facts}",
+            "context": "{context_research}"
+        }
 
         # Check for required environment variables
         required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
@@ -98,23 +117,7 @@ def run(content: Dict = None):
             
         print("All required API keys are present")
 
-        # Initialize CrewAI components
-        crew_instance = ResearchCrew()
-        
-        # Create specific research tasks with proper configurations
-        verify_task = crew_instance.verify_facts()
-        verify_task.add_context({'query': content['text']})
-        verify_task.set_expected_output('Detailed fact verification report')
-        
-        research_task = crew_instance.research_context()
-        research_task.add_context({'query': content['text']})
-        research_task.set_expected_output('Comprehensive context analysis')
-        
-        enhance_task = crew_instance.enhance_content()
-        enhance_task.add_context({'query': content['text']})
-        enhance_task.set_expected_output('Enhanced content suggestions')
-
-        # Initialize and run the crew with configured tasks
+        # Initialize and execute the crew with configured tasks
         print("Initializing research crew with configured tasks...")
         crew = crew_instance.crew()
         
@@ -122,12 +125,25 @@ def run(content: Dict = None):
         try:
             result = crew.kickoff(
                 inputs={
-                    'query': content['text'],
+                    'query': query_text,
                     'max_retries': 3,
-                    'timeout': 60
+                    'timeout': 60,
+                    'tasks': {
+                        'verify_facts': verify_facts,
+                        'research_context': research_context,
+                        'enhance_content': enhance_content
+                    }
                 }
             )
             print("Research completed successfully")
+            
+            # Parse and validate the result
+            if isinstance(result, str):
+                try:
+                    result = json.loads(result)
+                except json.JSONDecodeError:
+                    result = {"error": "Invalid result format"}
+            
             return result
         except Exception as task_error:
             print(f"Error during task execution: {str(task_error)}")
@@ -151,23 +167,24 @@ if __name__ == "__main__":
         
         # Process and format the research results
         try:
-            result_data = json.loads(result)
-            topics = [item['title'] for item in result_data.get('results', [])]
-            insights = "\n".join([
-                f"- {item['snippet']}" 
-                for item in result_data.get('results', [])
-                if item['snippet']
-            ])
+            # If result is already parsed JSON, use it directly
+            result_data = result if isinstance(result, dict) else json.loads(result)
+            
+            # Extract verified facts and research insights
+            verified_facts = result_data.get('verify_facts', {})
+            research_context = result_data.get('research_context', {})
+            enhanced_content = result_data.get('enhance_content', {})
             
             # Format output with structured data
             output = {
-                "topics": topics[:5],  # Top 5 relevant topics
-                "insights": insights,
-                "enhanced_content": result,
-                "sources": [
-                    {"title": item['title'], "url": item['url']}
-                    for item in result_data.get('results', [])
-                ]
+                "topics": verified_facts.get('topics', [])[:5],  # Top 5 verified topics
+                "insights": research_context.get('insights', ''),
+                "enhanced_content": enhanced_content.get('suggestions', ''),
+                "sources": verified_facts.get('sources', []),
+                "metadata": {
+                    "confidence_score": verified_facts.get('confidence_score', 0),
+                    "execution_time": result_data.get('execution_time', 0)
+                }
             }
         except json.JSONDecodeError:
             # Fallback for non-JSON results
