@@ -73,81 +73,108 @@ class ResearchCrew(CrewBase):
 
 def run(content: Dict = None):
     """Run the crew with the provided content"""
-    try:
-        print("Starting research crew execution...")
-        
-        if not content or 'text' not in content:
-            raise ValueError("Content must include 'text' field")
+    if not content or 'text' not in content:
+        raise ValueError("Content must include 'text' field")
 
-        query_text = content['text'].strip()
-        print(f"Starting research with query: {query_text[:100]}...")
-        
+    query_text = content['text'].strip()
+    print(f"Starting research with query: {query_text[:100]}...")
+    
+    # Check for required environment variables
+    required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    if missing_vars:
+        raise EnvironmentError(
+            f"Missing required environment variables: {', '.join(missing_vars)}"
+        )
+    
+    try:
         # Initialize the research crew
         crew_instance = ResearchCrew()
         
-        # Create agents with specific tasks
+        # Initialize and verify search tool
+        search_tool = crew_instance.search_tool
+        if not search_tool:
+            raise ValueError("Failed to initialize search tool")
+        
+        # Perform initial search with error handling
+        print(f"Performing initial search for query: {query_text}")
+        search_results = search_tool._run(query_text)
+        if not search_results:
+            raise ValueError("No search results returned")
+        
+        print("Search completed, parsing results...")
+        
+        # Parse search results with detailed error handling
+        try:
+            search_data = json.loads(search_results)
+            results_count = len(search_data.get('results', []))
+            print(f"Found {results_count} search results")
+            if results_count == 0:
+                print("Warning: No results found in search data")
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse search results: {str(e)}")
+            search_data = {"results": [], "error": "Failed to parse search results"}
+        except Exception as e:
+            print(f"Unexpected error processing search results: {str(e)}")
+            search_data = {"results": [], "error": str(e)}
+        
+        # Create and configure agents
         fact_checker = crew_instance.fact_checker()
         context_researcher = crew_instance.context_researcher()
         content_enhancer = crew_instance.content_enhancer()
         
-        # Configure tasks with the query context
-        verify_facts = crew_instance.verify_facts()
-        verify_facts.agent = fact_checker
-        verify_facts.context = {"query": query_text}
+        # Initialize tasks
+        verify_facts = Task(
+            description=crew_instance.tasks_config["verify_facts"]["description"],
+            agent=fact_checker,
+            context={
+                "query": query_text,
+                "search_data": search_data
+            }
+        )
         
-        research_context = crew_instance.research_context()
-        research_context.agent = context_researcher
-        research_context.context = {"query": query_text, "verified_facts": "{verified_facts}"}
+        research_context = Task(
+            description=crew_instance.tasks_config["research_context"]["description"],
+            agent=context_researcher,
+            context={
+                "query": query_text,
+                "search_data": search_data
+            }
+        )
         
-        enhance_content = crew_instance.enhance_content()
-        enhance_content.agent = content_enhancer
-        enhance_content.context = {
-            "query": query_text,
-            "verified_facts": "{verified_facts}",
-            "context": "{context_research}"
-        }
+        enhance_content = Task(
+            description=crew_instance.tasks_config["enhance_content"]["description"],
+            agent=content_enhancer,
+            context={
+                "query": query_text,
+                "search_data": search_data
+            }
+        )
 
-        # Check for required environment variables
-        required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
-        missing_vars = [var for var in required_vars if not os.getenv(var)]
-        if missing_vars:
-            raise EnvironmentError(
-                f"Missing required environment variables: {', '.join(missing_vars)}"
-            )
-            
-        print("All required API keys are present")
-
-        # Initialize and execute the crew with configured tasks
-        print("Initializing research crew with configured tasks...")
-        crew = crew_instance.crew()
+        # Initialize and execute the crew
+        print("Initializing research crew...")
+        crew = Crew(
+            agents=[fact_checker, context_researcher, content_enhancer],
+            tasks=[verify_facts, research_context, enhance_content],
+            verbose=True
+        )
         
-        print("Starting research process with proper task chain...")
-        try:
-            result = crew.kickoff(
-                inputs={
-                    'query': query_text,
-                    'max_retries': 3,
-                    'timeout': 60,
-                    'tasks': {
-                        'verify_facts': verify_facts,
-                        'research_context': research_context,
-                        'enhance_content': enhance_content
-                    }
-                }
-            )
-            print("Research completed successfully")
-            
-            # Parse and validate the result
-            if isinstance(result, str):
-                try:
-                    result = json.loads(result)
-                except json.JSONDecodeError:
-                    result = {"error": "Invalid result format"}
-            
-            return result
-        except Exception as task_error:
-            print(f"Error during task execution: {str(task_error)}")
-            raise
+        print("Starting research process...")
+        result = crew.kickoff()
+        print("Research completed successfully")
+        
+        # Parse and validate the result
+        if isinstance(result, str):
+            try:
+                result = json.loads(result)
+            except json.JSONDecodeError:
+                result = {"error": "Invalid result format"}
+        
+        return result
+        
+    except Exception as task_error:
+        print(f"Error during task execution: {str(task_error)}")
+        raise
 
     except Exception as e:
         print(f"Error in research process: {str(e)}", file=sys.stderr)

@@ -1,13 +1,20 @@
 # Research crew task configurations
 verify_facts:
     description: >
-        Verify all claims in the provided content. For each claim:
-        1. Find primary sources
-        2. Cross-reference with multiple reliable sources
-        3. Note any discrepancies or nuances
-        4. Provide confidence score for each verified fact
-        5. List all sources used
-    expected_output: Detailed fact-check report with sources and confidence scores
+        Analyze and verify information using the search_data provided:
+        1. Process all search results from search_data.results
+        2. Extract key facts and claims from each result
+        3. Cross-reference information across multiple sources
+        4. Evaluate source credibility and information consistency
+        5. Compile verified facts with confidence scores
+        6. Organize findings by relevance and reliability
+    expected_output: >
+        {
+          "topics": ["verified topics extracted from search results"],
+          "facts": ["verified facts with supporting evidence"],
+          "sources": [{"title": "source title", "url": "source url", "credibility": "score"}],
+          "confidence_score": "aggregated verification score"
+        }
     agent: fact_checker
 
 research_context:
