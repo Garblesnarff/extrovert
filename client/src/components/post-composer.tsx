@@ -63,6 +63,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const [selectedProvider, setSelectedProvider] = useState<string>();
   const [selectedModel, setSelectedModel] = useState<string>();
   const [postToTwitter, setPostToTwitter] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
 
   const editor = useEditor({
     extensions: [

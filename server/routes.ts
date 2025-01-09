@@ -45,6 +45,17 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  app.post('/api/media/upload', async (req, res) => {
+    try {
+      const twitterClient = (await import('./lib/twitter')).default;
+      const mediaId = await twitterClient.uploadMedia(req.body, req.headers['content-type'] || 'image/jpeg');
+      res.json({ mediaId });
+    } catch (error) {
+      console.error('Media upload error:', error);
+      res.status(500).json({ error: 'Failed to upload media' });
+    }
+  });
+
   app.post('/api/posts', async (req, res) => {
     try {
       interface PostToCreate {

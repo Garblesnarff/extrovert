@@ -21,9 +21,24 @@ class TwitterClient {
     });
   }
 
-  async postTweet(content: string): Promise<{ id: string; text: string }> {
+  async postTweet(content: string, mediaFiles?: Buffer[]): Promise<{ id: string; text: string }> {
     try {
-      const tweet = await this.client.v2.tweet(content);
+      if (!mediaFiles?.length) {
+        const tweet = await this.client.v2.tweet(content);
+        return {
+          id: tweet.data.id,
+          text: tweet.data.text,
+        };
+      }
+
+      const mediaIds = await Promise.all(
+        mediaFiles.map(file => this.uploadMedia(file, 'image/jpeg'))
+      );
+
+      const tweet = await this.client.v2.tweet(content, {
+        media: { media_ids: mediaIds as [string, ...string[]] }
+      });
+
       return {
         id: tweet.data.id,
         text: tweet.data.text,
