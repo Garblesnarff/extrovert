@@ -36,7 +36,7 @@ class TwitterClient {
       );
 
       const tweet = await this.client.v2.tweet(content, {
-        media: { media_ids: mediaIds as [string, ...string[]] }
+        media: { media_ids: mediaIds as [string] | [string, string] | [string, string, string] | [string, string, string, string] }
       });
 
       return {
