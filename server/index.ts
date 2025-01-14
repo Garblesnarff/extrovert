@@ -9,17 +9,15 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Apply rate limiting only to API routes to avoid affecting development server
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later',
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: 'Too many requests from this IP, please try again later'
 });
 
-// Apply rate limiting to all API routes
+// Apply rate limiting to all routes
 app.use('/api/', limiter);
+
 
 function log(message: string) {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -32,7 +30,6 @@ function log(message: string) {
   console.log(`${formattedTime} [express] ${message}`);
 }
 
-// Logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -64,36 +61,30 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  try {
-    // Register API routes first
-    registerRoutes(app);
-    const server = createServer(app);
+  registerRoutes(app);
+  const server = createServer(app);
 
-    // Global error handling middleware
-    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      console.error('Error:', err);
-      const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
 
-      res.status(status).json({ message });
-    });
+    res.status(status).json({ message });
+    throw err;
+  });
 
-    // Setup Vite for development or serve static files for production
-    if (process.env.NODE_ENV === "development") {
-      await setupVite(app, server);
-      log('Vite middleware setup complete');
-    } else {
-      serveStatic(app);
-      log('Static file serving enabled');
-    }
-
-    // Always serve on port 5000
-    const PORT = 5000;
-    server.listen(PORT, "0.0.0.0", () => {
-      log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
   }
+
+  // ALWAYS serve the app on port 5000
+  // this serves both the API and the client
+  const PORT = 5000;
+  server.listen(PORT, "0.0.0.0", () => {
+    log(`serving on port ${PORT}`);
+  });
 })();
