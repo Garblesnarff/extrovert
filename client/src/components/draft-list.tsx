@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -22,26 +22,49 @@ import { useToast } from '@/hooks/use-toast';
 import type { Post } from '../types';
 
 export function DraftList() {
+  // Remove the options object as it's not supported by the hook
   const { data: drafts, isLoading } = useDrafts();
   const deletePost = useDeletePost();
   const updatePost = useUpdatePost();
   const [editingPost, setEditingPost] = useState<Post | null>(null);
-  const [selectedDraft, setSelectedDraft] = useState<Post | null>(null);
-
   const { toast } = useToast();
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Drafts</h2>
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-[200px] w-full" />
-        ))}
-      </div>
-    );
-  }
+  const handleEditPost = useCallback((post: Post) => {
+    setEditingPost(post);
+  }, []);
 
-  const enhanceDraft = async (draft: Post, type: string) => {
+  const handleDeletePost = useCallback((postId: string) => {
+    deletePost.mutate(postId, {
+      onSuccess: () => {
+        toast({
+          title: "Draft Deleted",
+          description: "Your draft has been deleted successfully.",
+        });
+      },
+    });
+  }, [deletePost, toast]);
+
+  const handleUpdatePost = useCallback((draft: Post, isDraft: boolean) => {
+    updatePost.mutate(
+      {
+        id: draft.id,
+        content: draft.content,
+        isDraft,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: isDraft ? "Draft Updated" : "Post Published",
+            description: isDraft 
+              ? "Your draft has been updated successfully."
+              : "Your post has been published successfully.",
+          });
+        },
+      }
+    );
+  }, [updatePost, toast]);
+
+  const enhanceDraft = useCallback(async (draft: Post, type: string) => {
     try {
       const response = await fetch('/api/drafts/enhance', {
         method: 'POST',
@@ -53,26 +76,24 @@ export function DraftList() {
           model: 'gemini-pro'
         }),
       });
-      
+
       if (!response.ok) throw new Error('Enhancement failed');
-      
+
       const data = await response.json();
-      const enhancedDraft = {
-        ...draft,
-        content: data.enhanced.suggestedContent,
-      };
-      
-      // Update the draft with enhanced content
-      await updatePost.mutateAsync({
-        id: draft.id,
-        content: data.enhanced.suggestedContent,
-        isDraft: true,
-      });
-      
-      toast({
-        title: "Draft Enhanced",
-        description: "AI suggestions have been applied to your draft.",
-      });
+
+      // Update only if content has changed
+      if (data.enhanced.suggestedContent !== draft.content) {
+        await updatePost.mutateAsync({
+          id: draft.id,
+          content: data.enhanced.suggestedContent,
+          isDraft: true,
+        });
+
+        toast({
+          title: "Draft Enhanced",
+          description: "AI suggestions have been applied to your draft.",
+        });
+      }
     } catch (error) {
       toast({
         title: "Enhancement Failed",
@@ -80,7 +101,18 @@ export function DraftList() {
         variant: "destructive",
       });
     }
-  };
+  }, [updatePost, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Drafts</h2>
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-[200px] w-full" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -122,7 +154,7 @@ export function DraftList() {
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0"
-                  onClick={() => setEditingPost(draft)}
+                  onClick={() => handleEditPost(draft)}
                 >
                   <Edit2 className="h-4 w-4" />
                 </Button>
@@ -130,7 +162,7 @@ export function DraftList() {
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0"
-                  onClick={() => deletePost.mutate(draft.id)}
+                  onClick={() => handleDeletePost(draft.id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -141,7 +173,7 @@ export function DraftList() {
                 variant="outline"
                 size="sm"
                 className="gap-2"
-                onClick={() => setEditingPost(draft)}
+                onClick={() => handleEditPost(draft)}
               >
                 <Calendar className="h-4 w-4" />
                 Schedule
@@ -149,13 +181,7 @@ export function DraftList() {
               <Button
                 variant="default"
                 size="sm"
-                onClick={() => {
-                  updatePost.mutate({
-                    id: draft.id,
-                    content: draft.content,
-                    isDraft: false,
-                  });
-                }}
+                onClick={() => handleUpdatePost(draft, false)}
               >
                 Post Now
               </Button>
