@@ -2,8 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { createServer } from "http";
-
 import rateLimit from 'express-rate-limit';
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
