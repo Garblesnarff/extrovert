@@ -45,7 +45,13 @@ router.post('/api/ai/research', async (req, res) => {
     });
 
     await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        pythonProcess.kill();
+        reject(new Error('Research process timed out after 30 seconds'));
+      }, 30000);
+
       pythonProcess.on('close', (code) => {
+        clearTimeout(timeout);
         console.log('Python process exited with code:', code);
         if (code === 0) {
           resolve(null);

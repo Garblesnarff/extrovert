@@ -5,6 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useContentResearch } from '@/lib/crewai';
 import { ResizablePanel } from '@/components/ui/resizable';
+
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+
 import { useToast } from '@/hooks/use-toast';
 
 interface ResearchResult {
