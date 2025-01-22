@@ -5,6 +5,7 @@ import path from 'path';
 const router = Router();
 
 router.post('/api/ai/research', async (req, res) => {
+  console.log("Entering /api/ai/research route handler"); // ADD THIS LINE
   try {
     const { prompt } = req.body;
     if (!prompt) {
@@ -17,8 +18,7 @@ router.post('/api/ai/research', async (req, res) => {
     };
 
     // Spawn Python process to run research crew
-    console.log('Starting research process with content:', JSON.stringify({ text: content.text }));
-    
+    console.log('Before spawning python process'); // ADD THIS LINE
     const pythonProcess = spawn('python3', [
       path.join(__dirname, '../research_crew/main.py'),
       JSON.stringify(content)
@@ -28,6 +28,7 @@ router.post('/api/ai/research', async (req, res) => {
         PYTHONUNBUFFERED: '1'
       }
     });
+    console.log('After spawning python process'); // ADD THIS LINE
 
     let result = '';
     let error = '';
@@ -77,7 +78,7 @@ router.post('/api/ai/research', async (req, res) => {
         details: 'Invalid response format from research service'
       });
     }
-    
+
     return res.json({
       topics: researchResults?.topics || [],
       insights: researchResults?.insights || '',
@@ -87,7 +88,7 @@ router.post('/api/ai/research', async (req, res) => {
   } catch (error) {
     console.error('Research error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Failed to complete research',
       details: errorMessage
     });
