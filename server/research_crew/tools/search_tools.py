@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 import os
 import json
 import requests
-from crewai import BaseTool
+from crewai.tools import BaseTool
 
 class DualSearchTool(BaseTool):
     """Enhanced search tool using SerperDev API"""
