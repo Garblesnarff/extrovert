@@ -2,7 +2,9 @@ from typing import Dict, List, Optional
 import os
 import json
 import requests
-class DualSearchTool:
+from crewai import BaseTool
+
+class DualSearchTool(BaseTool):
     """Enhanced search tool using SerperDev API"""
 
     def __init__(self):
@@ -13,17 +15,30 @@ class DualSearchTool:
 
         self.serper_api_url = "https://api.serper.dev/search"
 
+    @property
     def name(self) -> str:
         return "dual_search_tool"
 
+    @property
     def description(self) -> str:
-        return "An enhanced search tool that combines SerperDev and BraveSearch for comprehensive results"
+        return "An enhanced search tool that searches the web for current information"
+
+    def _run(self, query: str, *args, **kwargs) -> str:
+        """Execute search and return results"""
+        print(f"[DualSearchTool] Starting search for query: {query}")
+        try:
+            # Direct SerperDev API call
+            serper_results = self._search_serper(query)
+            if serper_results:
+                return self._format_serper_results(serper_results)
+            return "No results found from search provider."
+        except Exception as e:
+            error_msg = f"Error executing search: {str(e)}"
+            print(f"[DualSearchTool] {error_msg}")
+            return error_msg
 
     def _search_serper(self, query: str) -> dict:
         """Direct call to SerperDev API"""
-        print("[DualSearchTool] _search_serper called with query:", query)
-        print("[DualSearchTool] API Key present:", bool(self.api_key))
-        
         headers = {
             'X-API-KEY': self.api_key,
             'Content-Type': 'application/json'
@@ -32,16 +47,10 @@ class DualSearchTool:
             'q': query,
             'num': 10
         }
-
-        print(f"[DualSearchTool] Calling SerperDev API with query: {query}")
         response = requests.post(self.serper_api_url, headers=headers, json=payload)
-        print(f"[DualSearchTool] SerperDev API Status: {response.status_code}")
-
         if response.status_code == 200:
             return response.json()
-        else:
-            print(f"[DualSearchTool] SerperDev API Error: {response.text}")
-            return None
+        return None
 
     def _format_serper_results(self, results: dict) -> str:
         """Format SerperDev results into readable text"""
@@ -49,7 +58,6 @@ class DualSearchTool:
             return "No results found"
 
         formatted = ["=== Latest Search Results ===\n"]
-
         for result in results['organic'][:5]:
             formatted.extend([
                 f"Title: {result.get('title', 'No Title')}",
@@ -57,33 +65,4 @@ class DualSearchTool:
                 f"Snippet: {result.get('snippet', 'No Snippet')}",
                 f"Date: {result.get('date', 'No Date')}\n"
             ])
-
         return "\n".join(formatted)
-
-    def _run(self, query: str, *args, **kwargs) -> str:
-        """Execute search with both providers and combine results"""
-        print(f"[DualSearchTool] Starting search for query: {query}")
-        combined_results = []
-
-        try:
-            # Direct SerperDev API call
-            serper_results = self._search_serper(query)
-            if serper_results:
-                formatted_results = self._format_serper_results(serper_results)
-                combined_results.append(formatted_results)
-                print("[DualSearchTool] Successfully got SerperDev results")
-
-            # Removed Brave search fallback
-
-            # Return combined results
-            if combined_results:
-                final_results = "\n".join(combined_results)
-                print("[DualSearchTool] Search completed successfully")
-                return final_results
-
-            return "No results found from either search provider."
-
-        except Exception as e:
-            error_msg = f"Error executing search: {str(e)}"
-            print(f"[DualSearchTool] {error_msg}")
-            return error_msg
