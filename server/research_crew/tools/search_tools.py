@@ -8,10 +8,15 @@ class DualSearchTool(BaseTool):
     """Enhanced search tool using SerperDev API"""
 
     def __init__(self):
-        # Initialize with SerperDev API key from environment
+        super().__init__() 
         self.api_key = os.getenv('SERPER_API_KEY')
+        print("[DualSearchTool] Initial API Key from env:", self.api_key)
+
         if not self.api_key:
+            print("[DualSearchTool] SERPER_API_KEY is missing!")
             raise ValueError("SERPER_API_KEY environment variable is required")
+        else:
+            print("[DualSearchTool] SERPER_API_KEY loaded successfully in __init__")
 
         self.serper_api_url = "https://api.serper.dev/search"
 
@@ -37,7 +42,7 @@ class DualSearchTool(BaseTool):
             print(f"[DualSearchTool] {error_msg}")
             return error_msg
 
-    def _search_serper(self, query: str) -> dict:
+    def _search_serper(self, query: str) -> dict:  # Fixed method name
         """Direct call to SerperDev API"""
         headers = {
             'X-API-KEY': self.api_key,
@@ -52,7 +57,7 @@ class DualSearchTool(BaseTool):
             return response.json()
         return None
 
-    def _format_serper_results(self, results: dict) -> str:
+    def _format_serper_results(self, results: dict) -> str:  # Fixed method name
         """Format SerperDev results into readable text"""
         if not results or 'organic' not in results:
             return "No results found"
