@@ -3,7 +3,11 @@ import { db } from "../db";
 import { posts } from "@db/schema";
 import { eq, asc, desc, sql } from "drizzle-orm";
 import { spawn } from 'child_process';
-import path from 'path';
+import path, { dirname } from 'path'; // <--- ADDED 'dirname' IMPORT
+import { fileURLToPath } from 'url';    // <--- ADDED 'fileURLToPath' IMPORT
+
+const __filename = fileURLToPath(import.meta.url); // ADD THESE TWO LINES
+const __dirname = dirname(__filename); 
 
 export function registerRoutes(app: Express) {
   // Posts Routes
@@ -365,12 +369,13 @@ export function registerRoutes(app: Express) {
   });
 
   app.post('/api/ai/research', async (req, res) => {
-  console.log("Entering /api/ai/research route handler");
-  try {
-    const { prompt } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: 'Prompt is required' });
-    }
+    console.log("Entering /api/ai/research route handler"); // ADD THIS LINE
+    console.log("req.body:", req.body); // ADD THIS LINE
+    try {
+      const { prompt, provider } = req.body;
+      if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required' });
+      }
 
     // Create content object for research crew
     const content = {
