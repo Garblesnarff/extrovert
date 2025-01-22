@@ -2,10 +2,8 @@ from typing import Dict, List, Optional
 import os
 import json
 import requests
-from crewai_tools import BraveSearchTool
-
 class DualSearchTool:
-    """Enhanced search tool using SerperDev with BraveSearch as fallback"""
+    """Enhanced search tool using SerperDev API"""
 
     def __init__(self):
         # Initialize with SerperDev API key from environment
@@ -13,7 +11,6 @@ class DualSearchTool:
         if not self.api_key:
             raise ValueError("SERPER_API_KEY environment variable is required")
 
-        self.brave_search = BraveSearchTool()
         self.serper_api_url = "https://api.serper.dev/search"
 
     def name(self) -> str:
@@ -76,15 +73,7 @@ class DualSearchTool:
                 combined_results.append(formatted_results)
                 print("[DualSearchTool] Successfully got SerperDev results")
 
-            # Get Brave search results as backup
-            try:
-                print("[DualSearchTool] Attempting Brave search as backup...")
-                brave_results = self.brave_search._run(query, *args, **kwargs)
-                if brave_results:
-                    combined_results.append("\n=== Additional Search Results ===\n")
-                    combined_results.append(brave_results)
-            except Exception as brave_error:
-                print(f"[DualSearchTool] Brave search error (non-critical): {str(brave_error)}")
+            # Removed Brave search fallback
 
             # Return combined results
             if combined_results:
