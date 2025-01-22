@@ -1,68 +1,63 @@
+
 #!/usr/bin/env python
 from typing import Dict
 import os
 import sys
 import json
 from crewai import Agent, Crew, Task
-from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import WebsiteSearchTool
 from tools.search_tools import DualSearchTool
 
-class ResearchCrew(CrewBase):
+class ResearchCrew:
     """Research crew for validating and enhancing Twitter content"""
 
     def __init__(self):
-        super().__init__()
         # Initialize tools
         self.search_tool = DualSearchTool()
         self.web_tool = WebsiteSearchTool()
-
-    @agent
-    def fact_checker(self) -> Agent:
-        """Creates the fact checking agent"""
-        return Agent(
+        
+        # Load config files
+        self.agents_config = self._load_config('agents.yaml')
+        self.tasks_config = self._load_config('tasks.yaml')
+        
+        # Initialize components
+        self.agents = []
+        self.tasks = []
+        self._setup_agents()
+        self._setup_tasks()
+        
+    def _load_config(self, filename):
+        config_path = os.path.join(os.path.dirname(__file__), 'config', filename)
+        with open(config_path, 'r') as f:
+            return yaml.safe_load(f)
+            
+    def _setup_agents(self):
+        self.fact_checker = Agent(
             config=self.agents_config["fact_checker"],
             tools=[self.search_tool, self.web_tool]
         )
-
-    @agent
-    def context_researcher(self) -> Agent:
-        """Creates the context research agent"""
-        return Agent(
+        self.context_researcher = Agent(
             config=self.agents_config["context_researcher"],
             tools=[self.search_tool, self.web_tool]
         )
-
-    @agent
-    def content_enhancer(self) -> Agent:
-        """Creates the content enhancement agent"""
-        return Agent(
+        self.content_enhancer = Agent(
             config=self.agents_config["content_enhancer"],
             tools=[self.web_tool]
         )
-
-    @task
-    def verify_facts(self) -> Task:
-        """Task for fact verification"""
-        return Task(
+        self.agents = [self.fact_checker, self.context_researcher, self.content_enhancer]
+        
+    def _setup_tasks(self):
+        self.verify_facts = Task(
             config=self.tasks_config["verify_facts"]
         )
-
-    @task
-    def research_context(self) -> Task:
-        """Task for context research"""
-        return Task(
+        self.research_context = Task(
             config=self.tasks_config["research_context"]
         )
-
-    @task
-    def enhance_content(self) -> Task:
-        """Task for content enhancement"""
-        return Task(
+        self.enhance_content = Task(
             config=self.tasks_config["enhance_content"]
         )
+        self.tasks = [self.verify_facts, self.research_context, self.enhance_content]
 
-    @crew
     def crew(self) -> Crew:
         """Assembles the research crew"""
         return Crew(
@@ -81,7 +76,7 @@ def run(content: Dict = None):
         print(f"[ResearchCrew] Starting research with content: {content['text'][:100]}...")
 
         # Check for required environment variables
-        required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
+        required_vars = ["SERPER_API_KEY"]
         missing_vars = [var for var in required_vars if not os.getenv(var)]
         if missing_vars:
             raise EnvironmentError(
@@ -108,6 +103,7 @@ def run(content: Dict = None):
 if __name__ == "__main__":
     import sys
     import json
+    import yaml
 
     try:
         # Get content from command line argument
