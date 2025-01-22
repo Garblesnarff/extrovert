@@ -8,7 +8,7 @@ fact_checker:
         ensuring accuracy in every detail. You excel at cross-referencing information 
         across multiple search engines to ensure comprehensive coverage.
     verbose: true
-    tools: [search_tool, web_tool, DualSearchTool]
+    tools: [DualSearchTool]
     allow_delegation: true
     planning: true
     llm: gemini/gemini-flash-8b
@@ -21,7 +21,7 @@ context_researcher:
         and context. You excel at connecting different pieces of information to create
         a complete picture.
     verbose: true
-    tools: [search_tool, web_tool, DualSearchTool]
+    tools: [DualSearchTool]
     llm: groq/llama3-70b-8192
 
 content_enhancer:

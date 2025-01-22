@@ -5,7 +5,6 @@ import os
 import sys
 import json
 from crewai import Agent, Crew, Task
-from crewai_tools import WebsiteSearchTool
 from tools.search_tools import DualSearchTool
 
 class ResearchCrew:
@@ -14,7 +13,7 @@ class ResearchCrew:
     def __init__(self):
         # Initialize tools
         self.search_tool = DualSearchTool()
-        self.web_tool = WebsiteSearchTool()
+        
         
         # Load config files
         self.agents_config = self._load_config('agents.yaml')
@@ -34,11 +33,11 @@ class ResearchCrew:
     def _setup_agents(self):
         self.fact_checker = Agent(
             config=self.agents_config["fact_checker"],
-            tools=[self.search_tool, self.web_tool]
+            tools=[self.search_tool]
         )
         self.context_researcher = Agent(
             config=self.agents_config["context_researcher"],
-            tools=[self.search_tool, self.web_tool]
+            tools=[self.search_tool]
         )
         self.content_enhancer = Agent(
             config=self.agents_config["content_enhancer"],
