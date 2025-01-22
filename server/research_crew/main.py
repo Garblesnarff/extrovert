@@ -74,10 +74,11 @@ class ResearchCrew(CrewBase):
 def run(content: Dict = None):
     """Run the crew with the provided content"""
     try:
+        print("[ResearchCrew] Run function started")
         if not content or 'text' not in content:
             raise ValueError("Content must include 'text' field")
 
-        print(f"Starting research with content: {content['text'][:100]}...")
+        print(f"[ResearchCrew] Starting research with content: {content['text'][:100]}...")
 
         # Check for required environment variables
         required_vars = ["SERPER_API_KEY", "BRAVE_API_KEY"]
@@ -90,13 +91,14 @@ def run(content: Dict = None):
         print("All required API keys are present")
 
         # Initialize and run the crew
-        print("Initializing research crew...")
+        print("[ResearchCrew] Initializing research crew...")
         crew = ResearchCrew().crew()
         
-        print("Starting research process...")
+        print("[ResearchCrew] Crew initialized, starting kickoff")
         result = crew.kickoff(inputs={'query': content['text']})
         
-        print("Research completed successfully")
+        print("[ResearchCrew] Research completed successfully")
+        print("[ResearchCrew] Result:", result[:200] + "..." if result else "No result")
         return result
 
     except Exception as e:

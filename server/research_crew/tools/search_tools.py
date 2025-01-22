@@ -24,6 +24,9 @@ class DualSearchTool:
 
     def _search_serper(self, query: str) -> dict:
         """Direct call to SerperDev API"""
+        print("[DualSearchTool] _search_serper called with query:", query)
+        print("[DualSearchTool] API Key present:", bool(self.api_key))
+        
         headers = {
             'X-API-KEY': self.api_key,
             'Content-Type': 'application/json'
