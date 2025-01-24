@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Calendar, Wand2, Twitter, Clock, Timer } from 'lucide-react';
-import { ResizablePanel } from '@/components/ui/resizable';
+import { Calendar, Wand2, Twitter } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -62,7 +60,6 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
   const [selectedProvider, setSelectedProvider] = useState<string>();
   const [selectedModel, setSelectedModel] = useState<string>();
   const [postToTwitter, setPostToTwitter] = useState(false);
-  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
 
   const editor = useEditor({
     extensions: [
@@ -171,20 +168,6 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
 
   return (
     <Form {...form}>
-      <AlertDialog open={showError} onOpenChange={setShowError}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <Button variant="outline" onClick={() => setShowError(false)}>
-              Close
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       <div className="space-y-4">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField

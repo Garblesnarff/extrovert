@@ -9,6 +9,8 @@ import { CommandMenu } from "./components/command-menu";
 import { Dashboard } from "./pages/dashboard";
 import { Analytics } from "./pages/analytics";
 import { ResearchPage } from "./pages/research";
+import { ContentStrategy } from "./pages/content-strategy";
+import { Engagement } from "./pages/engagement";
 
 function Navigation() {
   return (
@@ -17,6 +19,12 @@ function Navigation() {
         <div className="flex gap-6 text-sm">
           <Link href="/">
             <span className="transition-colors hover:text-primary cursor-pointer">Compose & Schedule</span>
+          </Link>
+          <Link href="/content-strategy">
+            <span className="transition-colors hover:text-primary cursor-pointer">Content Strategy</span>
+          </Link>
+          <Link href="/engagement">
+            <span className="transition-colors hover:text-primary cursor-pointer">Engagement</span>
           </Link>
           <Link href="/analytics">
             <span className="transition-colors hover:text-primary cursor-pointer">Analytics</span>
@@ -36,6 +44,8 @@ function Router() {
       <Navigation />
       <Switch>
         <Route path="/" component={Dashboard} />
+        <Route path="/content-strategy" component={ContentStrategy} />
+        <Route path="/engagement" component={Engagement} />
         <Route path="/analytics" component={Analytics} />
         <Route path="/research" component={ResearchPage} />
         <Route>404 Page Not Found</Route>
