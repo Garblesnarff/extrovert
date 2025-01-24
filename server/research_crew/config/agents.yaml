@@ -10,7 +10,7 @@ fact_checker:
     verbose: true
     allow_delegation: true
     planning: true
-    llm: gemini
+    llm: "gemini/gemini-2.0-flash-exp"
 
 context_researcher:
     role: Context & Background Researcher
@@ -22,7 +22,7 @@ context_researcher:
     verbose: true
     allow_delegation: true
     planning: true
-    llm: cerebras
+    llm: "gemini/gemini-2.0-flash-exp"
 
 content_enhancer:
     role: Content Enhancement Specialist
@@ -34,4 +34,4 @@ content_enhancer:
     verbose: true
     allow_delegation: true
     planning: true
-    llm: gemini
+    llm: "gemini/gemini-2.0-flash-exp"

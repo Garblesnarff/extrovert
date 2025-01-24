@@ -39,24 +39,30 @@ class ResearchCrew:
             goal=self.agents_config["fact_checker"]["goal"],
             backstory=self.agents_config["fact_checker"]["backstory"],
             tools=[self.search_tool],
-            llm_config={"provider": "gemini", "api_key": os.getenv("GEMINI_API_KEY")},
-            verbose=True
+            llm="gemini/gemini-2.0-flash-exp",    
+            verbose=True,
+            max_iter=3,  # Limit retries
+            max_retry_limit=3
         )
         self.context_researcher = Agent(
             role=self.agents_config["context_researcher"]["role"],
             goal=self.agents_config["context_researcher"]["goal"],
             backstory=self.agents_config["context_researcher"]["backstory"],
             tools=[self.search_tool],
-            llm_config={"provider": "cerebras", "api_key": os.getenv("CEREBRAS_API_KEY")},
-            verbose=True
+            llm="gemini/gemini-2.0-flash-exp",
+            verbose=True,
+            max_iter=3,  # Limit retries
+            max_retry_limit=3
         )
         self.content_enhancer = Agent(
             role=self.agents_config["content_enhancer"]["role"],
             goal=self.agents_config["content_enhancer"]["goal"],
             backstory=self.agents_config["content_enhancer"]["backstory"],
             tools=[self.search_tool],
-            llm_config={"provider": "gemini", "api_key": os.getenv("GEMINI_API_KEY")},
-            verbose=True
+            llm="gemini/gemini-2.0-flash-exp",
+            verbose=True,
+            max_iter=3,  # Limit retries
+            max_retry_limit=3
         )
         self.agents = [self.fact_checker, self.context_researcher, self.content_enhancer]
 
@@ -83,7 +89,7 @@ class ResearchCrew:
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
-            verbose=True
+            verbose=True,
         )
 
 def run(content: Dict = None) -> Dict:
@@ -106,24 +112,31 @@ def run(content: Dict = None) -> Dict:
         # Initialize and run the crew
         print("[ResearchCrew] Initializing research crew...")
         crew = ResearchCrew().crew()
+        print("[ResearchCrew] Research crew initialized.")    
 
-        print("[ResearchCrew] Crew initialized, starting kickoff")
+        # Execute the crew
         result = crew.kickoff(inputs={'query': content['text']})
-
         print("[ResearchCrew] Research completed successfully")
-        print("[ResearchCrew] Result:", result[:200] + "..." if result else "No result")
 
         # Format the result
+        result_text = result.raw if hasattr(result, 'raw') else str(result)
         formatted_result = {
-            "topics": [],  # Can be enhanced based on the result structure
-            "insights": str(result),
-            "enhanced_content": str(result)
+            "topics": [],
+            "insights": result_text,
+            "enhanced_content": result_text
         }
+
+        # Only print the JSON result at the end
+        print(json.dumps(formatted_result))
         return formatted_result
 
     except Exception as e:
-        print(f"Error in research process: {str(e)}", file=sys.stderr)
-        raise Exception(f"Error running research crew: {str(e)}")
+        error_message = f"Error running research crew: {str(e)}"
+        print(json.dumps({
+            "error": error_message,
+            "details": "Error processing research request"
+        }))
+        raise Exception(error_message)
 
 if __name__ == "__main__":
     try:
@@ -133,9 +146,6 @@ if __name__ == "__main__":
 
         content = json.loads(sys.argv[1])
         result = run(content)
-
-        # Output result as JSON
-        print(json.dumps(result))
 
     except json.JSONDecodeError as e:
         print(json.dumps({

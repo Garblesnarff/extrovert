@@ -271,7 +271,7 @@ export function registerRoutes(app: Express) {
           prompt = `Improve this tweet while maintaining its core message: "${content}"`;
       }
 
-      const response = await getAIResponse(prompt, 'gemini', 'gemini-pro');
+      const response = await getAIResponse(prompt, 'gemini', 'gemini-flash');
       
       res.json({
         enhanced: {
@@ -413,8 +413,8 @@ export function registerRoutes(app: Express) {
     await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         pythonProcess.kill();
-        reject(new Error('Research process timed out after 30 seconds'));
-      }, 30000);
+        reject(new Error('Research process timed out after 300 seconds'));
+      }, 300000);
 
       pythonProcess.on('close', (code) => {
         clearTimeout(timeout);
