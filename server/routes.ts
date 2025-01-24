@@ -3,11 +3,11 @@ import { db } from "../db";
 import { posts } from "@db/schema";
 import { eq, asc, desc, sql } from "drizzle-orm";
 import { spawn } from 'child_process';
-import path, { dirname } from 'path'; // <--- ADDED 'dirname' IMPORT
-import { fileURLToPath } from 'url';    // <--- ADDED 'fileURLToPath' IMPORT
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url); // ADD THESE TWO LINES
-const __dirname = dirname(__filename); 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export function registerRoutes(app: Express) {
   // Posts Routes
@@ -133,7 +133,7 @@ export function registerRoutes(app: Express) {
 
           // Insert remaining posts if any
           if (postsToCreate.length > 1) {
-            await Promise.all(postsToCreate.slice(1).map(post => 
+            await Promise.all(postsToCreate.slice(1).map(post =>
               db.insert(posts).values(post)
             ));
           }
@@ -195,7 +195,7 @@ export function registerRoutes(app: Express) {
       res.json(post[0]);
     } catch (error) {
       console.error('Failed to update post:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Failed to update post',
         details: error instanceof Error ? error.message : 'Unknown error'
       });
@@ -231,7 +231,7 @@ export function registerRoutes(app: Express) {
     try {
       const { prompt, provider, model } = req.body;
       const { getAIResponse } = await import('./providers');
-      
+
       if (!prompt) {
         return res.status(400).json({ error: 'Prompt is required' });
       }
@@ -240,7 +240,7 @@ export function registerRoutes(app: Express) {
       res.json(response);
     } catch (error) {
       console.error('AI assist error:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Failed to get AI assistance',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
@@ -272,7 +272,7 @@ export function registerRoutes(app: Express) {
       }
 
       const response = await getAIResponse(prompt, 'gemini', 'gemini-flash');
-      
+
       res.json({
         enhanced: {
           suggestedContent: response.suggestedContent,
@@ -282,7 +282,7 @@ export function registerRoutes(app: Express) {
       });
     } catch (error) {
       console.error('Draft enhancement error:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Failed to enhance draft',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
@@ -309,18 +309,18 @@ export function registerRoutes(app: Express) {
       }, suggest the optimal posting time. Consider the content type, target audience, and engagement patterns. Return only the suggested time in 24-hour format (HH:mm).`;
 
       const response = await getAIResponse(prompt, 'gemini', 'gemini-1.5-pro');
-      
+
       // Extract time from AI response and validate format
       const timeMatch = response.suggestedContent.match(/(\d{2}:\d{2})/);
       const suggestedTime = timeMatch ? timeMatch[0] : '09:00';
 
-      res.json({ 
+      res.json({
         suggestedTime,
-        analysis: response.suggestedContent 
+        analysis: response.suggestedContent
       });
     } catch (error) {
       console.error('Time suggestion error:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Failed to suggest optimal posting time',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
@@ -330,16 +330,21 @@ export function registerRoutes(app: Express) {
     try {
       const { exec } = await import('child_process');
       const command = 'python3 server/lib/trends.py';
-      
+
+      // Set CORS headers
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
       exec(command, (error, stdout, stderr) => {
         if (error) {
           console.error('Error executing Python script:', error);
-          return res.status(500).json({ 
+          return res.status(500).json({
             error: 'Failed to fetch trending topics',
-            message: error.message 
+            message: error.message
           });
         }
-        
+
         if (stderr) {
           console.error('Python script stderr:', stderr);
         }
@@ -352,7 +357,7 @@ export function registerRoutes(app: Express) {
           res.json(trendsData);
         } catch (parseError) {
           console.error('Error parsing trends data:', parseError, '\nRaw output:', stdout);
-          res.status(500).json({ 
+          res.status(500).json({
             error: 'Failed to parse trending topics',
             message: 'Invalid data format returned from trends service'
           });
@@ -361,104 +366,104 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error('Failed to fetch trends:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Failed to fetch trending topics',
-        message: errorMessage 
+        message: errorMessage
       });
     }
   });
 
   app.post('/api/ai/research', async (req, res) => {
-    console.log("Entering /api/ai/research route handler"); // ADD THIS LINE
-    console.log("req.body:", req.body); // ADD THIS LINE
+    console.log("Entering /api/ai/research route handler");
+    console.log("req.body:", req.body);
     try {
       const { prompt, provider } = req.body;
       if (!prompt) {
         return res.status(400).json({ error: 'Prompt is required' });
       }
 
-    // Create content object for research crew
-    const content = {
-      text: prompt
-    };
+      // Create content object for research crew
+      const content = {
+        text: prompt
+      };
 
-    // Spawn Python process to run research crew
-    console.log('Before spawning python process');
-    const pythonProcess = spawn('python3', [
-      path.join(__dirname, './research_crew/main.py'),
-      JSON.stringify(content)
-    ], {
-      env: {
-        ...process.env,
-        PYTHONUNBUFFERED: '1'
-      }
-    });
-    console.log('After spawning python process');
-
-    let result = '';
-    let error = '';
-
-    pythonProcess.stdout.on('data', (data) => {
-      const chunk = data.toString();
-      console.log('Python stdout:', chunk);
-      result += chunk;
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-      const chunk = data.toString();
-      console.error('Python stderr:', chunk);
-      error += chunk;
-    });
-
-    await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        pythonProcess.kill();
-        reject(new Error('Research process timed out after 300 seconds'));
-      }, 300000);
-
-      pythonProcess.on('close', (code) => {
-        clearTimeout(timeout);
-        console.log('Python process exited with code:', code);
-        if (code === 0) {
-          resolve(null);
-        } else {
-          reject(new Error(`Process exited with code ${code}. Error: ${error}`));
+      // Spawn Python process to run research crew
+      console.log('Before spawning python process');
+      const pythonProcess = spawn('python3', [
+        path.join(__dirname, './research_crew/main.py'),
+        JSON.stringify(content)
+      ], {
+        env: {
+          ...process.env,
+          PYTHONUNBUFFERED: '1'
         }
       });
-    });
+      console.log('After spawning python process');
 
-    if (error) {
+      let result = '';
+      let error = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        const chunk = data.toString();
+        console.log('Python stdout:', chunk);
+        result += chunk;
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        const chunk = data.toString();
+        console.error('Python stderr:', chunk);
+        error += chunk;
+      });
+
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          pythonProcess.kill();
+          reject(new Error('Research process timed out after 300 seconds'));
+        }, 300000);
+
+        pythonProcess.on('close', (code) => {
+          clearTimeout(timeout);
+          console.log('Python process exited with code:', code);
+          if (code === 0) {
+            resolve(null);
+          } else {
+            reject(new Error(`Process exited with code ${code}. Error: ${error}`));
+          }
+        });
+      });
+
+      if (error) {
+        console.error('Research error:', error);
+        throw new Error(`Failed to complete research: ${error}`);
+      }
+
+      // Parse and format the research results
+      let researchResults;
+      try {
+        researchResults = JSON.parse(result);
+      } catch (parseError) {
+        console.error('Failed to parse research results:', parseError);
+        return res.status(500).json({
+          error: 'Failed to parse research results',
+          details: 'Invalid response format from research service'
+        });
+      }
+
+      return res.json({
+        topics: researchResults?.topics || [],
+        insights: researchResults?.insights || '',
+        suggestedContent: researchResults?.enhanced_content || ''
+      });
+
+    } catch (error) {
       console.error('Research error:', error);
-      throw new Error(`Failed to complete research: ${error}`);
-    }
-
-    // Parse and format the research results
-    let researchResults;
-    try {
-      researchResults = JSON.parse(result);
-    } catch (parseError) {
-      console.error('Failed to parse research results:', parseError);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
       return res.status(500).json({
-        error: 'Failed to parse research results',
-        details: 'Invalid response format from research service'
+        error: 'Failed to complete research',
+        details: errorMessage
       });
     }
-
-    return res.json({
-      topics: researchResults?.topics || [],
-      insights: researchResults?.insights || '',
-      suggestedContent: researchResults?.enhanced_content || ''
-    });
-
-  } catch (error) {
-    console.error('Research error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return res.status(500).json({
-      error: 'Failed to complete research',
-      details: errorMessage
-    });
-  }
-});
+  });
 
   // Analytics Routes
   app.get('/api/analytics', async (req, res) => {
@@ -540,7 +545,7 @@ export function registerRoutes(app: Express) {
           status: 'pending'
         }
       ];
-      
+
       res.json(opportunities);
     } catch (error) {
       console.error('Failed to fetch engagement opportunities:', error);

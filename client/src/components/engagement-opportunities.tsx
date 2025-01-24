@@ -57,6 +57,7 @@ export function EngagementOpportunities() {
       const data = await response.json();
       setOpportunities(data);
     } catch (error) {
+      console.error('Failed to fetch opportunities:', error);
       toast({
         title: "Error",
         description: "Failed to load engagement opportunities",
@@ -131,24 +132,26 @@ export function EngagementOpportunities() {
             </CardHeader>
             <CardContent>
               <p className="text-sm mb-4">{opportunity.content}</p>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleStatusUpdate(opportunity.id, 'ignored')}
-                  disabled={updatingId === opportunity.id || opportunity.status !== 'pending'}
-                >
-                  {updatingId === opportunity.id ? 'Updating...' : 'Ignore'}
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => handleStatusUpdate(opportunity.id, 'engaged')}
-                  disabled={updatingId === opportunity.id || opportunity.status !== 'pending'}
-                >
-                  {updatingId === opportunity.id ? 'Updating...' : 'Engage'}
-                </Button>
-              </div>
+              {opportunity.status === 'pending' && (
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleStatusUpdate(opportunity.id, 'ignored')}
+                    disabled={updatingId === opportunity.id}
+                  >
+                    {updatingId === opportunity.id ? 'Updating...' : 'Ignore'}
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => handleStatusUpdate(opportunity.id, 'engaged')}
+                    disabled={updatingId === opportunity.id}
+                  >
+                    {updatingId === opportunity.id ? 'Updating...' : 'Engage'}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
