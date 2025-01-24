@@ -8,12 +8,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { CommandMenu } from "./components/command-menu";
 import { Dashboard } from "./pages/dashboard";
 import { Analytics } from "./pages/analytics";
+import ResearchPage from "./pages/research";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/analytics" component={Analytics} />
+      <Route path="/research" component={ResearchPage} />
       <Route>404 Page Not Found</Route>
     </Switch>
   );
