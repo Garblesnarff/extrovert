@@ -4,7 +4,6 @@ import { ScheduledPosts } from '../components/scheduled-posts';
 import { ContentStrategyDashboard } from '../components/content-strategy-dashboard';
 import { EngagementOpportunities } from '../components/engagement-opportunities';
 import { Analytics } from '../pages/analytics';
-import { Link } from "wouter";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -17,9 +16,6 @@ export function Dashboard() {
           <TabsTrigger value="strategy">Content Strategy</TabsTrigger>
           <TabsTrigger value="engagement">Engagement</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <Link href="/research">
-            <TabsTrigger value="research" className="cursor-pointer">Research Assistant</TabsTrigger>
-          </Link>
         </TabsList>
 
         <TabsContent value="compose">

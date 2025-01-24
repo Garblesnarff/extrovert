@@ -95,8 +95,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
       form.reset({
         content: initialPost.content,
         scheduledFor: initialPost.scheduledFor ? new Date(initialPost.scheduledFor) : undefined,
-        scheduledTime: initialPost.scheduledFor ?
-          new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+        scheduledTime: initialPost.scheduledFor ? 
+          new Date(initialPost.scheduledFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
           : undefined,
         isDraft: initialPost.isDraft,
         recurringPattern: null,
@@ -114,7 +114,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
         return;
       }
 
-      const result = await aiAssistant.mutateAsync({
+      const result = await aiAssistant.mutateAsync({ 
         prompt: content,
         provider: selectedProvider,
         model: selectedModel
@@ -143,8 +143,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
         : undefined;
 
       if (initialPost) {
-        await updatePost.mutateAsync({
-          id: initialPost.id,
+        await updatePost.mutateAsync({ 
+          id: initialPost.id, 
           ...data,
           scheduledFor: scheduledDate,
         });
@@ -284,8 +284,8 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
                 </TooltipProvider>
                 <Popover open={showSchedule} onOpenChange={setShowSchedule}>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
+                    <Button 
+                      variant="outline" 
                       type="button"
                       className={form.getValues('scheduledFor') && form.getValues('scheduledTime') ? 'bg-primary/10' : ''}
                     >
@@ -420,9 +420,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
           </form>
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={30}>
-          <ResearchAssistantPanel />
-        </ResizablePanel>
+        <ResearchAssistantPanel />
       </ResizablePanelGroup>
     </Form>
   );
