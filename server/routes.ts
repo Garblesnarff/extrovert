@@ -418,8 +418,8 @@ export function registerRoutes(app: Express) {
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
           pythonProcess.kill();
-          reject(new Error('Research process timed out after 300 seconds'));
-        }, 300000);
+          reject(new Error('Research process timed out after 600 seconds'));
+        }, 600000);
 
         pythonProcess.on('close', (code) => {
           clearTimeout(timeout);
@@ -440,7 +440,13 @@ export function registerRoutes(app: Express) {
       // Parse and format the research results
       let researchResults;
       try {
-        researchResults = JSON.parse(result);
+        const jsonStart = result.indexOf('{');
+        const jsonEnd = result.lastIndexOf('}');
+        if (jsonStart === -1 || jsonEnd === -1) {
+          throw new Error('No valid JSON found in output');
+        }
+        const jsonString = result.substring(jsonStart, jsonEnd + 1);
+        researchResults = JSON.parse(jsonString);
       } catch (parseError) {
         console.error('Failed to parse research results:', parseError);
         return res.status(500).json({
