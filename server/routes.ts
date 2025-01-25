@@ -437,28 +437,11 @@ export function registerRoutes(app: Express) {
         throw new Error(`Failed to complete research: ${error}`);
       }
 
-      // Parse and format the research results
-      let researchResults;
-      try {
-        const jsonStart = result.indexOf('{');
-        const jsonEnd = result.lastIndexOf('}');
-        if (jsonStart === -1 || jsonEnd === -1) {
-          throw new Error('No valid JSON found in output');
-        }
-        const jsonString = result.substring(jsonStart, jsonEnd + 1);
-        researchResults = JSON.parse(jsonString);
-      } catch (parseError) {
-        console.error('Failed to parse research results:', parseError);
-        return res.status(500).json({
-          error: 'Failed to parse research results',
-          details: 'Invalid response format from research service'
-        });
-      }
-
+      // Send the raw research results
       return res.json({
-        topics: researchResults?.topics || [],
-        insights: researchResults?.insights || '',
-        suggestedContent: researchResults?.enhanced_content || ''
+        insights: result,
+        topics: [],
+        suggestedContent: result
       });
 
     } catch (error) {
