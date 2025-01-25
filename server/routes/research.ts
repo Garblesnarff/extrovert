@@ -5,7 +5,7 @@ import path from 'path';
 const router = Router();
 
 router.post('/api/ai/research', async (req, res) => {
-  console.log("Entering /api/ai/research route handler"); // ADD THIS LINE
+  console.log("Entering /api/ai/research route handler"); 
   try {
     const { prompt } = req.body;
     if (!prompt) {
@@ -18,7 +18,7 @@ router.post('/api/ai/research', async (req, res) => {
     };
 
     // Spawn Python process to run research crew
-    console.log('Before spawning python process'); // ADD THIS LINE
+    console.log('Before spawning python process'); 
     const pythonProcess = spawn('python3', [
       path.join(__dirname, '../research_crew/main.py'),
       JSON.stringify(content)
@@ -28,7 +28,7 @@ router.post('/api/ai/research', async (req, res) => {
         PYTHONUNBUFFERED: '1'
       }
     });
-    console.log('After spawning python process'); // ADD THIS LINE
+    console.log('After spawning python process'); 
 
     let result = '';
     let error = '';
@@ -70,9 +70,15 @@ router.post('/api/ai/research', async (req, res) => {
     // Parse and format the research results
     let researchResults;
     try {
-      researchResults = JSON.parse(result);
+      // Clean the output and find JSON content
+      const jsonMatch = result.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON object found in response');
+      }
+      researchResults = JSON.parse(jsonMatch[0]);
     } catch (parseError) {
       console.error('Failed to parse research results:', parseError);
+      console.error('Raw result:', result);
       return res.status(500).json({
         error: 'Failed to parse research results',
         details: 'Invalid response format from research service'
