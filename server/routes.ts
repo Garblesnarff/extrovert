@@ -68,6 +68,7 @@ export function registerRoutes(app: Express) {
         content: string;
         scheduledFor: Date | null;
         isDraft: boolean;
+        status: string;
         recurringPattern: string | null;
         recurringEndDate: Date | null;
         createdAt: Date;
@@ -81,15 +82,9 @@ export function registerRoutes(app: Express) {
 
       const twitterClient = (await import('./lib/twitter')).default;
 
-      // If it's not a draft and not scheduled, post to Twitter immediately
-      if (!req.body.isDraft && !req.body.scheduledFor && req.body.postToTwitter) {
-        try {
-          const tweet = await twitterClient.postTweet(req.body.content);
-          req.body.tweetId = tweet.id;
-        } catch (error) {
-          console.error('Failed to post to Twitter:', error);
-          return res.status(500).json({ error: 'Failed to post to Twitter' });
-        }
+      // If it's not a draft and not scheduled, set status to scheduled
+      if (!req.body.isDraft && !req.body.scheduledFor) {
+        req.body.scheduledFor = new Date(); // Schedule for immediate posting
       }
 
       if (req.body.recurringPattern && req.body.scheduledFor && req.body.recurringEndDate) {
@@ -104,11 +99,11 @@ export function registerRoutes(app: Express) {
             content: req.body.content,
             scheduledFor: new Date(currentDate),
             isDraft: !!req.body.isDraft,
+            status: req.body.isDraft ? 'draft' : 'scheduled',
             recurringPattern: req.body.recurringPattern,
             recurringEndDate: new Date(endDate),
             createdAt: new Date(),
-            updatedAt: new Date(),
-            tweetId: req.body.tweetId
+            updatedAt: new Date()
           });
 
           // Calculate next date based on pattern
@@ -150,11 +145,11 @@ export function registerRoutes(app: Express) {
             content: req.body.content,
             scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
             isDraft: !!req.body.isDraft,
+            status: req.body.isDraft ? 'draft' : 'scheduled',
             recurringPattern: null,
             recurringEndDate: null,
             createdAt: new Date(),
-            updatedAt: new Date(),
-            tweetId: req.body.tweetId
+            updatedAt: new Date()
           };
 
           const post = await db.insert(posts).values(postData).returning();

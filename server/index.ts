@@ -3,6 +3,8 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { createServer } from "http";
 import rateLimit from 'express-rate-limit';
+import { PostScheduler } from './lib/scheduler';
+import { logger } from './lib/logger';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -17,7 +19,6 @@ const limiter = rateLimit({
 
 // Apply rate limiting to all routes
 app.use('/api/', limiter);
-
 
 function log(message: string) {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -61,6 +62,12 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize post scheduler with a 1-minute check interval
+  const scheduler = new PostScheduler({
+    checkInterval: 60000, // Check every minute
+    batchSize: 10 // Process up to 10 posts at a time
+  });
+
   registerRoutes(app);
   const server = createServer(app);
 
@@ -69,6 +76,7 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
+    logger.error(`Server error: ${message}`);
     throw err;
   });
 
@@ -86,5 +94,8 @@ app.use((req, res, next) => {
   const PORT = 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
+    // Start the scheduler after server is ready
+    scheduler.start();
+    logger.info('Post scheduler started with server');
   });
 })();

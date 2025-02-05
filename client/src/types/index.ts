@@ -5,6 +5,10 @@ export interface Post {
   isDraft: boolean;
   createdAt: Date;
   updatedAt: Date;
+  postedAt?: Date;
+  status: 'draft' | 'scheduled' | 'posted' | 'failed';
+  tweetId?: string;
+  error?: string;
 }
 
 export interface PostFormData {

@@ -18,6 +18,11 @@ export const posts = pgTable("posts", {
   userId: integer("user_id").references(() => users.id),
   recurringPattern: text("recurring_pattern"),
   recurringEndDate: timestamp("recurring_end_date"),
+  // New fields for post scheduling
+  postedAt: timestamp("posted_at"),
+  status: text("status").default('draft').notNull(),
+  tweetId: text("tweet_id"),
+  error: text("error"),
 });
 
 export const insertUserSchema = createInsertSchema(users);
