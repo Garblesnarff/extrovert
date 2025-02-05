@@ -151,8 +151,8 @@ export function PostComposer({ initialPost, onSuccess, preserveDraftState }: Pos
         const isImmediate = !data.isDraft && postToTwitter && !scheduledDate;
         await createPost.mutateAsync({
           ...data,
-          scheduledFor: isImmediate ? null : scheduledDate,
-          postToTwitter,
+          scheduledFor: isImmediate ? undefined : scheduledDate,
+          postToTwitter: isImmediate ? true : postToTwitter,
           isDraft: data.isDraft
         });
       }

@@ -82,84 +82,45 @@ export function registerRoutes(app: Express) {
 
       const twitterClient = (await import('./lib/twitter')).default;
 
-      // If it's not a draft and not scheduled, set status to scheduled
-      if (!req.body.isDraft && !req.body.scheduledFor) {
-        req.body.scheduledFor = new Date(); // Schedule for immediate posting
-      }
-
-      if (req.body.recurringPattern && req.body.scheduledFor && req.body.recurringEndDate) {
-        // Create recurring posts
-        const startDate = new Date(req.body.scheduledFor);
-        const endDate = new Date(req.body.recurringEndDate);
-        const postsToCreate: PostToCreate[] = [];
-        let currentDate = new Date(startDate);
-
-        while (currentDate <= endDate) {
-          postsToCreate.push({
-            content: req.body.content,
-            scheduledFor: new Date(currentDate),
-            isDraft: !!req.body.isDraft,
-            status: req.body.isDraft ? 'draft' : 'scheduled',
-            recurringPattern: req.body.recurringPattern,
-            recurringEndDate: new Date(endDate),
-            createdAt: new Date(),
-            updatedAt: new Date()
-          });
-
-          // Calculate next date based on pattern
-          const nextDate = new Date(currentDate);
-          switch (req.body.recurringPattern) {
-            case 'daily':
-              nextDate.setDate(nextDate.getDate() + 1);
-              break;
-            case 'weekly':
-              nextDate.setDate(nextDate.getDate() + 7);
-              break;
-            case 'monthly':
-              nextDate.setMonth(nextDate.getMonth() + 1);
-              break;
-          }
-          currentDate = nextDate;
-        }
-
+      // If it's not a draft and postToTwitter is true, post immediately
+      if (!req.body.isDraft && req.body.postToTwitter && !req.body.scheduledFor) {
+        // Post to Twitter immediately
         try {
-          // Insert first post and get the result
-          const result = await db.insert(posts).values(postsToCreate[0]).returning();
-
-          // Insert remaining posts if any
-          if (postsToCreate.length > 1) {
-            await Promise.all(postsToCreate.slice(1).map(post =>
-              db.insert(posts).values(post)
-            ));
-          }
-
-          res.json(result[0]); // Return the first post
-        } catch (error) {
-          console.error('Failed to create recurring posts:', error);
-          res.status(500).json({ error: 'Failed to create recurring posts' });
-        }
-      } else {
-        // Create single post
-        try {
+          const tweetResult = await twitterClient.tweet(req.body.content);
           const postData = {
             content: req.body.content,
-            scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
-            isDraft: !!req.body.isDraft,
-            status: req.body.isDraft ? 'draft' : 'scheduled',
+            scheduledFor: null, // Explicitly set to null for immediate posts
+            isDraft: false,
+            status: 'posted',
             recurringPattern: null,
             recurringEndDate: null,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            tweetId: tweetResult.id
           };
 
           const post = await db.insert(posts).values(postData).returning();
-          res.json(post[0]);
-        } catch (error) {
-          console.error('Failed to create single post:', error);
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-          res.status(500).json({ error: 'Failed to create post', details: errorMessage });
+          return res.json(post[0]);
+        } catch (twitterError) {
+          console.error('Twitter posting error:', twitterError);
+          return res.status(500).json({ error: 'Failed to post to Twitter' });
         }
       }
+
+      // Handle scheduled or draft posts as before...
+      const postData = {
+        content: req.body.content,
+        scheduledFor: req.body.scheduledFor ? new Date(req.body.scheduledFor) : null,
+        isDraft: !!req.body.isDraft,
+        status: req.body.isDraft ? 'draft' : 'scheduled',
+        recurringPattern: null,
+        recurringEndDate: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      const post = await db.insert(posts).values(postData).returning();
+      res.json(post[0]);
     } catch (error) {
       console.error('Post creation error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
