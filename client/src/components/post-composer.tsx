@@ -43,9 +43,10 @@ import type { PostFormData, Post } from '../types';
 interface PostComposerProps {
   initialPost?: Post;
   onSuccess?: () => void;
+  preserveDraftState?: boolean;  // Added new prop
 }
 
-export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
+export function PostComposer({ initialPost, onSuccess, preserveDraftState }: PostComposerProps) {
   const [showSchedule, setShowSchedule] = useState(false);
   const [showError, setShowError] = useState(false);
   const [suggestedTime, setSuggestedTime] = useState<string>();
@@ -143,6 +144,7 @@ export function PostComposer({ initialPost, onSuccess }: PostComposerProps) {
           id: initialPost.id,
           ...data,
           scheduledFor: scheduledDate,
+          isDraft: preserveDraftState ? initialPost.isDraft : data.isDraft, // Preserve draft state if requested
         });
       } else {
         await createPost.mutateAsync({

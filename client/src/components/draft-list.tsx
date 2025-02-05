@@ -187,7 +187,7 @@ export function DraftList() {
                       id: draft.id,
                       content: draft.content,
                       isDraft: false, // Only change isDraft when explicitly posting
-                      scheduledFor: null
+                      scheduledFor: undefined // Use undefined instead of null for the Date type
                     });
                   }}
                 >
