@@ -147,10 +147,13 @@ export function PostComposer({ initialPost, onSuccess, preserveDraftState }: Pos
           isDraft: preserveDraftState ? initialPost.isDraft : data.isDraft, // Preserve draft state if requested
         });
       } else {
+        // For new posts, handle immediate posting vs scheduling
+        const isImmediate = !data.isDraft && !scheduledDate && postToTwitter;
         await createPost.mutateAsync({
           ...data,
-          scheduledFor: scheduledDate,
-          postToTwitter: postToTwitter && !data.isDraft && !scheduledDate,
+          scheduledFor: isImmediate ? undefined : scheduledDate,
+          postToTwitter,
+          isDraft: data.isDraft
         });
       }
       form.reset();
