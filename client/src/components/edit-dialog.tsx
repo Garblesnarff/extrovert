@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { PostComposer } from './post-composer';
 import type { Post } from '../types';
 
@@ -15,8 +15,15 @@ export function EditDialog({ post, open, onOpenChange }: EditDialogProps) {
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Edit Post</DialogTitle>
+          <DialogDescription>
+            Make changes to your post. {post.isDraft ? 'This is currently saved as a draft.' : ''}
+          </DialogDescription>
         </DialogHeader>
-        <PostComposer initialPost={post} onSuccess={() => onOpenChange(false)} />
+        <PostComposer 
+          initialPost={post} 
+          onSuccess={() => onOpenChange(false)}
+          preserveDraftState={true} // New prop to ensure draft state is preserved
+        />
       </DialogContent>
     </Dialog>
   );

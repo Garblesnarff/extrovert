@@ -75,11 +75,12 @@ export function DraftList() {
 
       const data = await response.json();
 
-      // Update the draft with enhanced content
+      // Explicitly preserve draft state during update
       await updatePost.mutateAsync({
         id: draft.id,
         content: data.enhanced.suggestedContent,
-        isDraft: true,
+        isDraft: true, // Explicitly set isDraft to true
+        scheduledFor: draft.scheduledFor // Preserve scheduling if any
       });
 
       toast({
@@ -185,7 +186,8 @@ export function DraftList() {
                     updatePost.mutate({
                       id: draft.id,
                       content: draft.content,
-                      isDraft: false,
+                      isDraft: false, // Only change isDraft when explicitly posting
+                      scheduledFor: null
                     });
                   }}
                 >
