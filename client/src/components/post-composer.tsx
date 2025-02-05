@@ -43,7 +43,7 @@ import type { PostFormData, Post } from '../types';
 interface PostComposerProps {
   initialPost?: Post;
   onSuccess?: () => void;
-  preserveDraftState?: boolean;  // Added new prop
+  preserveDraftState?: boolean;
 }
 
 export function PostComposer({ initialPost, onSuccess, preserveDraftState }: PostComposerProps) {
@@ -144,14 +144,14 @@ export function PostComposer({ initialPost, onSuccess, preserveDraftState }: Pos
           id: initialPost.id,
           ...data,
           scheduledFor: scheduledDate,
-          isDraft: preserveDraftState ? initialPost.isDraft : data.isDraft, // Preserve draft state if requested
+          isDraft: preserveDraftState ? initialPost.isDraft : data.isDraft,
         });
       } else {
         // For new posts, handle immediate posting vs scheduling
-        const isImmediate = !data.isDraft && !scheduledDate && postToTwitter;
+        const isImmediate = !data.isDraft && postToTwitter && !scheduledDate;
         await createPost.mutateAsync({
           ...data,
-          scheduledFor: isImmediate ? undefined : scheduledDate,
+          scheduledFor: isImmediate ? null : scheduledDate,
           postToTwitter,
           isDraft: data.isDraft
         });

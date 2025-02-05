@@ -43,8 +43,8 @@ export function registerRoutes(app: Express) {
           desc(posts.createdAt)
         ],
       });
-      // Filter out posts without scheduledFor and ensure proper date handling
-      res.json(scheduled.filter(post => post.scheduledFor !== null));
+      // Only return posts that have a valid scheduledFor date
+      res.json(scheduled.filter(post => post.scheduledFor !== null && post.scheduledFor !== undefined));
     } catch (error) {
       console.error('Error fetching scheduled posts:', error);
       res.status(500).json({ error: 'Failed to fetch scheduled posts' });
